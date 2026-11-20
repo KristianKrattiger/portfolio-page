@@ -1,0 +1,22 @@
+{
+  "walk_date": "2026-11-20",
+  "method": "Read-only. Repos read with git show / git log at recorded SHAs; branch and SHA recorded before reading; no checkout, fetch, stash, commit or reset outside ~/portfolio. Full file list with mtimes: SOURCES.md in the source folder (not published).",
+  "walked": [
+    {"what": "GIN repo", "detail": "main @ 84abb9a (clean): README, architecture headings, sear/, gin/bookkeeper/, docs/ specs for stance channel, hedge-word, bi-encoder detector, decline eval, node6 setup, Epistemic Council; eval_runs metrics for 20260702T012203Z, 20260705T043114Z, 20260705T211452Z, 20260713T* (4 judge runs), 20260714T175645Z, 20260716T095519Z, 20260716T095704Z, 20260725T093515Z; data/frames/encoder_sweep.json; corpus_node1-3 headers. Branch docs/gin-15-clean-answer @ 20e6372: GIN_15_Clean_Answer.md front matter and abstract."},
+    {"what": "Receipts repo", "detail": "main @ 9a0eeb8 (2 untracked files, not read): README, reports/tesla-fsd.json, relation-measure-check spec results."},
+    {"what": "Assay repo", "detail": "main @ 2b6878e (clean, no remote): README, CHANGELOG, test file count."},
+    {"what": "sear-demo repo", "detail": "main @ 730ad1d (untracked .claude/, runs/): README results and limits, config/default.yaml; untracked logs runs/8a165f6-base/corpus_stdout.txt and poisoned_stdout.txt read from disk."},
+    {"what": "Latch repo", "detail": "main @ 3a76b7b (clean) for README and HISTORY; branch study3-agent-gate @ cdcd512 via git show for POSTMORTEM, PREREG, paper.tex abstract, study2 phase2 report and PREREG-2, study3 RESULTS. The study3 worktree is dirty (modified files, untracked paper/); only committed content was used."},
+    {"what": "Author's vault (notes)", "detail": "AGENTS.md house rules; project nodes GIN, SEAR, Assay, Cartographer-Bookkeeper Gate, IDF Divergence Gate, Typed Refusal, Latch, receipts, sear-demo; registry line for 'sprawl'. Grep-only searches of distilled sessions for two seed figures."},
+    {"what": "Sprawl folder", "detail": "Found under the desktop 'Orca Workspaces' folder. It is empty; the sprawl/README.md and sprawl LOG.md referenced by Latch docs were not found anywhere searched."}
+  ],
+  "not_walked": [
+    "Other repos in the projects folder (names withheld here): outside the four named projects, and some may touch topics excluded from this site.",
+    "Vault: Career/, CSUF/, Journey/, Frameworks/, Inbox/, Polymathy/, Ideas/, Skills/ and personal logs: personal or job-search material, excluded by the brief. Files whose names surfaced in a grep were skipped unread.",
+    "GIN: most docs (GIN_00 to GIN_14 conceptual papers, strategy register, executive briefs), most eval runs, test suites (not run), Merkle anchor-sync metrics.",
+    "Receipts and Assay source code beyond directory presence; Receipts fixtures and labels file contents; test suites (not run).",
+    "sear-demo source beyond config; the review document behind seed entry 12 (not found).",
+    "Latch: LOG.md in full, run files, study3 audit CSV, the untracked paper/ directory in the worktree.",
+    "Anything under .git internals, venvs, node_modules, caches, model weights, binaries."
+  ]
+}

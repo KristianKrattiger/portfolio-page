@@ -1,0 +1,8 @@
+{
+  "_comment": "Local repo paths for verify.py's LINKED-at-SHA check. Not published to dist/.",
+  "GIN": "C:/Users/krist/Projects/GIN",
+  "receipts": "C:/Users/krist/Projects/receipts",
+  "assay": "C:/Users/krist/Projects/assay",
+  "sear-demo": "C:/Users/krist/Projects/sear-demo",
+  "Latch": "C:/Users/krist/Projects/Latch"
+}

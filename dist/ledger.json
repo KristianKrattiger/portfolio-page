@@ -1,0 +1,1438 @@
+{
+  "generated_from": "content/ledger.yaml",
+  "build_date": "2026-11-20",
+  "stale_rule": "as_of older than 90 days before build_date; month-precision dates count from the 1st",
+  "hidden_entries_excluded": 2,
+  "counts": {
+    "by_state": {
+      "MEASURED": 4,
+      "BUILT": 9,
+      "IN-PROGRESS": 2,
+      "DESIGN-ONLY": 4,
+      "BLOCKED": 1,
+      "NOT-DONE": 3,
+      "KILLED": 1,
+      "NEGATIVE-RESULT": 11
+    },
+    "by_verification": {
+      "LINKED": 15,
+      "AUTHOR-REPORTED": 20
+    },
+    "stale": 9
+  },
+  "entries": [
+    {
+      "as_of": "2026-07-27",
+      "claim": "Adding a quantity/stance channel to the Cartographer relation detector raised its contradiction precision on a synthetic same-story corpus without losing recall.",
+      "disagreement": "The seed paired 0.632 -> 0.923 as one metric. In the spec, 0.632 is the within-event baseline and 0.923 is the cross-event-inclusive precision after the change; they are different metrics. The seed called the channel 'model-free'; the measured pipeline includes an NLI model. Verification stays AUTHOR-REPORTED because the numbers are in a spec's results section, not a committed eval output.",
+      "does_not_show": "Performance on text the author did not write. The corpus is synthetic and its patterns were authored by the person who labeled it, which is why Node6 (a blind collaborator corpus) was set up.",
+      "evidence": [
+        {
+          "repo": "GIN",
+          "path": "docs/superpowers/specs/2026-07-27-quantity-hedge-word-stopword-design.md",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 2,
+          "dirty": false,
+          "note": "results table, 'End-to-end node5, real models'"
+        },
+        {
+          "repo": "GIN",
+          "path": "docs/superpowers/specs/2026-07-26-same-story-stance-channel-design.md",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 2,
+          "dirty": false,
+          "note": "baseline P = 12/19 = 0.632; 'Node5 is synthetic'"
+        }
+      ],
+      "id": "gin-cartographer-stance",
+      "measurements": [
+        {
+          "metric": "within-event precision",
+          "value": "0.632 -> 1.000",
+          "denominator": "12/19 -> 12/12 (tp 12, fp 0)",
+          "dataset": "node5 same-story corpus, authored by the same person who labeled it",
+          "synthetic": true,
+          "system": "Cartographer + stance channel, all-MiniLM-L6-v2 + nli-deberta-v3-xsmall, scripts/eval_node5_stance.py",
+          "date": "2026-07-27"
+        },
+        {
+          "metric": "precision incl. cross-event pairs",
+          "value": "0.500 -> 0.923",
+          "denominator": "tp 12, fp 1 after",
+          "dataset": "same",
+          "synthetic": true,
+          "system": "same",
+          "date": "2026-07-27"
+        },
+        {
+          "metric": "recall",
+          "value": "1.000",
+          "denominator": "12 of 12",
+          "dataset": "same",
+          "synthetic": true,
+          "system": "same",
+          "date": "2026-07-27"
+        }
+      ],
+      "project": "gin",
+      "state": "MEASURED",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": true
+    },
+    {
+      "as_of": "2026-07-05",
+      "claim": "On six two-node queries over excerpts of public institutional and advocacy texts, the no-continuation arm kept both sides of each divergence and fabricated nothing, with Mistral-7B and with Qwen2.5-7B.",
+      "does_not_show": "Generality. Six queries on one pair of corpora is a demonstration, not a benchmark. Two model families agreeing on six queries is weak evidence of model independence.",
+      "evidence": [
+        {
+          "repo": "GIN",
+          "path": "data/eval_runs/20260705T043114Z/metrics.json",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "Mistral-7B run"
+        },
+        {
+          "repo": "GIN",
+          "path": "data/eval_runs/20260705T211452Z/metrics.json",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "Qwen2.5-7B run"
+        },
+        {
+          "repo": "GIN",
+          "path": "corpus_node1.json",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "sources attributed to IPCC and others"
+        }
+      ],
+      "id": "gin-divergence-realtext",
+      "measurements": [
+        {
+          "metric": "divergence fidelity",
+          "value": "1.000",
+          "denominator": "6 queries",
+          "dataset": "data/eval/queryset_twonode.yaml over corpus_node1/2 (excerpts attributed to public sources)",
+          "synthetic": "no, per README ('real fetched two-node text'); verbatim match to the sources not re-checked in the walk",
+          "system": "no-continuation arm, Mistral-7B-Instruct-v0.3 Q6_K",
+          "date": "2026-07-05"
+        },
+        {
+          "metric": "fabrication rate",
+          "value": "0.000",
+          "denominator": "0 of 10 claims, 6 queries",
+          "dataset": "same",
+          "synthetic": "no, per README",
+          "system": "no-continuation arm, Mistral-7B-Instruct-v0.3 Q6_K",
+          "date": "2026-07-05"
+        },
+        {
+          "metric": "fabrication rate",
+          "value": "0.000",
+          "denominator": "0 of 8 claims, 6 queries",
+          "dataset": "same",
+          "synthetic": "no, per README",
+          "system": "no-continuation arm, Qwen2.5-7B-Instruct Q6_K",
+          "date": "2026-07-05"
+        },
+        {
+          "metric": "divergence fidelity, comparison arm",
+          "value": "0.000",
+          "denominator": "6 queries",
+          "dataset": "same",
+          "synthetic": "no, per README",
+          "system": "plain RAG arm, Qwen2.5-7B-Instruct Q6_K",
+          "date": "2026-07-05"
+        }
+      ],
+      "project": "gin",
+      "state": "MEASURED",
+      "verification": "LINKED",
+      "visibility": "public",
+      "stale": true
+    },
+    {
+      "as_of": "2026-07-16",
+      "claim": "GIN's federation layer passed its own bars for delegation, peer selection, per-domain trust gating and mutual TLS, on up to three nodes running on one machine.",
+      "disagreement": "Seed said 'measured on a live 3-node deployment'. The artifacts show three nodes, all local to one machine.",
+      "does_not_show": "A deployment across machines or a real network. All three nodes ran on one machine over the loopback interface. Query sets are 6 and 8 queries. No load, latency or adversarial-peer testing.",
+      "evidence": [
+        {
+          "repo": "GIN",
+          "path": "data/eval_runs/20260714T175645Z/federation_metrics.json",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "two-node delegation"
+        },
+        {
+          "repo": "GIN",
+          "path": "data/eval_runs/20260716T095519Z/peer_selection_metrics.json",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "three nodes over mTLS, ungated"
+        },
+        {
+          "repo": "GIN",
+          "path": "data/eval_runs/20260716T095704Z/peer_selection_metrics.json",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "three nodes over mTLS, trust-gated"
+        },
+        {
+          "repo": "GIN",
+          "path": "README.md",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 2,
+          "dirty": false,
+          "note": "status table; node C CPU-only so three 7B models fit one GPU"
+        }
+      ],
+      "id": "gin-federation",
+      "measurements": [
+        {
+          "metric": "routing false positives / routing recall / routed fabrication / honest refusal",
+          "value": "0 / 1.0 / 0.0 / 1.0",
+          "denominator": "6 queries",
+          "dataset": "data/eval/queryset_federation.yaml over corpus_node1/2",
+          "synthetic": "no, per README; not re-checked",
+          "system": "two GIN nodes on one machine (loopback), sovereign delegation",
+          "date": "2026-07-14"
+        },
+        {
+          "metric": "peer selection precision@1 / routed fabrication / honest refusal",
+          "value": "1.0 / 0.0 / 1.0",
+          "denominator": "8 queries",
+          "dataset": "data/eval/queryset_peer_selection.yaml over corpus_node1-3",
+          "synthetic": "no, per README; not re-checked",
+          "system": "three GIN nodes on one machine, mutual TLS, ungated",
+          "date": "2026-07-16"
+        },
+        {
+          "metric": "gated peer contacted",
+          "value": "0",
+          "denominator": "8 queries",
+          "dataset": "same",
+          "synthetic": "no, per README; not re-checked",
+          "system": "three GIN nodes on one machine, mutual TLS, trust-gated config",
+          "date": "2026-07-16"
+        }
+      ],
+      "notes": "Merkle anchor sync (run 20260715T073932Z) and streaming are listed in the README; the anchor-sync metrics file was not opened in the walk, so those two sub-projects (also built, per the README) are not part of this claim.",
+      "project": "gin",
+      "state": "MEASURED",
+      "verification": "LINKED",
+      "visibility": "public",
+      "stale": true
+    },
+    {
+      "as_of": "2026-07-02",
+      "claim": "On a 20-query synthetic eval set, SEAR's no-continuation arm produced no fabricated claims, while a plain RAG arm on the same set fabricated about a quarter of its claims.",
+      "disagreement": "The seed ledger said the Phase 1 fabrication result was 'model-independent across families'. The repo's model-independence claim is about the two-node divergence query sets (see gin-divergence-realtext), not this baseline, which ran on one model.",
+      "does_not_show": "Performance on real-world corpora (this set is synthetic and author-built). The overlap verifier is lexical, so it cannot see a false relation built from real spans. Twenty queries is a small set.",
+      "evidence": [
+        {
+          "repo": "GIN",
+          "path": "data/eval_runs/20260702T012203Z/metrics.json",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "per-arm metrics"
+        },
+        {
+          "repo": "GIN",
+          "path": "data/eval_runs/20260702T012203Z/meta.json",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "model, verifier mode, n_queries"
+        }
+      ],
+      "id": "gin-nc-baseline",
+      "measurements": [
+        {
+          "metric": "fabrication rate (overlap verifier, threshold 0.5)",
+          "value": "0.000",
+          "denominator": "0 of 21 claims, 20 queries",
+          "dataset": "data/synthetic/news_corpus.yaml + data/eval/queryset.yaml",
+          "synthetic": true,
+          "system": "SEAR no-continuation arm, Mistral-7B-Instruct-v0.3 Q6_K, CPU",
+          "date": "2026-07-02"
+        },
+        {
+          "metric": "query relevance rate",
+          "value": "1.000",
+          "denominator": "20 queries (rate as defined in gin/eval; not re-derived in the walk for this site)",
+          "dataset": "same synthetic set",
+          "synthetic": true,
+          "system": "SEAR no-continuation arm, Mistral-7B-Instruct-v0.3 Q6_K, CPU",
+          "date": "2026-07-02"
+        },
+        {
+          "metric": "fabrication rate, comparison arm",
+          "value": "0.238",
+          "denominator": "about 5 of 21 claims (0.238 x 21; count not stored separately)",
+          "dataset": "same synthetic set",
+          "synthetic": true,
+          "system": "plain RAG arm, same model",
+          "date": "2026-07-02"
+        }
+      ],
+      "notes": "README at 84abb9a also reports an NLI-verifier rerun on the expanded set (run 20260712T035228Z): overall NLI fabrication 0.056 on a counterfactual entailment miss. That run's files were not opened in the walk for this site.",
+      "project": "gin",
+      "state": "MEASURED",
+      "verification": "LINKED",
+      "visibility": "public",
+      "stale": true
+    },
+    {
+      "as_of": "2026-10-04",
+      "claim": "The Bookkeeper is the single admission gate for GIN's graph state: it checks a confidence floor, endpoint existence, self-loops, anchor integrity, duplicates and DAG acyclicity, then stamps provenance on what it admits.",
+      "does_not_show": "Any measurement of the Bookkeeper. The walk found code and tests, not an eval output for the gate itself. The checks are structural; they do not judge whether an admitted relation is true.",
+      "evidence": [
+        {
+          "repo": "GIN",
+          "path": "gin/bookkeeper/bookkeeper.py",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "module docstring and admission checks"
+        },
+        {
+          "repo": "GIN",
+          "path": "tests/test_bookkeeper.py",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "exists; not run for this site"
+        }
+      ],
+      "id": "gin-bookkeeper",
+      "project": "gin",
+      "reported_result": "Seed ledger: 'reported measured'.",
+      "state": "BUILT",
+      "verification": "LINKED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-10-04",
+      "claim": "GIN's SEAR layer constrains every generated token, at decode time, to continue a span that occurs verbatim in the retrieved corpus, using a custom llama-cpp-python logits processor.",
+      "does_not_show": "That the constrained output is correct or fair to its source. Verbatim spans can still be selected or juxtaposed misleadingly. It also does not show behaviour on native Windows: the repo notes the generation path is only exercised under Linux/WSL.",
+      "evidence": [
+        {
+          "repo": "GIN",
+          "path": "sear/processor.py",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "constraint implementation"
+        },
+        {
+          "repo": "GIN",
+          "path": "README.md",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 2,
+          "dirty": false,
+          "note": "SEAR section: sparse, anchored, cursor tracking, zero cursors"
+        }
+      ],
+      "id": "gin-sear-decode-constraint",
+      "notes": "Stack per README at 84abb9a: Python, Postgres + pgvector, sentence-transformers all-MiniLM-L6-v2, llama-cpp-python, Mistral-7B-Instruct-v0.3 GGUF as the reference model. The seed dated this Aug 2026; the HEAD commit is 2026-10-04 and the eval runs are July 2026.",
+      "project": "gin",
+      "state": "BUILT",
+      "verification": "LINKED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-10-03",
+      "claim": "'GIN 15: The Clean Answer' is a working-draft design asking how much of the grounding constraint one model can carry inside its own generation; nothing in it is implemented or tested.",
+      "does_not_show": "Any implementation or result. The draft's own short answer is that training buys cost, not trust, and the checking stays outside the model.",
+      "evidence": [
+        {
+          "repo": "GIN",
+          "path": "docs/GIN_15_Clean_Answer.md",
+          "branch": "docs/gin-15-clean-answer",
+          "sha": "20e6372",
+          "tier": 2,
+          "dirty": false,
+          "note": "front matter: version 0.9-preliminary, status working draft; not merged to main"
+        }
+      ],
+      "id": "gin-15-clean-answer",
+      "project": "gin",
+      "state": "DESIGN-ONLY",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-07-11",
+      "claim": "The epistemic council, an institution to hold GIN's validity layer and weighting, exists only as a working-draft document.",
+      "does_not_show": "Any implementation or test of council weighting.",
+      "evidence": [
+        {
+          "repo": "GIN",
+          "path": "docs/GIN_10_Epistemic_Council.md",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 2,
+          "dirty": false,
+          "note": "version 0.4-preliminary, status working draft"
+        }
+      ],
+      "id": "gin-epistemic-council",
+      "project": "gin",
+      "state": "DESIGN-ONLY",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": true
+    },
+    {
+      "as_of": "2026-10-04",
+      "claim": "A Tier-2 relay mesh over Tailscale is a deployment target in GIN's design, not something I have built.",
+      "does_not_show": "Anything running. No mesh deployment artifact was found.",
+      "evidence": [
+        {
+          "repo": "GIN",
+          "path": "README.md",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 2,
+          "dirty": false,
+          "note": "Stack: 'mesh networking for Tier 2 relay topology (deployment target)'"
+        }
+      ],
+      "id": "gin-tailscale-mesh",
+      "project": "gin",
+      "state": "DESIGN-ONLY",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-07-25",
+      "blocked_by": "Labeled pairs: after the leak fix the gauge read issue_frame 24, agree 9, unrelated 6 against a target of 20 per class.",
+      "claim": "The framing corpus / Curator labeling program is blocked on labeled data at scale.",
+      "does_not_show": "Current label counts. The gauge reading is from 2026-07-25; the label store was not queried.",
+      "evidence": [
+        {
+          "repo": "GIN",
+          "path": "docs/superpowers/specs/2026-07-24-bi-encoder-frame-detector-design.md",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 2,
+          "dirty": false,
+          "note": "readiness gauge after leak fix: issue_frame 24 / agree 9 / unrelated 6 against a 20-per-class target, NOT ready"
+        },
+        {
+          "repo": "GIN",
+          "path": "docs/curator-labeling-guide.md",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 2,
+          "dirty": false,
+          "note": "labeling protocol exists"
+        }
+      ],
+      "id": "gin-framing-curator",
+      "notes": "Seed listed this as IN-PROGRESS + BLOCKED. One state per entry, so it is BLOCKED here; the Curator UI and label store exist (README status table).",
+      "project": "gin",
+      "state": "BLOCKED",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": true
+    },
+    {
+      "as_of": "2026-10-04",
+      "claim": "Node6, the first corpus to be written by a collaborator blind to the detector's internals, is set up but not executed.",
+      "does_not_show": "Any node6 corpus or result. No corpus_node6 file exists in the tree at 84abb9a (absence in the walk, not proof it does not exist elsewhere).",
+      "evidence": [
+        {
+          "repo": "GIN",
+          "path": "docs/node6-collaborator-setup.md",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 2,
+          "dirty": false,
+          "note": "setup doc, committed 2026-07-28 (9d6b6af)"
+        }
+      ],
+      "id": "gin-node6",
+      "project": "gin",
+      "state": "NOT-DONE",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-10-23",
+      "claim": "Phase 4, the SEAR training loop, has not been built; I closed it on purpose until there is a reason to train a model on relation-versus-relatedness detection.",
+      "does_not_show": "Whether training would help. Nothing has been trained.",
+      "evidence": [
+        {
+          "repo": "GIN",
+          "path": "README.md",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 2,
+          "dirty": false,
+          "note": "'Phase 4 (SEAR training loop) remains open'"
+        },
+        {
+          "repo": "vault",
+          "path": "CALICHE/Projects/GIN/GIN.md",
+          "branch": "n/a",
+          "sha": "n/a",
+          "tier": 3,
+          "dirty": false,
+          "note": "closed on purpose as of 2026-10-23"
+        }
+      ],
+      "id": "gin-phase4",
+      "project": "gin",
+      "state": "NOT-DONE",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-10-04",
+      "claim": "Letting the local SEAR proposer decline a pairing failed its bar: it declined 25 of 30 no-relation rows but kept only 2 of 5 rows that bear on the claim.",
+      "does_not_show": "Whether the bar or the labels are too strict: with about four independent positives, 'too strict' cannot be told apart from 'generous labels' (the spec's own caveat).",
+      "evidence": [
+        {
+          "repo": "GIN",
+          "path": "docs/superpowers/specs/2026-10-04-sear-relation-decline-design.md",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 2,
+          "dirty": false,
+          "note": "Results section, recorded in commit ae219b6"
+        }
+      ],
+      "id": "gin-decline-eval",
+      "notes": "Context in the same spec: blind hand-labels from 2026-09-25 found 0 of 21 SEAR relational rows were real relations (Tesla 0/11, Vercel 0/10). Not in the seed; added from the walk.",
+      "project": "gin",
+      "results": [
+        {
+          "metric": "no-relation rows declined",
+          "value": "25/30 (bar >= 24)",
+          "denominator": "30 labeled no-relation rows (26 distinct prompts)",
+          "dataset": "Receipts fixtures/relation-labels.json (author's hand labels on live vendor-ledger rows)",
+          "synthetic": false,
+          "system": "Qwen2.5-7B-Instruct Q6_K via SEAR proposer, GIN at bc38799",
+          "date": "2026-10-04"
+        },
+        {
+          "metric": "bearing rows kept",
+          "value": "2/5 (bar >= 4)",
+          "denominator": "5 labeled bearing rows (about 4 independent)",
+          "dataset": "same",
+          "synthetic": false,
+          "system": "same",
+          "date": "2026-10-04"
+        },
+        {
+          "metric": "live relational attempts kept",
+          "value": "3/112",
+          "denominator": "112 attempts across Tesla and Vercel ledgers",
+          "dataset": "live Receipts corpora",
+          "synthetic": false,
+          "system": "same",
+          "date": "2026-10-04"
+        }
+      ],
+      "state": "NEGATIVE-RESULT",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-07-25",
+      "claim": "Frozen sentence-embedding geometry did not separate issue-framing divergence: five encoders, including an NLI-trained one, each recovered 0 of 4 issue_frame pairs.",
+      "does_not_show": "That no learned method can detect framing. Four positive pairs is a very small target; the sweep says frozen geometry does not get there, nothing more.",
+      "evidence": [
+        {
+          "repo": "GIN",
+          "path": "data/frames/encoder_sweep.json",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "verdict 'framing_not_recoverable_frozen'; committed in 22a16a9"
+        }
+      ],
+      "id": "gin-encoder-sweep",
+      "project": "gin",
+      "results": [
+        {
+          "metric": "issue_frame recall, per encoder",
+          "value": "0.0 for all-MiniLM-L6-v2, all-mpnet-base-v2, nli-mpnet-base-v2, e5-large-v2, bge-large-en-v1.5",
+          "denominator": "0 of 4 issue_frame pairs each",
+          "dataset": "102 labeled pairs (AGREE 20, UNRELATED 20, DIVERGENT 24, RELATED_UNTYPED 38)",
+          "synthetic": "UNKNOWN — mix of author-built fixtures and node4 policy pairs",
+          "system": "frozen encoders, no fine-tuning",
+          "date": "2026-07-25"
+        }
+      ],
+      "state": "NEGATIVE-RESULT",
+      "verification": "LINKED",
+      "visibility": "public",
+      "stale": true
+    },
+    {
+      "as_of": "2026-07-25",
+      "claim": "The project's own final review found that 3 of the 4 bar pairs had leaked into the training set of a bi-encoder frame detector through byte-identical aliases; on the cleaned 49-row set it still failed its bar with issue_frame recall 0.00.",
+      "does_not_show": "Which of the three committed frame_detector runs corresponds to the cleaned set. The metrics file opened in the walk shows a LOO n of 102.",
+      "evidence": [
+        {
+          "repo": "GIN",
+          "path": "docs/superpowers/specs/2026-07-24-bi-encoder-frame-detector-design.md",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 2,
+          "dirty": false,
+          "note": "Results: leakage defect, 80 -> 49 rows, bar_failed"
+        },
+        {
+          "repo": "GIN",
+          "path": "data/eval_runs/20260725T093515Z/frame_detector_metrics.json",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "issue_frame_recall 0.0, bar_all_green false; its LOO block reads n=102, not reconciled here with the spec's 49 rows"
+        }
+      ],
+      "id": "gin-frame-detector-leak",
+      "project": "gin",
+      "results": [
+        {
+          "metric": "issue_frame recall (bar)",
+          "value": "0.00",
+          "denominator": "0 of 4",
+          "dataset": "cleaned 49-row training set per spec",
+          "synthetic": "UNKNOWN",
+          "system": "bi-encoder frame detector",
+          "date": "2026-07-25"
+        }
+      ],
+      "state": "NEGATIVE-RESULT",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": true
+    },
+    {
+      "as_of": "2026-07-13",
+      "claim": "A bigger LLM judge did not detect issue-framing contradictions better: recall on the 4 gold pairs went 2, 1, 2, then 0 across Mistral-7B, a Qwen 14B MoE, Qwen2.5-14B and a frontier model.",
+      "disagreement": "The seed merged this with the encoder sweep into one entry ('recall 0.000 across 5 encoders ... did not rise with model capability'). They are two experiments: the encoder sweep (0/4 for all five) and this judge sweep (non-monotonic, ending at 0/4).",
+      "does_not_show": "That framing is undetectable. The README's own reading is that the frontier judge read the pairs as corroborating or unrelated and disagreed with the gold, so the 'contradicts' label is a contestable curatorial stance. Four gold pairs cannot separate 'judge is weak' from 'label is arguable'.",
+      "evidence": [
+        {
+          "repo": "GIN",
+          "path": "data/eval_runs/20260713T092010Z/escalation_judge_metrics.json",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "Mistral-7B-Instruct-v0.3 Q6_K: 0.5"
+        },
+        {
+          "repo": "GIN",
+          "path": "data/eval_runs/20260713T190431Z/escalation_judge_metrics.json",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "Qwen3.6-14B-A3B MoE Q4_K_M: 0.25"
+        },
+        {
+          "repo": "GIN",
+          "path": "data/eval_runs/20260713T192930Z/escalation_judge_metrics.json",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "Qwen2.5-14B-Instruct Q4_K_M: 0.5"
+        },
+        {
+          "repo": "GIN",
+          "path": "data/eval_runs/20260713T223653Z/escalation_judge_metrics.json",
+          "branch": "main",
+          "sha": "84abb9a",
+          "tier": 1,
+          "dirty": false,
+          "note": "claude-opus-4-8: 0.0"
+        }
+      ],
+      "id": "gin-judge-capability",
+      "project": "gin",
+      "results": [
+        {
+          "metric": "issue_frame recall",
+          "value": "0.50 / 0.25 / 0.50 / 0.00",
+          "denominator": "2/4, 1/4, 2/4, 0/4 gold pairs",
+          "dataset": "33-pair labeled breadth set (4 issue_frame gold pairs)",
+          "synthetic": "UNKNOWN — author-labeled pairs from GIN's corpora",
+          "system": "escalation judge: Mistral-7B, Qwen3.6-14B-A3B, Qwen2.5-14B, claude-opus-4-8",
+          "date": "2026-07-13"
+        }
+      ],
+      "state": "NEGATIVE-RESULT",
+      "verification": "LINKED",
+      "visibility": "public",
+      "stale": true
+    },
+    {
+      "as_of": "2026-11-20",
+      "claim": "Structural checks on synthetic corpora are not quality checks: 6 of 21 'negative' pairs were contradictions smuggled in, caught only by human review.",
+      "does_not_show": "UNKNOWN — author to supply. No primary artifact found in the context walked (searched the GIN repo docs and the vault's distilled sessions for the figure).",
+      "evidence": "UNKNOWN",
+      "id": "gin-smuggled-pairs",
+      "notes": "From the seed ledger only. as_of is the date the seed was received, not a date of the finding.",
+      "project": "gin",
+      "state": "NEGATIVE-RESULT",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-10-09",
+      "claim": "sear-demo is a corpus-grounded answer pipeline with a verification gate: the model writes freely, then each claim must be entailed by its cited chunk (NLI) and every name and number must appear in it, or the claim is dropped; an explicit failure state replaces guessing.",
+      "does_not_show": "Decode-time constraint: this is SEAR's verify-after stage, not GIN's decode-time mask. Verified is not true: the gate enforces the corpus, not the world (see sear-poisoned-fork).",
+      "evidence": [
+        {
+          "repo": "sear-demo",
+          "path": "README.md",
+          "branch": "main",
+          "sha": "730ad1d",
+          "tier": 2,
+          "dirty": true,
+          "note": "description; untracked .claude/ in worktree"
+        },
+        {
+          "repo": "sear-demo",
+          "path": "config/default.yaml",
+          "branch": "main",
+          "sha": "730ad1d",
+          "tier": 1,
+          "dirty": true,
+          "note": "microsoft/phi-4 generator, cross-encoder/nli-deberta-v3-base verifier"
+        },
+        {
+          "repo": "sear-demo",
+          "path": "src",
+          "branch": "main",
+          "sha": "730ad1d",
+          "tier": 1,
+          "dirty": true,
+          "note": "pipeline source"
+        }
+      ],
+      "id": "sear-demo-pipeline",
+      "project": "sear",
+      "state": "BUILT",
+      "verification": "LINKED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-10-07",
+      "claim": "On its 27-probe main set, sear-demo refused all 9 probes that should be refused, but 5 of its 14 failure states were on probes that had a supportable answer.",
+      "does_not_show": "A measurement. The README says every number is a smoke test, not a measurement (13 chunks, 27 + 6 + 5 probes). Retrieval is not tested: top_k 12 of 13 chunks means the generator sees almost the whole corpus.",
+      "evidence": [
+        {
+          "repo": "sear-demo",
+          "path": "runs/8a165f6-base/corpus_stdout.txt",
+          "branch": "main (untracked)",
+          "sha": "8a165f6",
+          "tier": 1,
+          "dirty": true,
+          "note": "log opened on disk; header names commit 8a165f6; runs/ is not tracked by git, so this cannot be LINKED"
+        },
+        {
+          "repo": "sear-demo",
+          "path": "README.md",
+          "branch": "main",
+          "sha": "730ad1d",
+          "tier": 2,
+          "dirty": true,
+          "note": "Results and Known limits"
+        }
+      ],
+      "id": "sear-demo-results",
+      "notes": "Kept at BUILT, not MEASURED, because the author labels these smoke tests and the primary logs are untracked.",
+      "project": "sear",
+      "results": [
+        {
+          "metric": "failure-state recall",
+          "value": "9/9",
+          "denominator": "9 probes that should refuse (5 out-of-corpus, 4 near-miss)",
+          "dataset": "hand-built film corpus, 13 chunks, 27 probes",
+          "synthetic": "author-built from public film facts",
+          "system": "phi-4 generator + nli-deberta-v3-base + names-and-numbers check, commit 8a165f6",
+          "date": "2026-10-07"
+        },
+        {
+          "metric": "failure-state precision",
+          "value": "9/14",
+          "denominator": "14 failure states",
+          "dataset": "same",
+          "synthetic": "author-built",
+          "system": "same",
+          "date": "2026-10-07"
+        },
+        {
+          "metric": "fabrication rate, emitted / raw (proposed definition)",
+          "value": "0/13 / 2/27",
+          "denominator": "13 probes that answered / 27 probes",
+          "dataset": "same",
+          "synthetic": "author-built",
+          "system": "same",
+          "date": "2026-10-07"
+        }
+      ],
+      "state": "BUILT",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-10-09",
+      "claim": "A sear-demo walkthrough is being prepared; the latest commit adds a plan for a library corpus.",
+      "does_not_show": "A finished or public demo. The 85 tests the README describes were not run for this site; the author's notes of 2026-10-22 say they had not been run.",
+      "evidence": [
+        {
+          "repo": "sear-demo",
+          "path": "docs/DESIGN.md",
+          "branch": "main",
+          "sha": "730ad1d",
+          "tier": 2,
+          "dirty": true,
+          "note": "demo script (per commit 6558888)"
+        }
+      ],
+      "id": "sear-demo-status",
+      "project": "sear",
+      "state": "IN-PROGRESS",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-10",
+      "claim": "A review of sear-demo found measurement gaps (narrator-probe denominators, inverted control values, misattributed failure states); whether each is fixed is unknown.",
+      "does_not_show": "UNKNOWN — author to supply: which review, and the fix status of each gap. The review document was not found in the walk.",
+      "evidence": "UNKNOWN",
+      "id": "sear-review-gaps",
+      "notes": "The README at 730ad1d now prints narrator denominators and splits failure states into generator refusals and gate withholds, and notes an exemption bug fixed at f91cfbd. These cannot be mapped to the review items without the review.",
+      "project": "sear",
+      "state": "IN-PROGRESS",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-10-07",
+      "claim": "When two retrieved chunks contradict each other, sear-demo does not notice: in 4 of 5 conflict probes it silently stated one value, each time the one the model knew from memory.",
+      "does_not_show": "A fix. No conflict detector is built.",
+      "evidence": [
+        {
+          "repo": "sear-demo",
+          "path": "README.md",
+          "branch": "main",
+          "sha": "730ad1d",
+          "tier": 2,
+          "dirty": true,
+          "note": "Conflict fork table"
+        },
+        {
+          "repo": "sear-demo",
+          "path": "runs/8a165f6-base/conflict_stdout.txt",
+          "branch": "main (untracked)",
+          "sha": "8a165f6",
+          "tier": 1,
+          "dirty": true,
+          "note": "exists on disk; contents not opened in the walk"
+        }
+      ],
+      "id": "sear-conflict-fork",
+      "project": "sear",
+      "results": [
+        {
+          "metric": "conflict probes resolved silently to one value",
+          "value": "4/5",
+          "denominator": "5 conflict probes",
+          "dataset": "conflict fork, 17 chunks",
+          "synthetic": "author-built",
+          "system": "commit 8a165f6 baseline",
+          "date": "2026-10-07"
+        }
+      ],
+      "state": "NEGATIVE-RESULT",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-10-07",
+      "claim": "The poisoned-fork experiment passed the gate 5 of 5 with wrong facts; by the README's own reading this is the same property as counterfactual adherence (3 of 3), not a distinct finding.",
+      "disagreement": "The seed listed 'does the poisoned fork show anything distinct from counterfactual adherence' as an open question. The repo README answers it: they are the same property. The site records the README's answer; it is still the author's reading, not an independent test.",
+      "does_not_show": "Any defence against a poisoned corpus. The check enforces the report, not the world.",
+      "evidence": [
+        {
+          "repo": "sear-demo",
+          "path": "README.md",
+          "branch": "main",
+          "sha": "730ad1d",
+          "tier": 2,
+          "dirty": true,
+          "note": "Known limits: 'Verified is not true'"
+        },
+        {
+          "repo": "sear-demo",
+          "path": "runs/8a165f6-base/poisoned_stdout.txt",
+          "branch": "main (untracked)",
+          "sha": "8a165f6",
+          "tier": 1,
+          "dirty": true,
+          "note": "answered correctly (poisoned) 5/5"
+        }
+      ],
+      "id": "sear-poisoned-fork",
+      "project": "sear",
+      "results": [
+        {
+          "metric": "poisoned probes answered with the corpus's (wrong) value",
+          "value": "5/5",
+          "denominator": "5 poisoned probes",
+          "dataset": "poisoned fork of the film corpus",
+          "synthetic": "author-built",
+          "system": "commit 8a165f6 baseline",
+          "date": "2026-10-07"
+        }
+      ],
+      "state": "NEGATIVE-RESULT",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-10-03",
+      "claim": "Assay is the claim-audit constraint layer extracted from Receipts into a standalone TypeScript library (v0.1.0): corpus plus subject in, a ledger or a reasoned refusal out.",
+      "does_not_show": "Use outside Receipts' own field profile. An exact substring is not a fair reading of its source (README Limits). The local repo has no git remote, so publication cannot be confirmed here.",
+      "evidence": [
+        {
+          "repo": "assay",
+          "path": "README.md",
+          "branch": "main",
+          "sha": "2b6878e",
+          "tier": 2,
+          "dirty": false,
+          "note": "purpose, limits"
+        },
+        {
+          "repo": "assay",
+          "path": "CHANGELOG.md",
+          "branch": "main",
+          "sha": "2b6878e",
+          "tier": 1,
+          "dirty": false,
+          "note": "0.1.0 — 2026-10-03, extracted from Receipts src/assay with its history"
+        },
+        {
+          "repo": "assay",
+          "path": "src",
+          "branch": "main",
+          "sha": "2b6878e",
+          "tier": 1,
+          "dirty": false,
+          "note": "library source; 23 *.test.ts files in tree"
+        }
+      ],
+      "id": "assay-library",
+      "project": "receipts",
+      "state": "BUILT",
+      "verification": "LINKED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-10-01",
+      "claim": "Receipts is a TypeScript pipeline that reads a vendor's pages and independent sources (including SEC filings, NHTSA and IIHS), lets a model propose which claims contradict which, and discards any quote a deterministic gate cannot re-find in the fetched bytes.",
+      "does_not_show": "That a verbatim quote is a fair reading of its source, or that a proposed relation is real (see receipts-relation-check). The submission itself is not evidenced in the repo.",
+      "evidence": [
+        {
+          "repo": "receipts",
+          "path": "src",
+          "branch": "main",
+          "sha": "9a0eeb8",
+          "tier": 1,
+          "dirty": true,
+          "note": "engine source; worktree has 2 untracked files not read in the walk"
+        },
+        {
+          "repo": "receipts",
+          "path": "README.md",
+          "branch": "main",
+          "sha": "9a0eeb8",
+          "tier": 2,
+          "dirty": true,
+          "note": "'Written for the Pinetree Research challenge, and built on Solari cloud browsers'"
+        }
+      ],
+      "id": "receipts-pipeline",
+      "project": "receipts",
+      "reported_result": "Seed ledger: submitted to the Pinetree Research / Solari challenge.",
+      "state": "BUILT",
+      "verification": "LINKED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-09-30",
+      "claim": "The Tesla FSD ledger has no DIVERGENT or corroborated row; its strongest rows are two DISPUTED ones, such as Tesla's FSD page ('helping make the roads safer') against NHTSA recall 23V-085 ('increases the risk of a crash').",
+      "disagreement": "The seed says Receipts 'surfaced a Tesla disclosure divergence'. The committed ledger has zero divergent rows. An earlier ledger had one divergent row; the README says it was removed because it rested on a Wikipedia sentence cut off mid-way, whose full text was about a benchmark, not a collision rate. The repo wins.",
+      "does_not_show": "A measured refutation. The README: the recall sentence states no test or measurement, and it concerns FSD Beta in 2023, not today's FSD (Supervised). 'Read it as a regulator pushing back.'",
+      "evidence": [
+        {
+          "repo": "receipts",
+          "path": "reports/tesla-fsd.json",
+          "branch": "main",
+          "sha": "9a0eeb8",
+          "tier": 1,
+          "dirty": true,
+          "note": "8 rows: 4 unverified, 2 disputed, 2 context_unverified; both quotes tagged EXACT with offsets"
+        },
+        {
+          "repo": "receipts",
+          "path": "README.md",
+          "branch": "main",
+          "sha": "9a0eeb8",
+          "tier": 2,
+          "dirty": true,
+          "note": "'A real ledger' section; earlier divergent row removed as a truncated-quote error"
+        }
+      ],
+      "id": "receipts-tesla-ledger",
+      "project": "receipts",
+      "results": [
+        {
+          "metric": "ledger rows by status",
+          "value": "unverified 4, disputed 2, context_unverified 2, divergent 0",
+          "denominator": "8 rows",
+          "dataset": "11 pages fetched live 2026-09-30 (Tesla pages, 10-K, NHTSA, IIHS, others)",
+          "synthetic": false,
+          "system": "Receipts, claude-opus-5 proposer, two samples, relation check on",
+          "date": "2026-09-30"
+        }
+      ],
+      "state": "BUILT",
+      "verification": "LINKED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-10-01",
+      "claim": "Receipts has an offline test suite that needs no network and no key.",
+      "disagreement": "README says 816 tests; the author's vault note says 846. The higher tier (README) is shown first; neither was re-counted.",
+      "does_not_show": "That the tests pass today. They were not run for this site (the repo was read-only for this build and npm would write to it).",
+      "evidence": [
+        {
+          "repo": "receipts",
+          "path": "README.md",
+          "branch": "main",
+          "sha": "9a0eeb8",
+          "tier": 2,
+          "dirty": true,
+          "note": "Development: 'npm test # 816 tests'"
+        },
+        {
+          "repo": "vault",
+          "path": "CALICHE/Projects/receipts/receipts.md",
+          "branch": "n/a",
+          "sha": "n/a",
+          "tier": 3,
+          "dirty": false,
+          "note": "says 846 tests"
+        }
+      ],
+      "id": "receipts-tests",
+      "project": "receipts",
+      "reported_result": "816 tests (README) or 846 tests (author's notes).",
+      "state": "BUILT",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-10",
+      "claim": "Testing Assay as a standalone library is reported not done as of late October 2026.",
+      "disagreement": "The repo contains tests carried over from Receipts plus a smoke test, which sits awkwardly with 'testing NOT-DONE'. Most likely the seed means testing beyond the inherited unit tests, but that is a guess by the site's builder, so it is listed in NEEDS_AUTHOR.md.",
+      "does_not_show": "UNKNOWN — author to supply: what 'testing' means here. The repo at 2b6878e contains 23 test files, a no-network smoke test and a CI workflow; none were run for this site.",
+      "evidence": [
+        {
+          "repo": "seed",
+          "path": "seed ledger entry 14",
+          "branch": "n/a",
+          "sha": "n/a",
+          "tier": 4,
+          "dirty": false,
+          "note": "prior only"
+        }
+      ],
+      "id": "assay-testing",
+      "project": "receipts",
+      "state": "NOT-DONE",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-09-30",
+      "claim": "A frontier-model check that admits a relation only when both quotes measure the same thing failed its bar: it denied all 30 labeled no-relation pairs but admitted only 2 of 5 real ones.",
+      "does_not_show": "Whether the verifier or the labels are wrong on the misses; one miss flipped to admitted on a single re-query, so the 100% run-to-run agreement overstates stability near the boundary.",
+      "evidence": [
+        {
+          "repo": "receipts",
+          "path": "docs/superpowers/specs/2026-09-25-relation-measure-check-design.md",
+          "branch": "main",
+          "sha": "9a0eeb8",
+          "tier": 2,
+          "dirty": true,
+          "note": "Results, 2026-09-30: FAIL; check stays off by default"
+        }
+      ],
+      "id": "receipts-relation-check",
+      "project": "receipts",
+      "results": [
+        {
+          "metric": "negatives denied / positives admitted",
+          "value": "30/30 (bar >= 24) / 2/5 (bar >= 4)",
+          "denominator": "35 labeled pairs",
+          "dataset": "fixtures/relation-labels.json (author's hand labels)",
+          "synthetic": false,
+          "system": "claude-opus-5 verifier, max_tokens 4096",
+          "date": "2026-09-30"
+        }
+      ],
+      "state": "NEGATIVE-RESULT",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-10-01",
+      "claim": "Two planned sources could not be read: G2's device check gave zero successes in sixteen controlled attempts, and Reddit's challenge did not solve; both are reported as 'not read' instead of narrowing the ledger.",
+      "does_not_show": "Coverage of review sites. The ledger is missing what those sources would say.",
+      "evidence": [
+        {
+          "repo": "receipts",
+          "path": "README.md",
+          "branch": "main",
+          "sha": "9a0eeb8",
+          "tier": 2,
+          "dirty": true,
+          "note": "intro paragraph"
+        }
+      ],
+      "id": "receipts-source-refusals",
+      "project": "receipts",
+      "results": [
+        {
+          "metric": "G2 fetch successes",
+          "value": "0",
+          "denominator": "16 attempts over an hour on each of two proxy tiers",
+          "dataset": "live web",
+          "synthetic": false,
+          "system": "Receipts on Solari cloud browsers",
+          "date": "UNKNOWN"
+        }
+      ],
+      "state": "NEGATIVE-RESULT",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-11-11",
+      "claim": "I wrote a paper draft reporting the Latch negative result: 'When Gates Abstain Too Often: Typed Operator Gates Fail to Beat Chain-of-Thought on Multi-Hop QA'.",
+      "does_not_show": "Submission, review or publication. Status beyond 'draft' is unknown. The worktree has an untracked paper/ directory not read in the walk.",
+      "evidence": [
+        {
+          "repo": "Latch",
+          "path": "paper.tex",
+          "branch": "study3-agent-gate",
+          "sha": "cdcd512",
+          "tier": 1,
+          "dirty": false,
+          "note": "added in 745d691 'Add arXiv paper draft'"
+        }
+      ],
+      "id": "latch-paper",
+      "project": "latch",
+      "state": "BUILT",
+      "verification": "LINKED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-11-17",
+      "claim": "A gated chain of small language models (GIN's sole-writer gate pointed inward at inference steps) is a hypothesis only; no multi-model arm has been run.",
+      "disagreement": "The seed describes a three-arm experiment. HISTORY.md records a five-arm design (single CoT, free multi-SLM, single + gate, multi + gate + agreement, self-consistency). Neither has been run in its multi-model form. These are related to, but not the same work as, latch-pilot-killed and latch-study3-agent-gate.",
+      "does_not_show": "Any result for free-form SLM chains vs gated SLM chains vs one SLM at equal token budget. The Latch pilot and study 3 tested single-model gates only. The sprawl note the seed points to was not found: the Sprawl folder on disk is empty.",
+      "evidence": [
+        {
+          "repo": "Latch",
+          "path": "docs/HISTORY.md",
+          "branch": "study3-agent-gate",
+          "sha": "cdcd512",
+          "tier": 2,
+          "dirty": false,
+          "note": "origin 2026-11-06; 5-arm design incl. multi-SLM arms 1 and 3"
+        },
+        {
+          "repo": "Latch",
+          "path": "PREREG.md",
+          "branch": "study3-agent-gate",
+          "sha": "cdcd512",
+          "tier": 2,
+          "dirty": false,
+          "note": "section 2: 'multi-model arms 1/3 excluded by scope'"
+        },
+        {
+          "repo": "Latch",
+          "path": "study3/RESULTS.md",
+          "branch": "study3-agent-gate",
+          "sha": "cdcd512",
+          "tier": 2,
+          "dirty": false,
+          "note": "arms A0-A3 are all single-model"
+        }
+      ],
+      "id": "latch-gated-slm-chain",
+      "project": "latch",
+      "state": "DESIGN-ONLY",
+      "verification": "AUTHOR-REPORTED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-11-11",
+      "claim": "The Latch pilot, a typed-operator admission gate against free chain-of-thought on multi-hop QA, was killed at its preregistered G3 gate: the gated arm scored 37.5% at full coverage against 80.6% for chain-of-thought.",
+      "disagreement": "The McNemar statistic on the 32 jointly answered questions (b=4, c=2) appears as chi2 = 0.167 in POSTMORTEM.md and the vault, and as chi2 = 0.67, p = 0.41 in paper.tex. Both come from the same cells; the site builder's reading is that one uses a continuity correction, which the author has not confirmed. Neither changes the kill.",
+      "does_not_show": "Anything about gates that anchor to literal artifacts (fetched bytes, export rows). It tests a model translating a free-form question into a formal schema. Scoring was manual and not blinded; few-shot Example 5 was written from errors in the same 72 questions, which makes Arm 2's number optimistic; and PREREG section 5 treats abstentions as 'not answered, never wrong' while the headline scores them as wrong. The kill clause holds under either reading.",
+      "evidence": [
+        {
+          "repo": "Latch",
+          "path": "docs/POSTMORTEM.md",
+          "branch": "study3-agent-gate",
+          "sha": "cdcd512",
+          "tier": 1,
+          "dirty": false,
+          "note": "committed version; the worktree has uncommitted edits to this file, not used here"
+        },
+        {
+          "repo": "Latch",
+          "path": "PREREG.md",
+          "branch": "study3-agent-gate",
+          "sha": "cdcd512",
+          "tier": 1,
+          "dirty": false,
+          "note": "G3 promote/kill criteria; unchanged since 37b8a9c"
+        },
+        {
+          "repo": "Latch",
+          "path": "LOG.md",
+          "branch": "study3-agent-gate",
+          "sha": "cdcd512",
+          "tier": 1,
+          "dirty": false,
+          "note": "G3 KILL entry, commit 4adbb01"
+        }
+      ],
+      "id": "latch-pilot-killed",
+      "kill_criterion": "PREREG.md, G3: promote only if Arm 2 beats Arm 0 by >= 15 pp at full coverage with p < 0.05 (McNemar); kill if Arm 2 loses to Arm 0.",
+      "notes": "Stage history from POSTMORTEM: G1 promoted (74/100 decomposable; re-annotation 72/100, kappa 0.949). G2 was killed under the strict gate (0% admit), the gate and prompts were redesigned, G2 was killed again on manual review (16 of 26 non-trivial admits structurally valid but semantically wrong), then promoted at about 50% correct formalization with v4 prompts. G3 then killed the pilot.",
+      "project": "latch",
+      "results": [
+        {
+          "metric": "accuracy at full coverage, Arm 0 (CoT) vs Arm 2 (gate)",
+          "value": "80.6% vs 37.5% (-43.1 pp)",
+          "denominator": "58/72 vs 27/72",
+          "dataset": "2WikiMultihopQA validation, annotated-decomposable subset of a 100-question stratified sample",
+          "synthetic": false,
+          "system": "qwen2.5:14b, v4 prompts",
+          "date": "2026-11-11"
+        },
+        {
+          "metric": "Arm 2 abstention / precision on admitted",
+          "value": "55.6% / 84.4%",
+          "denominator": "40/72 abstained; 27/32 admitted correct",
+          "dataset": "same",
+          "synthetic": false,
+          "system": "same",
+          "date": "2026-11-11"
+        },
+        {
+          "metric": "Arm 0 on the same 32 admitted questions",
+          "value": "90.6%",
+          "denominator": "29/32",
+          "dataset": "same",
+          "synthetic": false,
+          "system": "same",
+          "date": "2026-11-11"
+        }
+      ],
+      "state": "KILLED",
+      "verification": "LINKED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-11-16",
+      "claim": "In a preregistered follow-up on 600 questions, gate/chain-of-thought agreement flagged chain-of-thought errors, but no better than plain self-consistency, so the gate added nothing over resampling.",
+      "does_not_show": "Compositional questions (excluded; the gate admitted 0 of 25 there in Phase 1). One model, one benchmark.",
+      "evidence": [
+        {
+          "repo": "Latch",
+          "path": "study2/phase2/analysis/phase2_report.txt",
+          "branch": "study3-agent-gate",
+          "sha": "cdcd512",
+          "tier": 1,
+          "dirty": false,
+          "note": "H1 supported, H2 fails"
+        },
+        {
+          "repo": "Latch",
+          "path": "study2/PREREG-2.md",
+          "branch": "study3-agent-gate",
+          "sha": "cdcd512",
+          "tier": 1,
+          "dirty": false,
+          "note": "registered at 3499b30"
+        }
+      ],
+      "id": "latch-study2-agreement",
+      "notes": "Not in the seed; added from the walk.",
+      "project": "latch",
+      "results": [
+        {
+          "metric": "H1: CoT error rate when gate agrees vs not",
+          "value": "2.80% vs 9.47% (one-sided permutation p = 0.0004)",
+          "denominator": "10/357 vs 23/243",
+          "dataset": "2WikiMultihopQA validation, 300 bridge_comparison + 300 comparison, seed 20262",
+          "synthetic": false,
+          "system": "qwen2.5:14b, temperature 0.2",
+          "date": "UNKNOWN — phase 2 report is undated; commits fall between 2026-11-11 and 2026-11-16"
+        },
+        {
+          "metric": "H2: accuracy of AGREE set minus self-consistency at matched coverage",
+          "value": "+0.32 pp, 95% CI [-0.90, +1.59] (bar: >= +2 pp, CI above 0)",
+          "denominator": "357 questions each",
+          "dataset": "same",
+          "synthetic": false,
+          "system": "same",
+          "date": "UNKNOWN — see above"
+        }
+      ],
+      "state": "NEGATIVE-RESULT",
+      "verification": "LINKED",
+      "visibility": "public",
+      "stale": false
+    },
+    {
+      "as_of": "2026-11-17",
+      "claim": "A preregistered provenance gate for small-model tool calls cut wrong state-changing actions at every model size, but cost more task success and correct actions than the registered margins allowed, so the verdict was null.",
+      "disagreement": "The seed (as of Nov 2026) lists an 'SLM reasoning-gate arm for tool calling / parameter verification' as IN-PROGRESS with no results. This site treats study 3 as that work (an assumption, logged); if so, the committed null result of 2026-11-17 supersedes 'no results reported'.",
+      "does_not_show": "Whether a warning instead of a block, or exempting values the model could look up, would keep the catch without the false alarms. That needs a new registered study. One benchmark, one model family, one decoding setting; the audit had one labeller.",
+      "evidence": [
+        {
+          "repo": "Latch",
+          "path": "study3/RESULTS.md",
+          "branch": "study3-agent-gate",
+          "sha": "cdcd512",
+          "tier": 1,
+          "dirty": false,
+          "note": "verdict null; per-arm tables; audit"
+        },
+        {
+          "repo": "Latch",
+          "path": "study3/PREREG-3.md",
+          "branch": "study3-agent-gate",
+          "sha": "cdcd512",
+          "tier": 1,
+          "dirty": false,
+          "note": "registered at 7a8a2fd, 2026-11-16"
+        },
+        {
+          "repo": "Latch",
+          "path": "study3/analysis/report.txt",
+          "branch": "study3-agent-gate",
+          "sha": "cdcd512",
+          "tier": 1,
+          "dirty": false,
+          "note": "exists; summarized in RESULTS.md (worktree has an uncommitted edit to the dry-run report, not used)"
+        }
+      ],
+      "id": "latch-study3-agent-gate",
+      "project": "latch",
+      "results": [
+        {
+          "metric": "wrong state-changing actions per task, no check (A0) vs gate (A2)",
+          "value": "3b 0.367 vs 0.267; 7b 0.793 vs 0.407; 14b 0.600 vs 0.367",
+          "denominator": "150 confirmatory tasks per model, paired",
+          "dataset": "BFCL v4 multi_turn_base",
+          "synthetic": false,
+          "system": "Qwen2.5 3b / 7b / 14b, temperature 0.2",
+          "date": "2026-11-17"
+        },
+        {
+          "metric": "task success, A2 minus A0",
+          "value": "3b -0.7 pp; 7b -4.0 pp; 14b -5.3 pp (H3 fails at 7b and 14b)",
+          "denominator": "150 tasks per model",
+          "dataset": "same",
+          "synthetic": false,
+          "system": "same",
+          "date": "2026-11-17"
+        },
+        {
+          "metric": "false alarms as share of gate blocks",
+          "value": "3b 9.3%; 7b 21.1%; 14b 33.5%",
+          "denominator": "25/270; 65/308; 87/260 blocks",
+          "dataset": "same",
+          "synthetic": false,
+          "system": "same",
+          "date": "2026-11-17"
+        }
+      ],
+      "state": "NEGATIVE-RESULT",
+      "verification": "LINKED",
+      "visibility": "public",
+      "stale": false
+    }
+  ]
+}

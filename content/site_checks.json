@@ -1,0 +1,99 @@
+{
+  "date": "2026-11-20",
+  "checks": [
+    {
+      "name": "Validator test suite (incl. must-fail cases)",
+      "command": "python -m unittest discover -s tests",
+      "result": "PASS",
+      "detail": "Ran 42 tests in 0.002s / OK"
+    },
+    {
+      "name": "Build fails on invalid ledgers",
+      "command": "python build.py --ledger <bad> (4 cases)",
+      "result": "PASS",
+      "detail": "MEASURED without denominator: exit 1, no output; KILLED without criterion: exit 1, no output; LINKED without SHA: exit 1, no output; missing does_not_show: exit 1, no output"
+    },
+    {
+      "name": "Deterministic build",
+      "command": "python build.py --date 2026-11-20 (twice, sha256 over all files)",
+      "result": "PASS",
+      "detail": "build 1 f5ae5773bb030693..., build 2 f5ae5773bb030693..."
+    },
+    {
+      "name": "Every LINKED entry: path exists at SHA, SHA on named branch",
+      "command": "git cat-file -e <sha>:<path>; git merge-base --is-ancestor <sha> <branch>",
+      "result": "PASS",
+      "detail": "15 LINKED entries, 37 evidence items checked"
+    },
+    {
+      "name": "No external hosts beyond evidence links; no secrets, IPs, *.ts.net names, hostnames, analytics",
+      "command": "regex scan of every file in dist/",
+      "result": "PASS",
+      "detail": "allowed hosts seen: ['github.com', 'kristiankrattiger.github.io', 'www.w3.org']; other hosts: 0 (w3.org is the SVG namespace inside a CSS data URI, never fetched)"
+    },
+    {
+      "name": "Internal link check (files and #fragments)",
+      "command": "html.parser over dist/*.html",
+      "result": "PASS",
+      "detail": "989 internal links in 23 pages"
+    },
+    {
+      "name": "HTML well-formedness (tag balance, duplicate ids)",
+      "command": "stdlib html.parser structural check",
+      "result": "PASS",
+      "detail": "23 pages"
+    },
+    {
+      "name": "WCAG AA contrast, every palette pair, both schemes",
+      "command": "WCAG 2.x relative-luminance formula",
+      "result": "PASS",
+      "detail": "light ink/paper 14.07 (need 4.5); light ink/paper-2 12.37 (need 4.5); light ink-2/paper 7.55 (need 4.5); light ink-2/paper-2 6.64 (need 4.5); light signal/paper 6.05 (need 4.5); light signal/paper-2 5.32 (need 4.5); light rule-soft/paper 3.34 (need 3.0); light rule/paper 14.07 (need 3.0); dark ink/paper 14.13 (need 4.5); dark ink/paper-2 12.62 (need 4.5); dark ink-2/paper 8.01 (need 4.5); dark ink-2/paper-2 7.15 (need 4.5); dark signal/paper 7.14 (need 4.5); dark signal/paper-2 6.37 (need 4.5); dark rule-soft/paper 3.78 (need 3.0); dark rule/paper 14.13 (need 3.0)"
+    },
+    {
+      "name": "Banned phrases/patterns from STYLE.md and private-topic terms",
+      "command": "regex over visible text, ledger.json, CSS",
+      "result": "PASS",
+      "detail": "21 phrases, 13 private terms, 8 CSS patterns, emoji ranges"
+    },
+    {
+      "name": "Keyboard basics (static): skip link, native controls, no positive tabindex, visible focus",
+      "command": "html.parser + CSS scan",
+      "result": "PASS",
+      "detail": "23 pages"
+    },
+    {
+      "name": "Pages render with JS off",
+      "command": "static check + msedge --headless --dump-dom on a script-stripped copy",
+      "result": "PASS",
+      "detail": "ledger table has 35 rows server-rendered for 35 public entries; JS-only filter form hidden by default: True; headless Edge on a script-stripped copy (1 script blocks removed): 23/23 pages render main+footer, ledger shows 35 rows, filter form stays hidden=True; with scripts: form revealed=True, counter='35 of 35 entries shown'"
+    },
+    {
+      "name": "Live: every route returns 200 from the loopback server",
+      "command": "HTTP GET x26 (URL in the final report, not published)",
+      "result": "PASS",
+      "detail": "/ 200; /about/ 200; /colophon/ 200; /index.html 200; /ledger.json 200; /ledger/ 200; /ledger/project/gin/ 200; /ledger/project/latch/ 200; /ledger/project/receipts/ 200; /ledger/project/sear/ 200; /ledger/state/blocked/ 200; /ledger/state/built/ 200; /ledger/state/design-only/ 200; /ledger/state/in-progress/ 200; /ledger/state/killed/ 200; /ledger/state/measured/ 200; /ledger/state/negative-result/ 200; /ledger/state/not-done/ 200; /ledger/verification/author-reported/ 200; /ledger/verification/linked/ 200; /not-done/ 200; /projects/gin/ 200; /projects/latch/ 200; /projects/receipts/ 200; /projects/sear/ 200; /style.css 200"
+    }
+  ],
+  "not_run": [
+    {
+      "name": "Full W3C/Nu HTML validation",
+      "reason": "no validator on this machine (no vnu, tidy or java); a stdlib structural check ran instead"
+    },
+    {
+      "name": "Interactive keyboard traversal in a real browser",
+      "reason": "no browser automation driver available without installing one; static keyboard checks ran instead"
+    },
+    {
+      "name": "Screen-reader pass",
+      "reason": "no screen reader automation available"
+    },
+    {
+      "name": "Automated visual regression test",
+      "reason": "none exists; instead the agent looked at headless-Edge screenshots (1280px dark and light, a 375px iframe for phone width) on 2026-11-20, which found and led to fixing a phone-width horizontal overflow; no human has reviewed the design"
+    },
+    {
+      "name": "Re-running the source repos' own test suites",
+      "reason": "repos are read-only for this build; running pytest/npm would write caches into them"
+    }
+  ]
+}
