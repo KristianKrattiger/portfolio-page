@@ -57,3 +57,8 @@
     shows it in use. "Analytics stack" was read as the Python libraries in PriceRiot's requirements.
 22. **PriceRiot's sanity-run numbers** (3 seeded runs) were not added: a sanity check, not a
     measurement, and the author did not report them as results.
+23. **Stress benchmark (GIN alewife).** The first run is the honest measurement and is shown as a
+    NEGATIVE-RESULT. The patched re-runs are BUILT with their numbers labelled as fit to the same
+    set, not MEASURED, because the patches were written against that set's failures. The
+    decode-constraint and live-LLM results are MEASURED: every field is in a committed eval output
+    and the patches did not touch them (the live run predates the patches).

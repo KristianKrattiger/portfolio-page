@@ -7,6 +7,10 @@
       "detail": "main @ 84abb9a (clean): README, architecture headings, sear/, gin/bookkeeper/, docs/ specs for stance channel, hedge-word, bi-encoder detector, decline eval, node6 setup, Epistemic Council; eval_runs metrics for 20260702T012203Z, 20260705T043114Z, 20260705T211452Z, 20260713T* (4 judge runs), 20260714T175645Z, 20260716T095519Z, 20260716T095704Z, 20260725T093515Z; data/frames/encoder_sweep.json; corpus_node1-3 headers. Branch docs/gin-15-clean-answer @ 20e6372: GIN_15_Clean_Answer.md front matter and abstract."
     },
     {
+      "what": "GIN branch alewife (added 2026-11-22)",
+      "detail": "alewife @ bc5b455, two commits after main, on no remote: the portfolio stress benchmark reports and metrics for four runs, the corpus docstring, the eval script's decode loop, and the relation-detector diff."
+    },
+    {
       "what": "Receipts repo",
       "detail": "main @ 9a0eeb8 (2 untracked files, not read): README, reports/tesla-fsd.json, relation-measure-check spec results."
     },

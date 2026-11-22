@@ -42,12 +42,20 @@
       ],
       "open_questions": [
         {
-          "q": "Does the relation detector hold on a corpus written by someone blind to its internals?",
+          "q": "Does the relation detector hold on a corpus written by someone blind to its internals? (The 2026-11-22 stress set does not answer this: its author shaped both the set and the fixes.)",
           "ids": [
             "gin-node6",
             "gin-cartographer-stance"
           ],
           "resolves": "Running Node6."
+        },
+        {
+          "q": "Do the stress-benchmark fixes hold on contradiction pairs and queries written after them?",
+          "ids": [
+            "gin-stress-patched",
+            "gin-stress-first-run"
+          ],
+          "resolves": "A fresh set written after the patches, ideally by someone who has not seen the detector; the patched code scored on it once, unchanged."
         },
         {
           "q": "Is issue-framing contradiction a detectable signal, or a curatorial stance that labels cannot pin down?",

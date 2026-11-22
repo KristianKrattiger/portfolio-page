@@ -17,13 +17,13 @@
       "name": "Deterministic build",
       "command": "python build.py --date 2026-11-22 (twice, sha256 over all files)",
       "result": "PASS",
-      "detail": "build 1 64b79a846a1e151e..., build 2 64b79a846a1e151e..."
+      "detail": "build 1 41fccf747fd7290c..., build 2 41fccf747fd7290c..."
     },
     {
       "name": "Every LINKED entry: path exists at SHA, SHA on named branch",
       "command": "git cat-file -e <sha>:<path>; git merge-base --is-ancestor <sha> <branch>",
       "result": "PASS",
-      "detail": "21 LINKED entries, 55 evidence items checked"
+      "detail": "26 LINKED entries, 65 evidence items checked"
     },
     {
       "name": "No external hosts beyond evidence links; no secrets, IPs, *.ts.net names, hostnames, analytics",
@@ -35,7 +35,7 @@
       "name": "Internal link check (files and #fragments)",
       "command": "html.parser over dist/*.html",
       "result": "PASS",
-      "detail": "1231 internal links in 30 pages"
+      "detail": "1279 internal links in 30 pages"
     },
     {
       "name": "HTML well-formedness (tag balance, duplicate ids)",
@@ -65,7 +65,7 @@
       "name": "Pages render with JS off",
       "command": "static check + msedge --headless --dump-dom on a script-stripped copy",
       "result": "PASS",
-      "detail": "ledger has 45 tags server-rendered for 45 public entries; JS-only filter form hidden by default: True; headless Edge on a script-stripped copy (1 script blocks removed): 30/30 pages render main+footer, ledger shows 45 tags, filter form stays hidden=True; with scripts: form revealed=True, counter='45 of 45 entries shown'"
+      "detail": "ledger has 50 tags server-rendered for 50 public entries; JS-only filter form hidden by default: True; headless Edge on a script-stripped copy (1 script blocks removed): 30/30 pages render main+footer, ledger shows 50 tags, filter form stays hidden=True; with scripts: form revealed=True, counter='50 of 50 entries shown'"
     },
     {
       "name": "Live: every route returns 200 from the loopback server",

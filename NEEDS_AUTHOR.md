@@ -26,3 +26,5 @@
 | 22 | PriceRiot, QSR ERP | Repo visibility. Both have GitHub remotes, but public status was not confirmed, so no links are shown. |
 | 23 | Skills | Excel (Analytic Solver, Data Science tabs), SAP and ISDS 474 data mining show as AUTHOR-REPORTED. A course project, file or certificate would let them link to evidence. |
 | 24 | Design | Review the built pages (the direction was chosen from mockups). Barlow Condensed was picked over Archivo Narrow by the agent. |
+| 25 | gin-stress-* | Branch alewife is local only. Push it if you want public links. Say whether you or an agent wrote the stress corpus and the patches. |
+| 26 | gin-stress-patched | The fixes were scored on the same set they were written against. A fresh set, written after the patches and scored once, would turn this into a measurement. |

@@ -13,6 +13,7 @@
 #   PriceRiot        main 2870b22 (clean)
 #   ISDS454_QSR_ERP  main 72a912e; extensions-plan 35eec27 (checkout on extensions-plan, clean)
 #   ISDS309_TunedIn  not under git; README mtime 2026-09-15
+#   GIN              alewife bc5b455 (worktree 'Additonal-testing', clean; local only, not on any remote)
 [
 {
   "id": "gin-sear-decode-constraint",
@@ -45,7 +46,7 @@
     {"metric": "query relevance rate", "value": "1.000", "denominator": "20 queries (rate as defined in gin/eval; not re-derived in the walk for this site)", "dataset": "same synthetic set", "synthetic": true, "system": "SEAR no-continuation arm, Mistral-7B-Instruct-v0.3 Q6_K, CPU", "date": "2026-07-02"},
     {"metric": "fabrication rate, comparison arm", "value": "0.238", "denominator": "about 5 of 21 claims (0.238 x 21; count not stored separately)", "dataset": "same synthetic set", "synthetic": true, "system": "plain RAG arm, same model", "date": "2026-07-02"}
   ],
-  "does_not_show": "Performance on real-world corpora (this set is synthetic and author-built). The overlap verifier is lexical, so it cannot see a false relation built from real spans. Twenty queries is a small set.",
+  "does_not_show": "Performance on real-world corpora (this set is synthetic and author-built). The overlap verifier is lexical, so it cannot see a false relation built from real spans (gin-stress-verifier-probes: it accepted 15 of 16 adversarial probes). Twenty queries is a small set.",
   "disagreement": "The seed ledger said the Phase 1 fabrication result was 'model-independent across families'. The repo's model-independence claim is about the two-node divergence query sets (see gin-divergence-realtext), not this baseline, which ran on one model.",
   "visibility": "public",
   "notes": "README at 84abb9a also reports an NLI-verifier rerun on the expanded set (run 20260712T035228Z): overall NLI fabrication 0.056 on a counterfactual entailment miss. That run's files were not opened in the walk for this site."
@@ -104,7 +105,7 @@
     {"metric": "peer selection precision@1 / routed fabrication / honest refusal", "value": "1.0 / 0.0 / 1.0", "denominator": "8 queries", "dataset": "data/eval/queryset_peer_selection.yaml over corpus_node1-3", "synthetic": "no, per README; not re-checked", "system": "three GIN nodes on one machine, mutual TLS, ungated", "date": "2026-07-16"},
     {"metric": "gated peer contacted", "value": "0", "denominator": "8 queries", "dataset": "same", "synthetic": "no, per README; not re-checked", "system": "three GIN nodes on one machine, mutual TLS, trust-gated config", "date": "2026-07-16"}
   ],
-  "does_not_show": "A deployment across machines or a real network. All three nodes ran on one machine over the loopback interface. Query sets are 6 and 8 queries. No load, latency or adversarial-peer testing.",
+  "does_not_show": "A deployment across machines or a real network. All three nodes ran on one machine over the loopback interface. Query sets are 6 and 8 queries. No load or latency testing. Adversarial-peer tests came later, on an unpushed branch (gin-stress-first-run), and a forged chunk got through there.",
   "disagreement": "Seed said 'measured on a live 3-node deployment'. The artifacts show three nodes, all local to one machine.",
   "visibility": "public",
   "notes": "Merkle anchor sync (run 20260715T073932Z) and streaming are listed in the README; the anchor-sync metrics file was not opened in the walk, so those two sub-projects (also built, per the README) are not part of this claim."
@@ -951,6 +952,393 @@
     }
   ],
   "does_not_show": "Whether any gap was fixed after the README was written.",
+  "visibility": "public"
+},
+{
+  "id": "gin-stress-first-run",
+  "project": "gin",
+  "claim": "A new all-layer stress benchmark, built from this site's own open questions, found defects on its first run: the production peer selector picked the right peer for 0.488 of 86 remote queries (dense ranking alone: 0.884), the relation detector's precision on 105 contradiction pairs was 0.573, a pinned peer's forged chunk was relayed unverified, and the trust gate denied all 17 trusted-domain queries sent to a multi-domain peer.",
+  "state": "NEGATIVE-RESULT",
+  "verification": "LINKED",
+  "as_of": "2026-11-22",
+  "evidence": [
+    {
+      "repo": "GIN",
+      "path": "data/eval_runs/portfolio_stress/metrics.json",
+      "branch": "alewife",
+      "sha": "bc5b455",
+      "tier": 1,
+      "dirty": false,
+      "note": "first run, 2026-11-22 21:01 UTC; added in 6654929"
+    },
+    {
+      "repo": "GIN",
+      "path": "data/eval_runs/portfolio_stress/report.md",
+      "branch": "alewife",
+      "sha": "bc5b455",
+      "tier": 1,
+      "dirty": false,
+      "note": "summary table"
+    },
+    {
+      "repo": "GIN",
+      "path": "gin/eval/stress_corpora.py",
+      "branch": "alewife",
+      "sha": "bc5b455",
+      "tier": 1,
+      "dirty": false,
+      "note": "docstring: designed from the open questions on this site's ledger"
+    }
+  ],
+  "results": [
+    {
+      "metric": "peer selection P@1, production RRF ranking",
+      "value": "0.488",
+      "denominator": "86 remote queries across 5 peers",
+      "dataset": "GIN portfolio stress corpus, N=6 federation",
+      "synthetic": true,
+      "system": "GIN federation, 6 nodes on one machine",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "peer selection P@1, dense ranking only",
+      "value": "0.884",
+      "denominator": "86 remote queries across 5 peers",
+      "dataset": "same",
+      "synthetic": true,
+      "system": "same",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "relation detector precision / recall / F1",
+      "value": "0.573 / 0.855 / 0.686",
+      "denominator": "105 story-class pairs",
+      "dataset": "120-pair contradiction set written for this benchmark ('blind-style': same author, not blind)",
+      "synthetic": true,
+      "system": "Cartographer, full pipeline with stance channel",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "issue-frame recall: Cartographer / frozen frame head",
+      "value": "0.000 / 0.333",
+      "denominator": "15 issue-frame pairs",
+      "dataset": "same",
+      "synthetic": true,
+      "system": "Cartographer; frozen bi-encoder frame head",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "retrieval top-1 accuracy",
+      "value": "0.914",
+      "denominator": "70 in-scope queries over 240 chunks",
+      "dataset": "GIN portfolio stress corpus, 6 domains",
+      "synthetic": true,
+      "system": "production hybrid retrieval + rerank",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "out-of-scope refusal on stopword-trap queries",
+      "value": "0.800",
+      "denominator": "5 queries",
+      "dataset": "same",
+      "synthetic": true,
+      "system": "same",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "trusted-domain queries denied by the trust gate (collateral)",
+      "value": "17 (rate 1.000)",
+      "denominator": "17 queries to a multi-domain peer",
+      "dataset": "N=6 federation",
+      "synthetic": true,
+      "system": "per-domain trust gate",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "pinned peer's forged chunk relayed unverified",
+      "value": "yes",
+      "denominator": "1 forged chunk id",
+      "dataset": "N=6 federation, live mTLS servers",
+      "synthetic": true,
+      "system": "federation client and router",
+      "date": "2026-11-22"
+    }
+  ],
+  "does_not_show": "Performance on text GIN's author did not shape. The corpus and the 'blind-style' pairs were generated for this benchmark from this site's own open questions; nobody blind to the detector wrote them. All six nodes ran on one machine.",
+  "notes": "Branch alewife exists only locally (not pushed), so there is no public link. Ran the same day the site's open questions were published.",
+  "visibility": "public"
+},
+{
+  "id": "gin-stress-patched",
+  "project": "gin",
+  "claim": "Patches to retrieval, the relation detector and federation, written against those failures, raised the same benchmark's scores: relation detector F1 0.686 to 0.982, production peer selection 0.488 to 0.872, retrieval top-1 0.914 to 1.000, stopword-trap refusal 4 of 5 to 5 of 5.",
+  "state": "BUILT",
+  "verification": "LINKED",
+  "as_of": "2026-11-22",
+  "evidence": [
+    {
+      "repo": "GIN",
+      "path": "data/eval_runs/portfolio_stress_general/metrics.json",
+      "branch": "alewife",
+      "sha": "bc5b455",
+      "tier": 1,
+      "dirty": false,
+      "note": "last of three re-runs (patched, patched_v2, general)"
+    },
+    {
+      "repo": "GIN",
+      "path": "gin/cartographer/quantity.py",
+      "branch": "alewife",
+      "sha": "bc5b455",
+      "tier": 1,
+      "dirty": false,
+      "note": "unit and scope patches; comment '(blind-corpus stress)'"
+    },
+    {
+      "repo": "GIN",
+      "path": "tests/test_portfolio_stress_layers.py",
+      "branch": "alewife",
+      "sha": "bc5b455",
+      "tier": 1,
+      "dirty": false,
+      "note": "tests added with the patches (not run for this site)"
+    }
+  ],
+  "results": [
+    {
+      "metric": "relation detector precision / recall / F1",
+      "value": "0.982 / 0.982 / 0.982",
+      "denominator": "105 story-class pairs (the same pairs)",
+      "dataset": "same 120-pair set as the first run",
+      "synthetic": true,
+      "system": "Cartographer after patches",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "peer selection P@1, production RRF ranking",
+      "value": "0.872",
+      "denominator": "86 remote queries (the same queries)",
+      "dataset": "same N=6 federation",
+      "synthetic": true,
+      "system": "GIN federation after patches",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "retrieval top-1 accuracy",
+      "value": "1.000",
+      "denominator": "70 in-scope queries (the same queries)",
+      "dataset": "same corpus",
+      "synthetic": true,
+      "system": "retrieval after patches",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "out-of-scope refusal on stopword-trap queries",
+      "value": "1.000",
+      "denominator": "5 queries (the same queries)",
+      "dataset": "same corpus",
+      "synthetic": true,
+      "system": "retrieval after patches",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "issue-frame recall, Cartographer",
+      "value": "0.000",
+      "denominator": "15 issue-frame pairs",
+      "dataset": "same set",
+      "synthetic": true,
+      "system": "Cartographer after patches",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "retrieval confidence-floor triggers",
+      "value": "10 (was 0)",
+      "denominator": "80 queries",
+      "dataset": "same corpus",
+      "synthetic": true,
+      "system": "retrieval after patches",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "trust-gate collateral denial rate",
+      "value": "0.000",
+      "denominator": "UNKNOWN: the report prints the denied count (0) in its denominator column",
+      "dataset": "same N=6 federation",
+      "synthetic": true,
+      "system": "trust gate after patches",
+      "date": "2026-11-22"
+    }
+  ],
+  "does_not_show": "That the fixes generalize. They were written after seeing failures on this exact set and re-scored on it, so these are fit scores, not held-out scores. One patch adds the exact units the set tests (euro, pound, km/h, GW, hectares). Issue-framing recall stayed at 0 of 15.",
+  "disagreement": "stress_corpora.py says the pairs were 'written without tailoring' to the detector's internals. That held for the first run only: the patches that followed were tailored to the pairs, and a patch comment names the stress corpus.",
+  "visibility": "public"
+},
+{
+  "id": "gin-stress-sear-decode",
+  "project": "gin",
+  "claim": "Under adversarial logits (+50 on every hallucinated token, random noise on the rest), SEAR's decode constraint let no hallucinated token through in 50 trials; all 65 extracted spans matched the corpus verbatim.",
+  "state": "MEASURED",
+  "verification": "LINKED",
+  "as_of": "2026-11-22",
+  "evidence": [
+    {
+      "repo": "GIN",
+      "path": "data/eval_runs/portfolio_stress_general/metrics.json",
+      "branch": "alewife",
+      "sha": "bc5b455",
+      "tier": 1,
+      "dirty": false,
+      "note": "layer4_sear_and_verifiers.adversarial_logit_decode; same values in all four runs"
+    },
+    {
+      "repo": "GIN",
+      "path": "scripts/eval_portfolio_stress.py",
+      "branch": "alewife",
+      "sha": "bc5b455",
+      "tier": 1,
+      "dirty": false,
+      "note": "adversarial decode loop; stand-in tokenizer"
+    }
+  ],
+  "measurements": [
+    {
+      "metric": "hallucinated tokens emitted",
+      "value": "0",
+      "denominator": "50 trials, 65 extracted spans",
+      "dataset": "GIN portfolio stress corpus (240 chunks)",
+      "synthetic": true,
+      "system": "SEAR logits processor driven by a stand-in tokenizer and synthetic logits; no language model",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "verbatim fabrication rate",
+      "value": "0.000",
+      "denominator": "50 trials",
+      "dataset": "same",
+      "synthetic": true,
+      "system": "same",
+      "date": "2026-11-22"
+    }
+  ],
+  "does_not_show": "Behaviour with a real model's logits and tokenizer: this tests the constraint mechanism, not answer quality. The noise seed comes from Python's hash() of the query id, which changes between processes unless PYTHONHASHSEED is fixed, so the exact trials are not reproducible.",
+  "visibility": "public"
+},
+{
+  "id": "gin-stress-verifier-probes",
+  "project": "gin",
+  "claim": "On 16 adversarial verifier probes (entity-number swaps, negation flips, context stripping, false juxtaposition), the lexical-overlap verifier accepted 15. The small NLI cross-encoder accepted 1 and the base one accepted 2.",
+  "state": "NEGATIVE-RESULT",
+  "verification": "LINKED",
+  "as_of": "2026-11-22",
+  "evidence": [
+    {
+      "repo": "GIN",
+      "path": "data/eval_runs/portfolio_stress_general/metrics.json",
+      "branch": "alewife",
+      "sha": "bc5b455",
+      "tier": 1,
+      "dirty": false,
+      "note": "layer4_sear_and_verifiers.verifier_blind_spot_probes; same values in all four runs"
+    }
+  ],
+  "results": [
+    {
+      "metric": "adversarial false-accept rate, lexical overlap verifier",
+      "value": "0.938",
+      "denominator": "16 adversarial probes (15 accepted)",
+      "dataset": "24 verifier probes written for this benchmark",
+      "synthetic": true,
+      "system": "GIN overlap verifier",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "adversarial false-accept rate, NLI DeBERTa xsmall",
+      "value": "0.062",
+      "denominator": "16 adversarial probes (1 accepted)",
+      "dataset": "same",
+      "synthetic": true,
+      "system": "NLI cross-encoder, xsmall",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "adversarial false-accept rate, NLI DeBERTa base",
+      "value": "0.125",
+      "denominator": "16 adversarial probes (2 accepted)",
+      "dataset": "same",
+      "synthetic": true,
+      "system": "NLI cross-encoder, base",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "true-accept rate, lexical overlap verifier",
+      "value": "0.500",
+      "denominator": "8 genuinely supported probes",
+      "dataset": "same",
+      "synthetic": true,
+      "system": "GIN overlap verifier",
+      "date": "2026-11-22"
+    }
+  ],
+  "does_not_show": "Anything beyond a small, self-written probe set: 16 adversarial probes. It also does not show that a bigger NLI model is safer; the base model did worse than xsmall here.",
+  "visibility": "public"
+},
+{
+  "id": "gin-stress-live-llm",
+  "project": "gin",
+  "claim": "With a live Qwen2.5-7B on 12 stress queries, SEAR's no-continuation arm made 0 unsupported claims out of 13 and plain RAG made 3 out of 7. Both arms repeated planted false facts in 3 of 3 counterfactual queries, and SEAR answered one out-of-scope trap query it should have refused.",
+  "state": "MEASURED",
+  "verification": "LINKED",
+  "as_of": "2026-11-22",
+  "evidence": [
+    {
+      "repo": "GIN",
+      "path": "data/eval_runs/portfolio_stress/metrics.json",
+      "branch": "alewife",
+      "sha": "bc5b455",
+      "tier": 1,
+      "dirty": false,
+      "note": "live_windows_llm section, first run only (before the patches); per-query rows"
+    }
+  ],
+  "measurements": [
+    {
+      "metric": "unsupported claims, SEAR no-continuation arm (overlap and NLI checks agree)",
+      "value": "0",
+      "denominator": "0 of 13 claims, 12 queries",
+      "dataset": "12 queries from the GIN portfolio stress corpus",
+      "synthetic": true,
+      "system": "Qwen2.5-7B-Instruct Q6_K on CPU, SEAR arm",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "unsupported claims, plain RAG arm (overlap and NLI checks agree)",
+      "value": "3",
+      "denominator": "3 of 7 claims, 12 queries",
+      "dataset": "same",
+      "synthetic": true,
+      "system": "Qwen2.5-7B-Instruct Q6_K on CPU, RAG arm",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "counterfactual adherence (repeated a planted false fact)",
+      "value": "SEAR 3, RAG 3",
+      "denominator": "3 counterfactual queries each",
+      "dataset": "same",
+      "synthetic": true,
+      "system": "both arms",
+      "date": "2026-11-22"
+    },
+    {
+      "metric": "out-of-scope refusals",
+      "value": "SEAR 2, RAG 3",
+      "denominator": "3 out-of-scope queries each (2 are stopword traps)",
+      "dataset": "same",
+      "synthetic": true,
+      "system": "both arms",
+      "date": "2026-11-22"
+    }
+  ],
+  "does_not_show": "A fair comparison: plain RAG refused 9 of 12 queries, including answerable ones, so its 7 claims are a thin sample. Twelve queries on a synthetic corpus is small. It also shows SEAR copying planted falsehoods verbatim, as in sear-poisoned-fork: verbatim grounding does not catch a wrong source.",
   "visibility": "public"
 }
 ]

@@ -15,6 +15,7 @@ user's home folder).
 | ~/Projects/assay | main @ 2b6878e | 2026-10-03 | clean; no git remote |
 | ~/Projects/sear-demo | main @ 730ad1d | 2026-10-09 | dirty: untracked .claude/ (not read), runs/ (read 2 logs) |
 | ~/Projects/Latch | main @ 3a76b7b | 2026-11-09 | clean |
+| ~/orca/workspaces/GIN/Additonal-testing (added 2026-11-22) | alewife @ bc5b455 (2 commits after 84abb9a; on no remote) | 2026-11-22 | clean; read via git show from ~/Projects/GIN |
 | ~/Projects/PriceRiot (added 2026-11-22) | main @ 2870b22 | 2026-07-23 | clean |
 | ~/orca/workspaces/ISDS454_QSR_ERP/ideas (added 2026-11-22) | checkout on extensions-plan @ 35eec27; main @ 72a912e read via git show | 2026-11-16 / 2026-11-11 | clean |
 | ~/Projects/ISDS309_TunedIn (added 2026-11-22) | not a git repo (git resolves to the home-folder repo, which has no commits) | — | n/a |
@@ -76,6 +77,10 @@ user's home folder).
 | QSR ERP docs/superpowers/specs/2026-11-16-extensions-plan.md (head) | extensions-plan @ 35eec27 | qsr-erp-extensions |
 | Author's statement of QSR ERP role, in conversation | 2026-11-22 | qsr-erp-role (teammates' names given but deliberately not recorded anywhere) |
 | ~/Projects/ISDS309_TunedIn/README.md; ISDS309.Core listing | mtime 2026-09-15 / 2026-10-20 | tunedin-app, tunedin-gaps |
+| GIN data/eval_runs/portfolio_stress*/report.md (4 runs) and metrics.json (first and general runs; live_windows_llm rows) | alewife @ bc5b455 | gin-stress-first-run, gin-stress-patched, gin-stress-sear-decode, gin-stress-verifier-probes, gin-stress-live-llm |
+| GIN gin/eval/stress_corpora.py (docstring) | alewife @ bc5b455 | benchmark origin, 'blind-style' disagreement |
+| GIN scripts/eval_portfolio_stress.py (function list, decode loop seed) | alewife @ bc5b455 | gin-stress-sear-decode (stand-in tokenizer, hash() seed) |
+| GIN git diff 84abb9a..bc5b455 -- gin/cartographer/quantity.py (added lines grep); git show --stat of both commits | alewife @ bc5b455 | gin-stress-patched (units tailored to the set) |
 | ~/OneDrive/Desktop/Orca Workspaces/Sprawl/ | dir mtime 2026-11-11 00:14 | EMPTY; seed entry 17's note not found |
 
 ## Searches run (grep only, results not otherwise read)
