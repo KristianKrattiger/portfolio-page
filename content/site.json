@@ -72,7 +72,7 @@
     {
       "slug": "sear",
       "name": "SEAR",
-      "subtitle": "Sparse Epistemically Anchored Reasoning: the verify-after demo",
+      "subtitle": "Sparse Epistemically Anchored Reasoning, in two versions: token-level inside GIN, and verify-after in sear-demo",
       "what_it_is_ids": [
         "sear-demo-pipeline"
       ],
@@ -99,7 +99,29 @@
           "resolves": "A corpus large enough that top_k leaves most chunks out."
         }
       ],
-      "group": "research"
+      "group": "research",
+      "versions": [
+        {
+          "name": "SEAR in GIN: verify while generating",
+          "how": "A custom llama-cpp-python logits processor constrains every token at decode time to continue a span that occurs verbatim in the retrieved corpus. Text the corpus does not contain cannot be generated in the first place.",
+          "ids": [
+            "gin-sear-decode-constraint",
+            "gin-nc-baseline",
+            "gin-divergence-realtext"
+          ],
+          "where": "These entries live on the GIN page and are counted under GIN."
+        },
+        {
+          "name": "sear-demo: verify after generating",
+          "how": "The model writes freely. Each claim must then be entailed by its cited chunk (NLI), and every name and number must appear in that chunk, or the claim is dropped. When nothing survives, an explicit failure state replaces a guess.",
+          "ids": [
+            "sear-demo-pipeline",
+            "sear-demo-results",
+            "sear-conflict-fork"
+          ],
+          "where": "The rest of this page covers this version; the counts on this page and on Home are its entries only."
+        }
+      ]
     },
     {
       "slug": "receipts",

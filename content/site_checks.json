@@ -5,7 +5,7 @@
       "name": "Validator test suite (incl. must-fail cases)",
       "command": "python -m unittest discover -s tests",
       "result": "PASS",
-      "detail": "Ran 43 tests in 0.003s / OK"
+      "detail": "Ran 43 tests in 0.002s / OK"
     },
     {
       "name": "Build fails on invalid ledgers",
@@ -17,7 +17,7 @@
       "name": "Deterministic build",
       "command": "python build.py --date 2026-11-22 (twice, sha256 over all files)",
       "result": "PASS",
-      "detail": "build 1 72b83d882fae34be..., build 2 72b83d882fae34be..."
+      "detail": "build 1 64b79a846a1e151e..., build 2 64b79a846a1e151e..."
     },
     {
       "name": "Every LINKED entry: path exists at SHA, SHA on named branch",
@@ -35,7 +35,7 @@
       "name": "Internal link check (files and #fragments)",
       "command": "html.parser over dist/*.html",
       "result": "PASS",
-      "detail": "1226 internal links in 30 pages"
+      "detail": "1231 internal links in 30 pages"
     },
     {
       "name": "HTML well-formedness (tag balance, duplicate ids)",

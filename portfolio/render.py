@@ -625,7 +625,7 @@ def page_project(proj, entries, ctx):
 <li><a href="#measured">What was measured</a></li><li><a href="#not-measured">Not measured or built</a></li>
 <li><a href="#weak">Weaknesses and negative results</a></li><li><a href="#open">Open questions</a></li>
 <li><a href="#evidence">Evidence</a></li></ol></nav>
-<section><h2 class="band" id="what">What it is</h2><div class="sheet"><ul class="plain">{what}</ul></div></section>
+<section><h2 class="band" id="what">What it is</h2>{versions_html(proj, page, ctx) or f'<div class="sheet"><ul class="plain">{what}</ul></div>'}</section>
 {section("What exists", "exists", exists, "No BUILT or IN-PROGRESS entries.")}
 {section("What was measured", "measured", measured, "No entry meets MEASURED: number, denominator, dataset, synthetic flag, system and date all known. Numbers that fall short are shown with their entries.")}
 {section("Not measured or built", "not-measured", not_built, "No NOT-DONE, DESIGN-ONLY or BLOCKED entries.",
@@ -640,6 +640,22 @@ def page_project(proj, entries, ctx):
 <tbody>{ev_rows}</tbody></table></div></div></section>
 """
     return layout(page, proj["name"], body, ctx)
+
+
+def versions_html(proj, page, ctx):
+    """Projects that exist in more than one version show each version, with its
+    entries linked wherever they live."""
+    vs = proj.get("versions")
+    if not vs:
+        return ""
+    cards = []
+    for i, v in enumerate(vs, 1):
+        items = "".join(
+            f'<li>{state_tag(ctx.by_id[x]["state"])} {e(ctx.by_id[x]["claim"])} '
+            f'<a class="mono" href="{e(entry_home_href(page, ctx.by_id[x]))}">#{e(x)}</a></li>' for x in v["ids"])
+        cards.append(f'<div class="sheet version"><h3><span class="vnum">Version {i}</span> {e(v["name"])}</h3>'
+                     f'<p>{e(v["how"])}</p><ul class="plain">{items}</ul><p class="seen">{e(v["where"])}</p></div>')
+    return '<div class="versions">' + "".join(cards) + "</div>"
 
 
 def page_about(entries, ctx):
@@ -735,6 +751,7 @@ def build_site(all_entries, site, walk, checks, build_date):
     refs = [i for sk in site.get("skills", []) for i in sk.get("backed_by", [])]
     for p in site["projects"]:
         refs += p["what_it_is_ids"] + [i for q in p["open_questions"] for i in q["ids"]]
+        refs += [i for v in p.get("versions", []) for i in v["ids"]]
     for i in refs:
         if i not in ctx.by_id:
             raise ValueError(f"site.json references unknown or hidden entry {i}")

@@ -102,6 +102,12 @@ h3.fam .n{font-family:var(--mono);font-weight:400;font-size:.9rem}
 .sheet h3:first-child{margin-top:0}
 .sheet p{max-width:72ch}
 .sheet a{color:var(--ink)}
+.versions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:0 0 16px}
+.versions .sheet{margin:0}
+.version h3{font-size:1.45rem;line-height:1.05;text-transform:none;letter-spacing:0}
+.vnum{display:block;font-family:var(--mono);font-weight:700;font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.version li .tape{margin-right:6px}
+@media (max-width:760px){.versions{grid-template-columns:minmax(0,1fr)}}
 .about{margin:0;display:grid;grid-template-columns:minmax(0,9rem) minmax(0,1fr);gap:0 18px}
 .about dt{font-family:var(--mono);font-weight:700;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;padding:10px 0;border-top:1px solid var(--rule-soft)}
 .about dd{margin:0;padding:9px 0;border-top:1px solid var(--rule-soft);min-width:0}
