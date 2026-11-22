@@ -50,3 +50,6 @@ Python 3 stdlib only. No third-party requests. Every page works without JS.
 Deterministic output given the same ledger and build date
 (`PORTFOLIO_BUILD_DATE`, default today). Served by `python -m http.server`
 bound to 127.0.0.1.
+
+## Addendum 2026-11-22 (restyle)
+Adds `projects/` (index of all projects, research and other work). Ledger entries render as tags grouped by project, then family; see docs/superpowers/specs/2026-11-22-restyle-design.md. Build-fail rules unchanged.

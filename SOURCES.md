@@ -1,4 +1,4 @@
-# SOURCES.md — every file consulted (walk of 2026-11-20)
+# SOURCES.md — every file consulted (walk of 2026-11-20, extended 2026-11-22)
 
 Git sources were read with `git show <sha>:<path>` / `git log` at the recorded SHA. For a git
 file, "mtime" means the commit date of the snapshot, since a committed file has no filesystem
@@ -15,6 +15,9 @@ user's home folder).
 | ~/Projects/assay | main @ 2b6878e | 2026-10-03 | clean; no git remote |
 | ~/Projects/sear-demo | main @ 730ad1d | 2026-10-09 | dirty: untracked .claude/ (not read), runs/ (read 2 logs) |
 | ~/Projects/Latch | main @ 3a76b7b | 2026-11-09 | clean |
+| ~/Projects/PriceRiot (added 2026-11-22) | main @ 2870b22 | 2026-07-23 | clean |
+| ~/orca/workspaces/ISDS454_QSR_ERP/ideas (added 2026-11-22) | checkout on extensions-plan @ 35eec27; main @ 72a912e read via git show | 2026-11-16 / 2026-11-11 | clean |
+| ~/Projects/ISDS309_TunedIn (added 2026-11-22) | not a git repo (git resolves to the home-folder repo, which has no commits) | — | n/a |
 | ~/orca/workspaces/Latch/G2-GPU-Testing | study3-agent-gate @ cdcd512 | 2026-11-17 | DIRTY: modified OPERATORS.md, data/finqa_coverage_results.json, docs/POSTMORTEM.md, gate.py, harness.py, study2 files, study3/analysis/dryrun_report.txt, test_gate.py; untracked paper/. Only committed content was used (git show cdcd512:...). |
 
 ## Files consulted
@@ -64,6 +67,15 @@ user's home folder).
 | ~/Monolith/CALICHE/Projects/receipts/receipts.md | 2026-10-24 04:50 | receipts-tests (846) disagreement |
 | ~/Monolith/CALICHE/Projects/sear-demo/sear-demo.md | 2026-10-24 01:46 | sear-demo-status (tests not run per author) |
 | ~/Monolith/CALICHE/Projects/PROJECTS_INDEX.md | 2026-10-23 00:44 | orientation only |
+| PriceRiot README.md, IMPLEMENTATION_STATUS.md, requirements.txt | 2870b22 | priceriot-engine, priceriot-pos-etl, priceriot-analysis-apps, priceriot-not-built; skills (analytics stack, Streamlit) |
+| PriceRiot tree listing (cxx/bindings, python/ingestion, python/dashboard, python/webapp, notebooks, tests); grep of python/webapp/app.py for "workers"; git log | 2870b22 | same entries; no workers route |
+| PriceRiot data/runs/sanity_13day/aggregate_summary.json (opened, not used: a 3-run sanity check, not a measurement) | 2870b22 | nothing |
+| QSR ERP README.md | 35eec27 (checkout) and 72a912e | qsr-erp-database, qsr-erp-framework |
+| QSR ERP docs/superpowers/specs/2026-10-07-qsr-erp-database-design.md (head) | 72a912e | qsr-erp-database |
+| QSR ERP tree listing (db/, scripts/, app/framework/, app/screens/README.md, tests/); git log main (authorship counted, names not recorded) | 72a912e | qsr-erp-database, qsr-erp-framework, qsr-erp-role |
+| QSR ERP docs/superpowers/specs/2026-11-16-extensions-plan.md (head) | extensions-plan @ 35eec27 | qsr-erp-extensions |
+| Author's statement of QSR ERP role, in conversation | 2026-11-22 | qsr-erp-role (teammates' names given but deliberately not recorded anywhere) |
+| ~/Projects/ISDS309_TunedIn/README.md; ISDS309.Core listing | mtime 2026-09-15 / 2026-10-20 | tunedin-app, tunedin-gaps |
 | ~/OneDrive/Desktop/Orca Workspaces/Sprawl/ | dir mtime 2026-11-11 00:14 | EMPTY; seed entry 17's note not found |
 
 ## Searches run (grep only, results not otherwise read)
@@ -74,6 +86,6 @@ user's home folder).
 ## Skipped without reading (recorded only)
 - ~/Monolith/Career/ (including a file about job openings), CSUF/, CALICHE/Journey/, Frameworks/ (one line seen in a grep hit for "sprawl", not used), Inbox/, Polymathy/, Ideas/ (titles listed only).
 - Distilled session files whose titles mention team roles/outreach or internship: not opened.
-- ~/Projects/attest, backstop, intake, claim-record-master(.zip), PriceRiot, coursework repos: not opened (outside scope; may touch excluded topics).
+- ~/Projects/attest, backstop, backstop-diagnosis, intake, claim-record-master(.zip), RestaurantDatabaseProject: not opened (outside scope; may touch excluded topics).
 - ~/exopere: folder name seen in a home-directory listing; not opened.
 - receipts untracked frontier.txt, small.txt; sear-demo .claude/; Latch worktree paper/ and uncommitted diffs.

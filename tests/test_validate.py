@@ -48,6 +48,10 @@ def errors_for(entries):
 
 
 class PassingCases(unittest.TestCase):
+    def test_new_projects_accepted(self):
+        for proj in ("priceriot", "qsr-erp", "tunedin"):
+            validate_entries([base(project=proj)])
+
     def test_minimal_entry_passes(self):
         self.assertEqual(errors_for([base()]), [])
 

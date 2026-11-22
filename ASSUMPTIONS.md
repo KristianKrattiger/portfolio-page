@@ -42,3 +42,18 @@
     equivalent.
 16. **Process.** The brief's own process (SPEC, PLAN, tests first, review, live check) was followed
     instead of an interactive brainstorming round, because the brief says not to block on questions.
+17. **Restyle (2026-11-22).** Direction chosen by the author from mockups: concrete wall, punched
+    tags, label tape; colour = family (done / failed / unfinished). Agent's calls: Barlow Condensed,
+    TTF served as-is, grain removed, square punch hole (keeps the no-rounded-corners rule), numbers
+    and evidence folded under each tag on the ledger (open on project pages).
+18. **Tagline** is option 2 as picked by the author. "Business technologist" was dropped at the
+    author's request.
+19. **QSR ERP role** comes from the author's own statement (AUTHOR-REPORTED). The commit log
+    supports authorship of main only. Teammates' names were given in conversation and are kept
+    out of every file; the verifier checks for them by hash.
+20. **QSR ERP evidence** is pinned to main @ 72a912e (on origin/main), not the checked-out
+    extensions-plan branch, except for the extensions spec, which exists only there.
+21. **Skills** list is the author's; a skill links to a ledger entry only where that entry's evidence
+    shows it in use. "Analytics stack" was read as the Python libraries in PriceRiot's requirements.
+22. **PriceRiot's sanity-run numbers** (3 seeded runs) were not added: a sanity check, not a
+    measurement, and the author did not report them as results.

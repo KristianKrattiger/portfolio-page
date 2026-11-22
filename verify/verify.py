@@ -47,11 +47,16 @@ def run(cmd, **kw):
     return subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", **kw)
 
 
-def dist_files(base=DIST):
+def dist_files(base=DIST, assets=False):
+    """Every file in dist/. assets=False leaves out fonts/ (the bundled font binaries and
+    their licence text, copied byte for byte from assets/fonts and never generated), so
+    text scans only see what the build writes."""
     out = []
     for d, _, fs in os.walk(base):
         for f in fs:
-            out.append(os.path.relpath(os.path.join(d, f), base).replace(os.sep, "/"))
+            r = os.path.relpath(os.path.join(d, f), base).replace(os.sep, "/")
+            if assets or not r.startswith("fonts/"):
+                out.append(r)
     return sorted(out)
 
 
@@ -103,7 +108,7 @@ def check_build_fails_on_bad_ledger():
 
 def tree_hash(base):
     h = hashlib.sha256()
-    for rel in dist_files(base):
+    for rel in dist_files(base, assets=True):
         h.update(rel.encode())
         with open(os.path.join(base, rel), "rb") as fh:
             h.update(hashlib.sha256(fh.read()).digest())
@@ -301,8 +306,22 @@ BANNED = ["hi, i'm", "hi i'm", "passionate", "groundbreaking", "novel", "cutting
 BANNED_CSS = [r"linear-gradient\(", r"radial-gradient\(", r"backdrop-filter", r"border-radius\s*:\s*(?!0[;}\s])",
               r"parallax", r"typewriter", r"<marquee", r"@import\s+url\(http"]
 EMOJI = re.compile("[\U0001F300-\U0001FAFF\U00002600-\U000027BF\U0001F000-\U0001F2FF]")
+# Teammates' first names, stored only as SHA-256 of the lowercased word, so the names never
+# enter this repo while a leak into dist/ still fails the check.
+PRIVATE_NAME_HASHES = {
+    "69bfe1e6e44821df7f8a0927bd7e61ef208fdb25deaa4353450bc3fb904abd52",
+    "c71758a30a821e220d7f441eec57f6d7347183186cacb7f41f55a33a522dc64e",
+    "7f2c7bc80b97eb6fd2b7932826ce72697648c1ac3284316f92aef0102a748c69",
+    "d919a100ce6b45524d415d52d088d5817587c6dd8c3691b03b8063c44d043523",
+    "cd879f74c6ffe6e4ae973145798ca26489fa2a61f7b29ac5fd816c0ad959511f",
+}
 PRIVATE_TERMS = ["pinetree internship", "internship", "job search", "employer", "girlfriend", "boyfriend",
                  "wife", "husband", "attest", "claim-record", "business plan", "salary", "gpa"]
+
+
+def name_hits(txt):
+    return any(hashlib.sha256(w.encode()).hexdigest() in PRIVATE_NAME_HASHES
+               for w in set(re.findall(r"[a-z]+", txt.lower())))
 
 
 def check_banned(parsed):
@@ -317,7 +336,11 @@ def check_banned(parsed):
                 hits.append(f"{r}: private term '{w}'")
         if EMOJI.search(read(r)):
             hits.append(f"{r}: emoji")
+        if name_hits(txt):
+            hits.append(f"{r}: teammate name")
     j = read("ledger.json").lower()
+    if name_hits(j):
+        hits.append("ledger.json: teammate name")
     for w in BANNED + PRIVATE_TERMS:
         if re.search(r"(?<![a-z])" + re.escape(w) + r"(?![a-z])", j):
             hits.append(f"ledger.json: '{w}'")
@@ -326,7 +349,7 @@ def check_banned(parsed):
             if re.search(rx, read(r), re.I):
                 hits.append(f"{r}: pattern {rx}")
     record("Banned phrases/patterns from STYLE.md and private-topic terms", "regex over visible text, ledger.json, CSS",
-           not hits, f"{len(BANNED)} phrases, {len(PRIVATE_TERMS)} private terms, {len(BANNED_CSS)} CSS patterns, emoji ranges"
+           not hits, f"{len(BANNED)} phrases, {len(PRIVATE_TERMS)} private terms, {len(PRIVATE_NAME_HASHES)} hashed names, {len(BANNED_CSS)} CSS patterns, emoji ranges"
            + (f"; hits: {hits[:12]}" if hits else ""))
 
 
@@ -352,7 +375,7 @@ def check_nojs(parsed):
     rows = src.count('data-verification="')
     form_hidden = re.search(r'<form id="filters"[^>]*\bhidden\b', src) is not None
     ok = rows == len(entries) and form_hidden
-    detail = f"ledger table has {rows} rows server-rendered for {len(entries)} public entries; JS-only filter form hidden by default: {form_hidden}"
+    detail = f"ledger has {rows} tags server-rendered for {len(entries)} public entries; JS-only filter form hidden by default: {form_hidden}"
     # This Edge build ignores --blink-settings=scriptEnabled=false / --disable-javascript for
     # --dump-dom (verified: the filter script still ran). So the JS-off render is tested on a
     # copy of dist/ with every <script> block removed, which is what a JS-off browser sees here
@@ -388,7 +411,7 @@ def check_nojs(parsed):
                 pages_ok.append('<main id="main"' in d and "</footer>" in d)
             ok &= off_rows == len(entries) and off_hidden and on_shown and all(pages_ok)
             detail += (f"; headless Edge on a script-stripped copy ({n_scripts} script blocks removed): "
-                       f"{sum(pages_ok)}/{len(pages_ok)} pages render main+footer, ledger shows {off_rows} rows, "
+                       f"{sum(pages_ok)}/{len(pages_ok)} pages render main+footer, ledger shows {off_rows} tags, "
                        f"filter form stays hidden={off_hidden}; with scripts: form revealed={on_shown}, "
                        f"counter='{on_count.group(1) if on_count else '?'}'")
         except Exception as exc:  # noqa: BLE001
@@ -402,7 +425,9 @@ def check_nojs(parsed):
 
 
 ROUTES = ["/", "/index.html", "/not-done/", "/ledger/", "/ledger.json", "/about/", "/colophon/", "/style.css",
-          "/projects/gin/", "/projects/sear/", "/projects/receipts/", "/projects/latch/"]
+          "/projects/", "/projects/gin/", "/projects/sear/", "/projects/receipts/", "/projects/latch/",
+          "/projects/priceriot/", "/projects/qsr-erp/", "/projects/tunedin/",
+          "/fonts/BarlowCondensed-SemiBold.ttf", "/fonts/BarlowCondensed-ExtraBold.ttf", "/fonts/OFL.txt"]
 
 
 def check_live(base):
@@ -447,7 +472,7 @@ def main():
     not_run("Full W3C/Nu HTML validation", "no validator on this machine (no vnu, tidy or java); a stdlib structural check ran instead")
     not_run("Interactive keyboard traversal in a real browser", "no browser automation driver available without installing one; static keyboard checks ran instead")
     not_run("Screen-reader pass", "no screen reader automation available")
-    not_run("Automated visual regression test", "none exists; instead the agent looked at headless-Edge screenshots (1280px dark and light, a 375px iframe for phone width) on 2026-11-20, which found and led to fixing a phone-width horizontal overflow; no human has reviewed the design")
+    not_run("Automated visual regression test", "none exists; instead the agent looked at headless-Edge screenshots (1280px dark and light, a 375px iframe for phone width) on 2026-11-20 and again after the 2026-11-22 restyle, which found and led to fixing phone-width overflows; the author chose the direction from mockups but has not reviewed the built pages")
     not_run("Re-running the source repos' own test suites", "repos are read-only for this build; running pytest/npm would write caches into them")
 
     if not args.no_write:

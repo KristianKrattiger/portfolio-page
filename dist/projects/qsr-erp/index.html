@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; font-src 'self'; script-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<title>QSR ERP — Kristian Krattiger</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<svg class="defs" aria-hidden="true" focusable="false" width="0" height="0"><defs>
+<symbol id="s-measured" viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" fill="currentColor"/></symbol>
+<symbol id="s-built" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="s-in-progress" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="2" y="2" width="4" height="8" fill="currentColor"/></symbol>
+<symbol id="s-design-only" viewBox="0 0 12 12"><polygon points="6,1 11,6 6,11 1,6" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="s-blocked" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="2" y="5" width="8" height="2" fill="currentColor"/></symbol>
+<symbol id="s-not-done" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+<symbol id="s-killed" viewBox="0 0 12 12"><path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" stroke-width="2.2" fill="none"/></symbol>
+<symbol id="s-negative-result" viewBox="0 0 12 12"><polygon points="1.5,2.5 10.5,2.5 6,10.5" fill="currentColor"/></symbol>
+</defs></svg>
+<header class="masthead">
+<p class="who"><a href="../../index.html">Kristian Krattiger</a></p>
+<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../colophon/index.html">Colophon</a></li></ul></nav>
+</header>
+<main id="main" tabindex="-1">
+
+<section class="lead">
+<h1 class="title">QSR ERP</h1>
+<p class="tagline">Restaurant ERP database and app, ISDS 454 group project (I lead it)</p>
+<p class="wallnote"><span class="strip"><span class="chip done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-measured"/></svg>Done 2</span><span class="chip failed zero"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-killed"/></svg>Failed 0</span><span class="chip unfinished"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-not-done"/></svg>Unfinished 2</span></span></p>
+</section>
+<nav class="jump" aria-label="Sections"><ol>
+<li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
+<li><a href="#measured">What was measured</a></li><li><a href="#not-measured">Not measured or built</a></li>
+<li><a href="#weak">Weaknesses and negative results</a></li><li><a href="#open">Open questions</a></li>
+<li><a href="#evidence">Evidence</a></li></ol></nav>
+<section><h2 class="band" id="what">What it is</h2><div class="sheet"><ul class="plain"><li>A SQLite database for a quick-service restaurant ERP, built from the group&#x27;s logical ERD: sales import, recipes and inventory, staff scheduling and labor cost, and threshold alerts, with reporting views and a deterministic generator for four weeks of sample data for a fictional pizza shop. <a class="mono" href="#qsr-erp-database">#qsr-erp-database</a></li><li>The app framework the team builds on: a Flask screen loader that registers each screen folder and refuses to start on a broken one, PBKDF2 login with role guards and CSRF checks on every POST, a base template, shared components, and a starter stylesheet for teammates to edit. <a class="mono" href="#qsr-erp-framework">#qsr-erp-framework</a></li><li>I designed the database and the app&#x27;s architecture, built the framework screens and base styling, and am leading the team through implementation. Teammates own the data visualisation and the queries that put data on each screen. <a class="mono" href="#qsr-erp-role">#qsr-erp-role</a></li></ul></div></section>
+<section><h2 class="band" id="exists">What exists<span class="strip">3 entries</span></h2><article class="tag done" id="qsr-erp-database" data-project="qsr-erp" data-state="BUILT" data-verification="LINKED">
+<p class="meta"><span class="tape done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-built"/></svg>BUILT</span> <span class="stk stk-linked">LINKED</span> <a class="eid" href="../../ledger/index.html#qsr-erp-database">#qsr-erp-database</a> <span class="asof">as of 2026-11-11</span></p>
+<p class="claim">A SQLite database for a quick-service restaurant ERP, built from the group&#x27;s logical ERD: sales import, recipes and inventory, staff scheduling and labor cost, and threshold alerts, with reporting views and a deterministic generator for four weeks of sample data for a fictional pizza shop.</p>
+<p class="dns"><span class="lbl">Does not show</span>Use with a real restaurant&#x27;s data: every row is generated. The 15 test files on main were not run for this site.</p>
+<dl><dt>Evidence</dt><dd><ul class="ev"><li><span class="mono">ISDS454_QSR_ERP @ main 72a912e : db/schema.sql</span> <span class="tier">tier 1</span> — tables, constraints, double-booking trigger</li><li><span class="mono">ISDS454_QSR_ERP @ main 72a912e : db/views.sql</span> <span class="tier">tier 1</span> — reporting views</li><li><span class="mono">ISDS454_QSR_ERP @ main 72a912e : scripts/seedgen</span> <span class="tier">tier 1</span> — fixed-seed sample-data generator</li><li><span class="mono">ISDS454_QSR_ERP @ main 72a912e : docs/superpowers/specs/2026-10-07-qsr-erp-database-design.md</span> <span class="tier">tier 2</span> — design spec, 2026-10-07</li></ul></dd><dt>Notes</dt><dd>ISDS 454 group project. The author designed the database (see qsr-erp-role).</dd></dl>
+</article>
+<article class="tag done" id="qsr-erp-framework" data-project="qsr-erp" data-state="BUILT" data-verification="LINKED">
+<p class="meta"><span class="tape done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-built"/></svg>BUILT</span> <span class="stk stk-linked">LINKED</span> <a class="eid" href="../../ledger/index.html#qsr-erp-framework">#qsr-erp-framework</a> <span class="asof">as of 2026-11-11</span></p>
+<p class="claim">The app framework the team builds on: a Flask screen loader that registers each screen folder and refuses to start on a broken one, PBKDF2 login with role guards and CSRF checks on every POST, a base template, shared components, and a starter stylesheet for teammates to edit.</p>
+<p class="dns"><span class="lbl">Does not show</span>The finished screens. On main at 72a912e, app/screens holds only its README; the screens are being built by the team.</p>
+<dl><dt>Evidence</dt><dd><ul class="ev"><li><span class="mono">ISDS454_QSR_ERP @ main 72a912e : app/framework/loader.py</span> <span class="tier">tier 1</span> — screen loader</li><li><span class="mono">ISDS454_QSR_ERP @ main 72a912e : app/framework/auth.py</span> <span class="tier">tier 1</span> — login, role guards</li><li><span class="mono">ISDS454_QSR_ERP @ main 72a912e : app/templates/base.html</span> <span class="tier">tier 1</span> — base layout</li><li><span class="mono">ISDS454_QSR_ERP @ main 72a912e : app/static/style.css</span> <span class="tier">tier 1</span> — starter stylesheet</li></ul></dd></dl>
+</article>
+<article class="tag unfinished" id="qsr-erp-role" data-project="qsr-erp" data-state="IN-PROGRESS" data-verification="AUTHOR-REPORTED">
+<p class="meta"><span class="tape unfinished"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-in-progress"/></svg>IN-PROGRESS</span> <span class="stk stk-author">AUTHOR-REPORTED</span> <a class="eid" href="../../ledger/index.html#qsr-erp-role">#qsr-erp-role</a> <span class="asof">as of 2026-11-22</span></p>
+<p class="claim">I designed the database and the app&#x27;s architecture, built the framework screens and base styling, and am leading the team through implementation. Teammates own the data visualisation and the queries that put data on each screen.</p>
+<p class="dns"><span class="lbl">Does not show</span>The project&#x27;s outcome or grade; it was still in progress at this build. Teammates&#x27; work is not described here beyond what they own.</p>
+<dl><dt>Verification</dt><dd class="sig">Author-reported, not re-verified. No tier-1 artifact containing this claim was opened for this site.</dd><dt>Evidence</dt><dd><ul class="ev"><li><span class="mono">ISDS454_QSR_ERP @ main 72a912e : git log main</span> <span class="tier">tier 1</span> — all 30 commits on main are authored by me; this supports authorship of main, not the division of team work</li><li><span class="mono">author&#x27;s statement : statement to the site build, 2026-11-22</span> <span class="tier">tier 3</span> — role and team split</li></ul></dd></dl>
+</article></section>
+<section><h2 class="band" id="measured">What was measured<span class="strip">0 entries</span></h2><div class="sheet"><p>No entry meets MEASURED: number, denominator, dataset, synthetic flag, system and date all known. Numbers that fall short are shown with their entries.</p></div></section>
+<section><h2 class="band" id="not-measured">Not measured or built<span class="strip">1 entry</span></h2><article class="tag unfinished" id="qsr-erp-extensions" data-project="qsr-erp" data-state="DESIGN-ONLY" data-verification="AUTHOR-REPORTED">
+<p class="meta"><span class="tape unfinished"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-design-only"/></svg>DESIGN-ONLY</span> <span class="stk stk-author">AUTHOR-REPORTED</span> <a class="eid" href="../../ledger/index.html#qsr-erp-extensions">#qsr-erp-extensions</a> <span class="asof">as of 2026-11-16</span></p>
+<p class="claim">Extensions are written up and parked: a price simulation with a break-even check, a finance/BI layer, AI summaries that may only cite numbers from the database, business onboarding, real POS data, and hosting. None is built.</p>
+<p class="dns"><span class="lbl">Does not show</span>That any extension will be built. The plan itself makes them conditional on the required screens.</p>
+<dl><dt>Verification</dt><dd class="sig">Author-reported, not re-verified. No tier-1 artifact containing this claim was opened for this site.</dd><dt>Evidence</dt><dd><ul class="ev"><li><span class="mono">ISDS454_QSR_ERP @ extensions-plan 35eec27 : docs/superpowers/specs/2026-11-16-extensions-plan.md</span> <span class="tier">tier 2</span> — Status: parked; built only if the required screens are on track</li></ul></dd></dl>
+</article><div class="sheet"><h3>What each entry does not show</h3><ul class="plain"><li><a class="mono" href="#qsr-erp-database">#qsr-erp-database</a> Use with a real restaurant&#x27;s data: every row is generated. The 15 test files on main were not run for this site.</li><li><a class="mono" href="#qsr-erp-framework">#qsr-erp-framework</a> The finished screens. On main at 72a912e, app/screens holds only its README; the screens are being built by the team.</li><li><a class="mono" href="#qsr-erp-role">#qsr-erp-role</a> The project&#x27;s outcome or grade; it was still in progress at this build. Teammates&#x27; work is not described here beyond what they own.</li><li><a class="mono" href="#qsr-erp-extensions">#qsr-erp-extensions</a> That any extension will be built. The plan itself makes them conditional on the required screens.</li></ul></div></section>
+<section><h2 class="band" id="weak">Weaknesses and negative results<span class="strip">0 entries</span></h2><div class="sheet"><p>No NEGATIVE-RESULT or KILLED entries.</p></div></section>
+<section><h2 class="band" id="open">Open questions</h2><div class="sheet"><ul class="plain"><li>Do the required screens land before the feature freeze? <span class="mono small">from <a href="#qsr-erp-framework">#qsr-erp-framework</a>, <a href="#qsr-erp-extensions">#qsr-erp-extensions</a></span><br><span class="small">Would resolve it: The team&#x27;s screens merged to main.</span></li></ul></div></section>
+<section><h2 class="band" id="evidence">Evidence</h2><div class="sheet">
+<p>Repos with no public URL on this site (visibility not confirmed): <span class="mono">ISDS454_QSR_ERP</span>. <span class="unknown">UNKNOWN — author to supply</span></p>
+<div class="scroll" role="region" aria-label="Evidence index" tabindex="0"><table class="nums">
+<caption>Every evidence pointer used on this page</caption>
+<thead><tr><th scope="col">Repo / source</th><th scope="col">Branch</th><th scope="col">SHA</th><th scope="col">Path</th><th scope="col">Used by</th></tr></thead>
+<tbody><tr><td class="mono">ISDS454_QSR_ERP</td><td class="mono">main</td><td class="mono">72a912e</td><td class="mono">db/schema.sql</td><td class="mono"><a href="#qsr-erp-database">#qsr-erp-database</a></td></tr><tr><td class="mono">ISDS454_QSR_ERP</td><td class="mono">main</td><td class="mono">72a912e</td><td class="mono">db/views.sql</td><td class="mono"><a href="#qsr-erp-database">#qsr-erp-database</a></td></tr><tr><td class="mono">ISDS454_QSR_ERP</td><td class="mono">main</td><td class="mono">72a912e</td><td class="mono">scripts/seedgen</td><td class="mono"><a href="#qsr-erp-database">#qsr-erp-database</a></td></tr><tr><td class="mono">ISDS454_QSR_ERP</td><td class="mono">main</td><td class="mono">72a912e</td><td class="mono">docs/superpowers/specs/2026-10-07-qsr-erp-database-design.md</td><td class="mono"><a href="#qsr-erp-database">#qsr-erp-database</a></td></tr><tr><td class="mono">ISDS454_QSR_ERP</td><td class="mono">main</td><td class="mono">72a912e</td><td class="mono">app/framework/loader.py</td><td class="mono"><a href="#qsr-erp-framework">#qsr-erp-framework</a></td></tr><tr><td class="mono">ISDS454_QSR_ERP</td><td class="mono">main</td><td class="mono">72a912e</td><td class="mono">app/framework/auth.py</td><td class="mono"><a href="#qsr-erp-framework">#qsr-erp-framework</a></td></tr><tr><td class="mono">ISDS454_QSR_ERP</td><td class="mono">main</td><td class="mono">72a912e</td><td class="mono">app/templates/base.html</td><td class="mono"><a href="#qsr-erp-framework">#qsr-erp-framework</a></td></tr><tr><td class="mono">ISDS454_QSR_ERP</td><td class="mono">main</td><td class="mono">72a912e</td><td class="mono">app/static/style.css</td><td class="mono"><a href="#qsr-erp-framework">#qsr-erp-framework</a></td></tr><tr><td class="mono">ISDS454_QSR_ERP</td><td class="mono">main</td><td class="mono">72a912e</td><td class="mono">git log main</td><td class="mono"><a href="#qsr-erp-role">#qsr-erp-role</a></td></tr><tr><td class="mono">author</td><td class="mono">n/a</td><td class="mono">n/a</td><td class="mono">statement to the site build, 2026-11-22</td><td class="mono"><a href="#qsr-erp-role">#qsr-erp-role</a></td></tr><tr><td class="mono">ISDS454_QSR_ERP</td><td class="mono">extensions-plan</td><td class="mono">35eec27</td><td class="mono">docs/superpowers/specs/2026-11-16-extensions-plan.md</td><td class="mono"><a href="#qsr-erp-extensions">#qsr-erp-extensions</a></td></tr></tbody></table></div></div></section>
+
+</main>
+<footer class="foot">
+<p>Built 2026-11-22 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
+Machine-readable: <a href="../../ledger.json">ledger.json</a>.</p>
+</footer>
+
+</body>
+</html>

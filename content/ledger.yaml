@@ -9,6 +9,10 @@
 #   assay      main 2b6878e (clean, no git remote)
 #   sear-demo  main 730ad1d (untracked .claude/ and runs/; runs/ logs read from disk)
 #   Latch      main 3a76b7b; study3-agent-gate cdcd512 (worktree dirty; committed state only)
+# Added 2026-11-22 (read-only):
+#   PriceRiot        main 2870b22 (clean)
+#   ISDS454_QSR_ERP  main 72a912e; extensions-plan 35eec27 (checkout on extensions-plan, clean)
+#   ISDS309_TunedIn  not under git; README mtime 2026-09-15
 [
 {
   "id": "gin-sear-decode-constraint",
@@ -611,5 +615,342 @@
   "does_not_show": "UNKNOWN — author to supply.",
   "visibility": "hidden",
   "notes": "Hidden by default per brief; author must opt in. as_of is the seed date."
+},
+{
+  "id": "priceriot-engine",
+  "project": "priceriot",
+  "claim": "PriceRiot is a retail-store simulation: customer and worker agents pathfind (A* on a navmesh) through a YAML-defined store in a C++17 core exposed to Python through pybind11, and generate synthetic transaction records.",
+  "state": "BUILT",
+  "verification": "LINKED",
+  "as_of": "2026-07-23",
+  "evidence": [
+    {
+      "repo": "PriceRiot",
+      "path": "README.md",
+      "branch": "main",
+      "sha": "2870b22",
+      "tier": 2,
+      "dirty": false,
+      "note": "what it does, repository layout"
+    },
+    {
+      "repo": "PriceRiot",
+      "path": "cxx/bindings",
+      "branch": "main",
+      "sha": "2870b22",
+      "tier": 1,
+      "dirty": false,
+      "note": "pybind11 module"
+    },
+    {
+      "repo": "PriceRiot",
+      "path": "tests/test_simulation.py",
+      "branch": "main",
+      "sha": "2870b22",
+      "tier": 1,
+      "dirty": false,
+      "note": "smoke/integration tests; tests/test_temporal_equivalence.py also present"
+    }
+  ],
+  "does_not_show": "That the simulated shoppers behave like a real store's. No calibration or validation against real foot traffic or sales is in the repo. The tests were not run for this site.",
+  "visibility": "public"
+},
+{
+  "id": "priceriot-pos-etl",
+  "project": "priceriot",
+  "claim": "A POS ingestion pipeline cleans historical transaction CSVs, maps SKUs, and extracts simulation parameters, which the web app applies when a run has POS data attached.",
+  "state": "BUILT",
+  "verification": "LINKED",
+  "as_of": "2026-07-23",
+  "evidence": [
+    {
+      "repo": "PriceRiot",
+      "path": "python/ingestion",
+      "branch": "main",
+      "sha": "2870b22",
+      "tier": 1,
+      "dirty": false,
+      "note": "cleaner.py, sku_mapper.py, param_extractor.py, run_ingestion.py"
+    },
+    {
+      "repo": "PriceRiot",
+      "path": "python/webapp/simulation_runner.py",
+      "branch": "main",
+      "sha": "2870b22",
+      "tier": 1,
+      "dirty": false,
+      "note": "calls extract_params when POS data is set (per IMPLEMENTATION_STATUS 3.1)"
+    }
+  ],
+  "does_not_show": "How well the extracted parameters reproduce the source data. No fit or error measure is in the repo.",
+  "visibility": "public"
+},
+{
+  "id": "priceriot-analysis-apps",
+  "project": "priceriot",
+  "claim": "On top of the engine: a Streamlit dashboard with simulation and POS modes, a FastAPI + Vue 3 web app with run comparison and a layout editor, and Jupyter notebooks for basket, queue and heatmap analysis.",
+  "state": "BUILT",
+  "verification": "LINKED",
+  "as_of": "2026-07-23",
+  "evidence": [
+    {
+      "repo": "PriceRiot",
+      "path": "python/dashboard/app.py",
+      "branch": "main",
+      "sha": "2870b22",
+      "tier": 1,
+      "dirty": false,
+      "note": "Streamlit app"
+    },
+    {
+      "repo": "PriceRiot",
+      "path": "python/webapp/app.py",
+      "branch": "main",
+      "sha": "2870b22",
+      "tier": 1,
+      "dirty": false,
+      "note": "FastAPI routes"
+    },
+    {
+      "repo": "PriceRiot",
+      "path": "notebooks",
+      "branch": "main",
+      "sha": "2870b22",
+      "tier": 1,
+      "dirty": false,
+      "note": "basic_analysis.ipynb, queues_and_heatmaps.ipynb"
+    }
+  ],
+  "does_not_show": "Use by anyone other than the author, or any test of the web front end. No front-end tests are in the tree.",
+  "visibility": "public"
+},
+{
+  "id": "priceriot-not-built",
+  "project": "priceriot",
+  "claim": "Not built: changing staff counts on a queued run (POST /api/runs/{id}/workers), and the plan's deferred work: pricing hooks, a parameter-sweep API, a layout optimizer, and ML.",
+  "state": "NOT-DONE",
+  "verification": "LINKED",
+  "as_of": "2026-07-23",
+  "evidence": [
+    {
+      "repo": "PriceRiot",
+      "path": "python/webapp/app.py",
+      "branch": "main",
+      "sha": "2870b22",
+      "tier": 1,
+      "dirty": false,
+      "note": "no workers route in the file"
+    },
+    {
+      "repo": "PriceRiot",
+      "path": "IMPLEMENTATION_STATUS.md",
+      "branch": "main",
+      "sha": "2870b22",
+      "tier": 2,
+      "dirty": false,
+      "note": "6.1 Open; Deferred (P3/P4) items remain Open; last reviewed 2026-04-03"
+    }
+  ],
+  "does_not_show": "Whether any of it is planned. Despite the name, no pricing logic is in the engine yet.",
+  "visibility": "public"
+},
+{
+  "id": "qsr-erp-database",
+  "project": "qsr-erp",
+  "claim": "A SQLite database for a quick-service restaurant ERP, built from the group's logical ERD: sales import, recipes and inventory, staff scheduling and labor cost, and threshold alerts, with reporting views and a deterministic generator for four weeks of sample data for a fictional pizza shop.",
+  "state": "BUILT",
+  "verification": "LINKED",
+  "as_of": "2026-11-11",
+  "evidence": [
+    {
+      "repo": "ISDS454_QSR_ERP",
+      "path": "db/schema.sql",
+      "branch": "main",
+      "sha": "72a912e",
+      "tier": 1,
+      "dirty": false,
+      "note": "tables, constraints, double-booking trigger"
+    },
+    {
+      "repo": "ISDS454_QSR_ERP",
+      "path": "db/views.sql",
+      "branch": "main",
+      "sha": "72a912e",
+      "tier": 1,
+      "dirty": false,
+      "note": "reporting views"
+    },
+    {
+      "repo": "ISDS454_QSR_ERP",
+      "path": "scripts/seedgen",
+      "branch": "main",
+      "sha": "72a912e",
+      "tier": 1,
+      "dirty": false,
+      "note": "fixed-seed sample-data generator"
+    },
+    {
+      "repo": "ISDS454_QSR_ERP",
+      "path": "docs/superpowers/specs/2026-10-07-qsr-erp-database-design.md",
+      "branch": "main",
+      "sha": "72a912e",
+      "tier": 2,
+      "dirty": false,
+      "note": "design spec, 2026-10-07"
+    }
+  ],
+  "does_not_show": "Use with a real restaurant's data: every row is generated. The 15 test files on main were not run for this site.",
+  "notes": "ISDS 454 group project. The author designed the database (see qsr-erp-role).",
+  "visibility": "public"
+},
+{
+  "id": "qsr-erp-framework",
+  "project": "qsr-erp",
+  "claim": "The app framework the team builds on: a Flask screen loader that registers each screen folder and refuses to start on a broken one, PBKDF2 login with role guards and CSRF checks on every POST, a base template, shared components, and a starter stylesheet for teammates to edit.",
+  "state": "BUILT",
+  "verification": "LINKED",
+  "as_of": "2026-11-11",
+  "evidence": [
+    {
+      "repo": "ISDS454_QSR_ERP",
+      "path": "app/framework/loader.py",
+      "branch": "main",
+      "sha": "72a912e",
+      "tier": 1,
+      "dirty": false,
+      "note": "screen loader"
+    },
+    {
+      "repo": "ISDS454_QSR_ERP",
+      "path": "app/framework/auth.py",
+      "branch": "main",
+      "sha": "72a912e",
+      "tier": 1,
+      "dirty": false,
+      "note": "login, role guards"
+    },
+    {
+      "repo": "ISDS454_QSR_ERP",
+      "path": "app/templates/base.html",
+      "branch": "main",
+      "sha": "72a912e",
+      "tier": 1,
+      "dirty": false,
+      "note": "base layout"
+    },
+    {
+      "repo": "ISDS454_QSR_ERP",
+      "path": "app/static/style.css",
+      "branch": "main",
+      "sha": "72a912e",
+      "tier": 1,
+      "dirty": false,
+      "note": "starter stylesheet"
+    }
+  ],
+  "does_not_show": "The finished screens. On main at 72a912e, app/screens holds only its README; the screens are being built by the team.",
+  "visibility": "public"
+},
+{
+  "id": "qsr-erp-role",
+  "project": "qsr-erp",
+  "claim": "I designed the database and the app's architecture, built the framework screens and base styling, and am leading the team through implementation. Teammates own the data visualisation and the queries that put data on each screen.",
+  "state": "IN-PROGRESS",
+  "verification": "AUTHOR-REPORTED",
+  "as_of": "2026-11-22",
+  "evidence": [
+    {
+      "repo": "ISDS454_QSR_ERP",
+      "path": "git log main",
+      "branch": "main",
+      "sha": "72a912e",
+      "tier": 1,
+      "dirty": false,
+      "note": "all 30 commits on main are authored by me; this supports authorship of main, not the division of team work"
+    },
+    {
+      "repo": "author",
+      "path": "statement to the site build, 2026-11-22",
+      "branch": "n/a",
+      "sha": "n/a",
+      "tier": 3,
+      "dirty": false,
+      "note": "role and team split"
+    }
+  ],
+  "does_not_show": "The project's outcome or grade; it was still in progress at this build. Teammates' work is not described here beyond what they own.",
+  "visibility": "public"
+},
+{
+  "id": "qsr-erp-extensions",
+  "project": "qsr-erp",
+  "claim": "Extensions are written up and parked: a price simulation with a break-even check, a finance/BI layer, AI summaries that may only cite numbers from the database, business onboarding, real POS data, and hosting. None is built.",
+  "state": "DESIGN-ONLY",
+  "verification": "AUTHOR-REPORTED",
+  "as_of": "2026-11-16",
+  "evidence": [
+    {
+      "repo": "ISDS454_QSR_ERP",
+      "path": "docs/superpowers/specs/2026-11-16-extensions-plan.md",
+      "branch": "extensions-plan",
+      "sha": "35eec27",
+      "tier": 2,
+      "dirty": false,
+      "note": "Status: parked; built only if the required screens are on track"
+    }
+  ],
+  "does_not_show": "That any extension will be built. The plan itself makes them conditional on the required screens.",
+  "visibility": "public"
+},
+{
+  "id": "tunedin-app",
+  "project": "tunedin",
+  "claim": "TunedIn is a .NET 8 WinForms ticketing app built for ISDS 309 (Spring 2025): login, ticket-pack selection, cart, payment and receipt screens over a shared core library, with comma-delimited text files as storage.",
+  "state": "BUILT",
+  "verification": "AUTHOR-REPORTED",
+  "as_of": "2026-09-15",
+  "evidence": [
+    {
+      "repo": "ISDS309_TunedIn",
+      "path": "README.md",
+      "branch": "n/a (not under git)",
+      "sha": "n/a",
+      "tier": 2,
+      "dirty": false,
+      "note": "file mtime 2026-09-15"
+    },
+    {
+      "repo": "ISDS309_TunedIn",
+      "path": "ISDS309.Core",
+      "branch": "n/a (not under git)",
+      "sha": "n/a",
+      "tier": 1,
+      "dirty": false,
+      "note": "Domain, Enums, Services folders present; not pinned to a commit"
+    }
+  ],
+  "does_not_show": "That it builds today; it was not built for this site. It is not under version control, so no commit pins this description. Whether it was solo or group work is not recorded.",
+  "visibility": "public"
+},
+{
+  "id": "tunedin-gaps",
+  "project": "tunedin",
+  "claim": "Known gaps, from the project's own README: login does not check credentials against stored data, data is not saved automatically on exit, and there is no error handling around the app's main loop.",
+  "state": "NOT-DONE",
+  "verification": "AUTHOR-REPORTED",
+  "as_of": "2026-09-15",
+  "evidence": [
+    {
+      "repo": "ISDS309_TunedIn",
+      "path": "README.md",
+      "branch": "n/a (not under git)",
+      "sha": "n/a",
+      "tier": 2,
+      "dirty": false,
+      "note": "Known limitations / TODOs"
+    }
+  ],
+  "does_not_show": "Whether any gap was fixed after the README was written.",
+  "visibility": "public"
 }
 ]

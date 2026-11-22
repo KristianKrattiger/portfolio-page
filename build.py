@@ -56,6 +56,13 @@ def main(argv=None):
         os.makedirs(os.path.dirname(full), exist_ok=True)
         with open(full, "w", encoding="utf-8", newline="\n") as fh:
             fh.write(content)
+    # Static assets (bundled font + its licence), copied byte for byte.
+    fonts_src = os.path.join(ROOT, "assets", "fonts")
+    if os.path.isdir(fonts_src):
+        fonts_out = os.path.join(out, "fonts")
+        os.makedirs(fonts_out, exist_ok=True)
+        for name in sorted(os.listdir(fonts_src)):
+            shutil.copyfile(os.path.join(fonts_src, name), os.path.join(fonts_out, name))
     print(f"built {len(pages)} files into {out} (build date {build_date.isoformat()})")
     return 0
 

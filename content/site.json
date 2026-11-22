@@ -1,6 +1,6 @@
 {
   "name": "Kristian Krattiger",
-  "line": "Business technologist. I work on verification and grounding of AI output.",
+  "line": "AI verification and grounding: what I built, what I measured, and what didn't work.",
   "contact": "UNKNOWN — author to supply",
   "education": "CSUF senior. BA Business Administration (Information Systems), minor in Computer Science.",
   "education_source": "author's brief (not re-verified against a record)",
@@ -15,12 +15,19 @@
     "receipts": "https://github.com/KristianKrattiger/receipts"
   },
   "linkable_shas": {
-    "GIN": ["84abb9a"],
-    "receipts": ["9a0eeb8"]
+    "GIN": [
+      "84abb9a"
+    ],
+    "receipts": [
+      "9a0eeb8"
+    ]
   },
   "extra_links": {
     "receipts": [
-      {"label": "Hosted Receipts ledgers (GitHub Pages, linked from the repo README)", "url": "https://kristiankrattiger.github.io/receipts/"}
+      {
+        "label": "Hosted Receipts ledgers (GitHub Pages, linked from the repo README)",
+        "url": "https://kristiankrattiger.github.io/receipts/"
+      }
     ]
   },
   "projects": [
@@ -28,44 +35,249 @@
       "slug": "gin",
       "name": "GIN",
       "subtitle": "Grounded Intelligence Network",
-      "what_it_is_ids": ["gin-sear-decode-constraint", "gin-bookkeeper", "gin-federation"],
+      "what_it_is_ids": [
+        "gin-sear-decode-constraint",
+        "gin-bookkeeper",
+        "gin-federation"
+      ],
       "open_questions": [
-        {"q": "Does the relation detector hold on a corpus written by someone blind to its internals?", "ids": ["gin-node6", "gin-cartographer-stance"], "resolves": "Running Node6."},
-        {"q": "Is issue-framing contradiction a detectable signal, or a curatorial stance that labels cannot pin down?", "ids": ["gin-encoder-sweep", "gin-judge-capability", "gin-framing-curator"], "resolves": "More labeled pairs than four, ideally from more than one labeler."},
-        {"q": "Do the federation bars survive nodes on separate machines?", "ids": ["gin-federation", "gin-tailscale-mesh"], "resolves": "A multi-machine run of the same query sets."}
-      ]
+        {
+          "q": "Does the relation detector hold on a corpus written by someone blind to its internals?",
+          "ids": [
+            "gin-node6",
+            "gin-cartographer-stance"
+          ],
+          "resolves": "Running Node6."
+        },
+        {
+          "q": "Is issue-framing contradiction a detectable signal, or a curatorial stance that labels cannot pin down?",
+          "ids": [
+            "gin-encoder-sweep",
+            "gin-judge-capability",
+            "gin-framing-curator"
+          ],
+          "resolves": "More labeled pairs than four, ideally from more than one labeler."
+        },
+        {
+          "q": "Do the federation bars survive nodes on separate machines?",
+          "ids": [
+            "gin-federation",
+            "gin-tailscale-mesh"
+          ],
+          "resolves": "A multi-machine run of the same query sets."
+        }
+      ],
+      "group": "research"
     },
     {
       "slug": "sear",
       "name": "SEAR",
       "subtitle": "Sparse Epistemically Anchored Reasoning: the verify-after demo",
-      "what_it_is_ids": ["sear-demo-pipeline"],
+      "what_it_is_ids": [
+        "sear-demo-pipeline"
+      ],
       "open_questions": [
-        {"q": "Can the gate tell when two cited chunks contradict each other?", "ids": ["sear-conflict-fork"], "resolves": "A conflict detector, measured on the conflict fork."},
-        {"q": "Which of the review's measurement gaps are fixed?", "ids": ["sear-review-gaps"], "resolves": "The review document and a per-item status from the author."},
-        {"q": "What happens when retrieval actually has to choose?", "ids": ["sear-demo-results"], "resolves": "A corpus large enough that top_k leaves most chunks out."}
-      ]
+        {
+          "q": "Can the gate tell when two cited chunks contradict each other?",
+          "ids": [
+            "sear-conflict-fork"
+          ],
+          "resolves": "A conflict detector, measured on the conflict fork."
+        },
+        {
+          "q": "Which of the review's measurement gaps are fixed?",
+          "ids": [
+            "sear-review-gaps"
+          ],
+          "resolves": "The review document and a per-item status from the author."
+        },
+        {
+          "q": "What happens when retrieval actually has to choose?",
+          "ids": [
+            "sear-demo-results"
+          ],
+          "resolves": "A corpus large enough that top_k leaves most chunks out."
+        }
+      ],
+      "group": "research"
     },
     {
       "slug": "receipts",
       "name": "Receipts + Assay",
       "subtitle": "Vendor claims against independent sources, with a substring gate",
-      "what_it_is_ids": ["receipts-pipeline", "assay-library"],
+      "what_it_is_ids": [
+        "receipts-pipeline",
+        "assay-library"
+      ],
       "open_questions": [
-        {"q": "Can any relation check, local or frontier, admit real relations without admitting same-topic noise?", "ids": ["receipts-relation-check", "gin-decline-eval"], "resolves": "More than about four independent positive labels."},
-        {"q": "What does 'testing Assay' still need to cover?", "ids": ["assay-testing"], "resolves": "Author to define the scope."}
-      ]
+        {
+          "q": "Can any relation check, local or frontier, admit real relations without admitting same-topic noise?",
+          "ids": [
+            "receipts-relation-check",
+            "gin-decline-eval"
+          ],
+          "resolves": "More than about four independent positive labels."
+        },
+        {
+          "q": "What does 'testing Assay' still need to cover?",
+          "ids": [
+            "assay-testing"
+          ],
+          "resolves": "Author to define the scope."
+        }
+      ],
+      "group": "research"
     },
     {
       "slug": "latch",
       "name": "Latch",
       "subtitle": "Mechanical admission gates for small-model reasoning",
-      "what_it_is_ids": ["latch-pilot-killed", "latch-study3-agent-gate"],
+      "what_it_is_ids": [
+        "latch-pilot-killed",
+        "latch-study3-agent-gate"
+      ],
       "open_questions": [
-        {"q": "Does mechanical admission pay off only when a claim can be anchored to a literal artifact?", "ids": ["latch-pilot-killed"], "resolves": "A registered test on a gate that anchors to fetched bytes or export rows."},
-        {"q": "Would a warning, or exempting values the model could look up, keep the catch without the false alarms?", "ids": ["latch-study3-agent-gate"], "resolves": "A new registered study (named in study 3's limitations)."},
-        {"q": "Does a gated chain of small models behave differently from one gated model?", "ids": ["latch-gated-slm-chain"], "resolves": "Running the multi-model arms, which no study so far has."}
+        {
+          "q": "Does mechanical admission pay off only when a claim can be anchored to a literal artifact?",
+          "ids": [
+            "latch-pilot-killed"
+          ],
+          "resolves": "A registered test on a gate that anchors to fetched bytes or export rows."
+        },
+        {
+          "q": "Would a warning, or exempting values the model could look up, keep the catch without the false alarms?",
+          "ids": [
+            "latch-study3-agent-gate"
+          ],
+          "resolves": "A new registered study (named in study 3's limitations)."
+        },
+        {
+          "q": "Does a gated chain of small models behave differently from one gated model?",
+          "ids": [
+            "latch-gated-slm-chain"
+          ],
+          "resolves": "Running the multi-model arms, which no study so far has."
+        }
+      ],
+      "group": "research"
+    },
+    {
+      "slug": "priceriot",
+      "name": "PriceRiot",
+      "group": "other",
+      "subtitle": "Retail-store simulation for synthetic transaction data",
+      "what_it_is_ids": [
+        "priceriot-engine",
+        "priceriot-pos-etl"
+      ],
+      "open_questions": [
+        {
+          "q": "Do the simulated shoppers reproduce a real store's transactions?",
+          "ids": [
+            "priceriot-engine",
+            "priceriot-pos-etl"
+          ],
+          "resolves": "Fitting extracted parameters on one slice of POS data and scoring the simulation on a held-out slice."
+        }
+      ]
+    },
+    {
+      "slug": "qsr-erp",
+      "name": "QSR ERP",
+      "group": "other",
+      "subtitle": "Restaurant ERP database and app, ISDS 454 group project (I lead it)",
+      "what_it_is_ids": [
+        "qsr-erp-database",
+        "qsr-erp-framework",
+        "qsr-erp-role"
+      ],
+      "open_questions": [
+        {
+          "q": "Do the required screens land before the feature freeze?",
+          "ids": [
+            "qsr-erp-framework",
+            "qsr-erp-extensions"
+          ],
+          "resolves": "The team's screens merged to main."
+        }
+      ]
+    },
+    {
+      "slug": "tunedin",
+      "name": "TunedIn",
+      "group": "other",
+      "subtitle": "Desktop ticketing app, ISDS 309",
+      "what_it_is_ids": [
+        "tunedin-app"
+      ],
+      "open_questions": [
+        {
+          "q": "Were the README's known gaps ever closed?",
+          "ids": [
+            "tunedin-gaps"
+          ],
+          "resolves": "A credential check against stored users and a save on exit."
+        }
       ]
     }
-  ]
+  ],
+  "focus": "Verification and grounding of AI output: systems where a model may propose but a deterministic check decides what gets admitted.",
+  "skills": [
+    {
+      "name": "Python analytics stack: pandas, NumPy, Matplotlib, seaborn",
+      "backed_by": [
+        "priceriot-analysis-apps"
+      ]
+    },
+    {
+      "name": "Streamlit dashboards",
+      "backed_by": [
+        "priceriot-analysis-apps"
+      ]
+    },
+    {
+      "name": "ETL pipelines",
+      "backed_by": [
+        "priceriot-pos-etl"
+      ]
+    },
+    {
+      "name": "SQL and relational database design (SQLite)",
+      "backed_by": [
+        "qsr-erp-database"
+      ]
+    },
+    {
+      "name": "ERP design; SAP",
+      "backed_by": [
+        "qsr-erp-database"
+      ],
+      "note": "SAP experience is author-reported"
+    },
+    {
+      "name": "Excel, including Analytic Solver and the Data Science tabs",
+      "backed_by": []
+    },
+    {
+      "name": "Data mining techniques (ISDS 474)",
+      "backed_by": []
+    },
+    {
+      "name": "Local LLM evaluation harnesses; preregistered studies with kill criteria",
+      "backed_by": [
+        "gin-nc-baseline",
+        "latch-pilot-killed"
+      ]
+    },
+    {
+      "name": "Languages in the repos: Python, C++17, C# / .NET, TypeScript, SQL",
+      "backed_by": [
+        "priceriot-engine",
+        "tunedin-app",
+        "assay-library",
+        "qsr-erp-database"
+      ]
+    }
+  ],
+  "skills_source": "list supplied by the author on 2026-11-22; entries marked 'seen in' link to a ledger entry whose evidence shows the skill in use"
 }

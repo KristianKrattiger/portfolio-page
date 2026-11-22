@@ -1,12 +1,22 @@
-"""Render the ledger into static pages. Pure functions; returns {path: text}."""
+"""Render the ledger into static pages. Pure functions; returns {path: text}.
+
+Visual system: every entry is a punched tag; its state is a strip of label tape
+whose colour encodes the family (done / failed / unfinished) and whose word and
+shape name the state. See docs/superpowers/specs/2026-11-22-restyle-design.md.
+"""
 import html
 import json
 from collections import Counter, OrderedDict
 
 from .validate import STATES, VERIFICATIONS, is_stale, is_unknown
 
-NOT_DONE_STATES = ["IN-PROGRESS", "DESIGN-ONLY", "BLOCKED", "NOT-DONE", "KILLED", "NEGATIVE-RESULT"]
 DONE_STATES = ["MEASURED", "BUILT"]
+FAILED_STATES = ["KILLED", "NEGATIVE-RESULT"]
+UNFINISHED_STATES = ["IN-PROGRESS", "DESIGN-ONLY", "BLOCKED", "NOT-DONE"]
+NOT_DONE_STATES = FAILED_STATES + UNFINISHED_STATES
+FAMILIES = [("done", "Done", DONE_STATES), ("failed", "Failed", FAILED_STATES),
+            ("unfinished", "Unfinished", UNFINISHED_STATES)]
+FAMILY_SHAPE = {"done": "measured", "failed": "killed", "unfinished": "not-done"}
 SHAPE_NAMES = {
     "MEASURED": "filled square", "BUILT": "open square", "IN-PROGRESS": "half-filled square",
     "DESIGN-ONLY": "open diamond", "BLOCKED": "barred square", "NOT-DONE": "open circle",
@@ -22,7 +32,6 @@ STATE_GLOSS = {
     "KILLED": "stopped by a stated criterion",
     "NEGATIVE-RESULT": "tested; did not hold",
 }
-FACETS = [("project", None), ("state", STATES), ("verification", VERIFICATIONS)]
 UNKNOWN_TEXT = "UNKNOWN — author to supply"
 
 e = html.escape
@@ -32,33 +41,43 @@ def slug(s):
     return s.lower().replace(" ", "-")
 
 
+def family(state):
+    for key, _label, states in FAMILIES:
+        if state in states:
+            return key
+    raise ValueError(state)
+
+
 # ---------------------------------------------------------------- primitives
 
 SVG_DEFS = """<svg class="defs" aria-hidden="true" focusable="false" width="0" height="0"><defs>
 <symbol id="s-measured" viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" fill="currentColor"/></symbol>
-<symbol id="s-built" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
-<symbol id="s-in-progress" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="2" width="4" height="8" fill="currentColor"/></symbol>
-<symbol id="s-design-only" viewBox="0 0 12 12"><polygon points="6,1 11,6 6,11 1,6" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
-<symbol id="s-blocked" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="5" width="8" height="2" fill="currentColor"/></symbol>
-<symbol id="s-not-done" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
-<symbol id="s-killed" viewBox="0 0 12 12"><path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+<symbol id="s-built" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="s-in-progress" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="2" y="2" width="4" height="8" fill="currentColor"/></symbol>
+<symbol id="s-design-only" viewBox="0 0 12 12"><polygon points="6,1 11,6 6,11 1,6" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="s-blocked" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="2" y="5" width="8" height="2" fill="currentColor"/></symbol>
+<symbol id="s-not-done" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+<symbol id="s-killed" viewBox="0 0 12 12"><path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" stroke-width="2.2" fill="none"/></symbol>
 <symbol id="s-negative-result" viewBox="0 0 12 12"><polygon points="1.5,2.5 10.5,2.5 6,10.5" fill="currentColor"/></symbol>
 </defs></svg>"""
 
 
+def shape(name):
+    return f'<svg class="shape" aria-hidden="true" focusable="false"><use href="#s-{name}"/></svg>'
+
+
 def state_tag(state):
-    s = slug(state)
-    return (f'<span class="st st-{s}"><svg class="shape" aria-hidden="true" focusable="false">'
-            f'<use href="#s-{s}"/></svg>{e(state)}</span>')
+    """Label tape: family colour, state shape, state word."""
+    return f'<span class="tape {family(state)}">{shape(slug(state))}{e(state)}</span>'
 
 
 def verif_tag(v):
-    cls = "vf-linked" if v == "LINKED" else "vf-author"
-    return f'<span class="vf {cls}">{e(v)}</span>'
+    cls = "stk-linked" if v == "LINKED" else "stk-author"
+    return f'<span class="stk {cls}">{e(v)}</span>'
 
 
 def stale_tag():
-    return '<span class="flag flag-stale" title="as_of older than 90 days at build time">STALE</span>'
+    return '<span class="stk stk-stale" title="as_of older than 90 days at build time">STALE</span>'
 
 
 def text(v):
@@ -90,11 +109,14 @@ def rel(from_path, to_path):
 
 
 def entry_href(page, entry_id):
-    return rel(page, "ledger/index.html") + "#" + entry_id
+    target = "ledger/index.html"
+    if page == target:
+        return "#" + entry_id
+    return rel(page, target) + "#" + entry_id
 
 
 def entry_home_href(page, entry):
-    """Link to the entry's full block on its own project page (same page -> bare #id)."""
+    """Link to the entry's tag on its own project page (same page -> bare #id)."""
     target = f"projects/{entry['project']}/index.html"
     if target == page:
         return "#" + entry["id"]
@@ -108,13 +130,34 @@ def project_name(site, key):
     return key
 
 
+def sort_entries(entries, site):
+    order = {p["slug"]: i for i, p in enumerate(site["projects"])}
+    sidx = {s: i for i, s in enumerate(STATES)}
+    return sorted(entries, key=lambda x: (order.get(x["project"], 99), sidx[x["state"]], x["id"]))
+
+
+def family_counts(entries):
+    c = Counter(family(x["state"]) for x in entries)
+    return {k: c.get(k, 0) for k, _l, _s in FAMILIES}
+
+
+def strip(entries):
+    """Small family-count chips; zero counts are shown dashed, never hidden."""
+    fc = family_counts(entries)
+    chips = []
+    for key, label, _s in FAMILIES:
+        n = fc[key]
+        cls = f"chip {key}" + (" zero" if n == 0 else "")
+        chips.append(f'<span class="{cls}">{shape(FAMILY_SHAPE[key])}{e(label)} {n}</span>')
+    return '<span class="strip">' + "".join(chips) + "</span>"
+
+
 # ---------------------------------------------------------------- layout
 
 def nav(page, site):
-    items = [("index.html", "Ledger summary"), ("ledger/index.html", "Full ledger"),
-             ("not-done/index.html", "Not done, failed, untested")]
-    items += [(f"projects/{p['slug']}/index.html", p["name"]) for p in site["projects"]]
-    items += [("about/index.html", "About"), ("colophon/index.html", "Colophon")]
+    items = [("ledger/index.html", "Ledger"), ("not-done/index.html", "Not done"),
+             ("projects/index.html", "Projects"), ("about/index.html", "About"),
+             ("colophon/index.html", "Colophon")]
     lis = []
     for target, label in items:
         cur = ' aria-current="page"' if target == page else ""
@@ -130,7 +173,7 @@ def layout(page, title, body, ctx, script=""):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; font-src 'self'; script-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <title>{e(title)} — {e(site['name'])}</title>
 <link rel="stylesheet" href="{rel(page, 'style.css')}">
 </head>
@@ -145,7 +188,7 @@ def layout(page, title, body, ctx, script=""):
 {body}
 </main>
 <footer class="foot">
-<p class="mono">Built {e(ctx.build_date.isoformat())} from content/ledger.yaml. STALE = as_of older than 90 days at build time.
+<p>Built {e(ctx.build_date.isoformat())} from content/ledger.yaml. STALE = as_of older than 90 days at build time.
 Machine-readable: <a href="{rel(page, 'ledger.json')}">ledger.json</a>.</p>
 </footer>
 {script}
@@ -154,7 +197,7 @@ Machine-readable: <a href="{rel(page, 'ledger.json')}">ledger.json</a>.</p>
 """
 
 
-# ---------------------------------------------------------------- entry blocks
+# ---------------------------------------------------------------- tags
 
 def evidence_html(ev, site):
     if is_unknown(ev):
@@ -164,14 +207,22 @@ def evidence_html(ev, site):
         repo = it["repo"]
         sha = str(it.get("sha", ""))
         branch = str(it.get("branch", ""))
-        loc = f"{repo} @ {branch} {sha}" if repo not in ("vault", "seed") else (
-            "author's notes (vault)" if repo == "vault" else "seed ledger (prior only)")
+        if repo == "vault":
+            loc = "author's notes (vault)"
+        elif repo == "seed":
+            loc = "seed ledger (prior only)"
+        elif repo == "author":
+            loc = "author's statement"
+        elif sha == "n/a":
+            loc = f"{repo} ({branch})"
+        else:
+            loc = f"{repo} @ {branch} {sha}"
         path_html = e(it["path"])
         if sha in site.get("linkable_shas", {}).get(repo, []) and repo in site.get("public_repos", {}):
             url = f"{site['public_repos'][repo]}/blob/{sha}/{it['path']}"
             if "(untracked)" not in branch:
                 path_html = f'<a href="{e(url)}" rel="noreferrer">{path_html}</a>'
-        dirty = ' <span class="flag">worktree dirty</span>' if it.get("dirty") else ""
+        dirty = ' <span class="stk stk-flag">worktree dirty</span>' if it.get("dirty") else ""
         note = f' — {e(it["note"])}' if it.get("note") else ""
         lis.append(f'<li><span class="mono">{e(loc)} : {path_html}</span> '
                    f'<span class="tier">tier {e(str(it.get("tier", "?")))}</span>{dirty}{note}</li>')
@@ -185,90 +236,131 @@ def numbers_table(rows, caption):
     for m in rows:
         cells = [m.get(k, "UNKNOWN") for k in
                  ["metric", "value", "denominator", "dataset", "synthetic", "system", "date"]]
-        body.append("<tr>" + "".join(f"<td>{text(c)}</td>" for c in cells) + "</tr>")
+        body.append("<tr>" + "".join(
+            f'<td{" class=\"nowrap\"" if i in (1, 6) else ""}>{text(c)}</td>' for i, c in enumerate(cells)) + "</tr>")
     return (f'<div class="scroll" role="region" aria-label="{e(caption)}" tabindex="0">'
             f'<table class="nums"><caption>{e(caption)}</caption><thead><tr>{head}</tr></thead>'
             f'<tbody>{"".join(body)}</tbody></table></div>')
 
 
-def entry_block(entry, ctx, page, heading="h3"):
+def tag(entry, ctx, page, anchor=True, show_project=True, details=True):
+    """One entry as a punched tag. anchor=True puts the entry id on the tag."""
     eid = entry["id"]
-    tags = [state_tag(entry["state"]), verif_tag(entry["verification"]),
-            f'<span class="mono asof">as of {e(entry["as_of"])}</span>']
+    fam = family(entry["state"])
+    meta = [state_tag(entry["state"]), verif_tag(entry["verification"])]
     if ctx.stale(entry):
-        tags.append(stale_tag())
-    parts = [f'<article class="entry" id="{e(eid)}">',
-             f'<p class="meta"><a class="eid mono" href="{entry_href(page, eid)}">#{e(eid)}</a> '
-             f'{" ".join(tags)}</p>',
-             f'<{heading} class="claim">{e(entry["claim"])}</{heading}>', "<dl>"]
+        meta.append(stale_tag())
+    meta.append(f'<a class="eid" href="{entry_href(page, eid)}">#{e(eid)}</a>')
+    if show_project:
+        meta.append(f'<span class="proj">{e(project_name(ctx.site, entry["project"]))}</span>')
+    meta.append(f'<span class="asof">as of {e(entry["as_of"])}</span>')
+    idattr = f' id="{e(eid)}"' if anchor else ""
+    parts = [f'<article class="tag {fam}"{idattr} data-project="{e(entry["project"])}" '
+             f'data-state="{e(entry["state"])}" data-verification="{e(entry["verification"])}">',
+             f'<p class="meta">{" ".join(meta)}</p>',
+             f'<p class="claim">{e(entry["claim"])}</p>',
+             f'<p class="dns"><span class="lbl">Does not show</span>{text(entry["does_not_show"])}</p>']
+    facts = []
     if entry.get("verification") == "AUTHOR-REPORTED":
-        parts.append('<dt>Verification</dt><dd class="sig">Author-reported, not re-verified. '
+        facts.append('<dt>Verification</dt><dd class="sig">Author-reported, not re-verified. '
                      'No tier-1 artifact containing this claim was opened for this site.</dd>')
     if entry.get("measurements"):
-        parts.append("<dt>Measured</dt><dd>" + numbers_table(entry["measurements"], f"Measurements for {eid}") + "</dd>")
+        facts.append("<dt>Measured</dt><dd>" + numbers_table(entry["measurements"], f"Measurements for {eid}") + "</dd>")
     if entry.get("results"):
-        parts.append("<dt>Reported numbers</dt><dd>" + numbers_table(entry["results"], f"Numbers for {eid}") + "</dd>")
+        facts.append("<dt>Reported numbers</dt><dd>" + numbers_table(entry["results"], f"Numbers for {eid}") + "</dd>")
     if entry.get("reported_result"):
-        parts.append(f'<dt>Reported result</dt><dd>{e(entry["reported_result"])} '
-                     f'<span class="flag">details not supplied</span></dd>')
+        facts.append(f'<dt>Reported result</dt><dd>{e(entry["reported_result"])} '
+                     f'<span class="stk stk-flag">details not supplied</span></dd>')
     if entry.get("kill_criterion"):
-        parts.append(f'<dt>Kill criterion</dt><dd>{e(entry["kill_criterion"])}</dd>')
+        facts.append(f'<dt>Kill criterion</dt><dd>{e(entry["kill_criterion"])}</dd>')
     if entry.get("blocked_by"):
-        parts.append(f'<dt>Blocked by</dt><dd>{e(entry["blocked_by"])}</dd>')
-    parts.append(f'<dt>Does not show</dt><dd>{text(entry["does_not_show"])}</dd>')
+        facts.append(f'<dt>Blocked by</dt><dd>{e(entry["blocked_by"])}</dd>')
     if entry.get("disagreement"):
-        parts.append(f'<dt>Sources disagree</dt><dd class="sig">{e(entry["disagreement"])}</dd>')
-    parts.append(f'<dt>Evidence</dt><dd>{evidence_html(entry["evidence"], ctx.site)}</dd>')
+        facts.append(f'<dt>Sources disagree</dt><dd class="sig">{e(entry["disagreement"])}</dd>')
+    more = [f'<dt>Evidence</dt><dd>{evidence_html(entry["evidence"], ctx.site)}</dd>']
     if entry.get("notes"):
-        parts.append(f'<dt>Notes</dt><dd>{e(entry["notes"])}</dd>')
-    parts.append("</dl></article>")
+        more.append(f'<dt>Notes</dt><dd>{e(entry["notes"])}</dd>')
+    if details:
+        # Compact tag: short, decisive facts stay visible; numbers, the verification
+        # note and evidence fold under one summary that names what is inside.
+        visible, folded, inside = [], [], []
+        for f in facts:
+            if f.startswith(("<dt>Kill criterion", "<dt>Blocked by")):
+                visible.append(f)
+            else:
+                folded.append(f)
+        if entry.get("measurements"):
+            inside.append(f'{len(entry["measurements"])} measured number' + ("s" if len(entry["measurements"]) != 1 else ""))
+        if entry.get("results"):
+            inside.append(f'{len(entry["results"])} reported number' + ("s" if len(entry["results"]) != 1 else ""))
+        if entry.get("disagreement"):
+            inside.append("where sources disagree")
+        inside.append("evidence")
+        if visible:
+            parts.append("<dl>" + "".join(visible) + "</dl>")
+        flag = ' <span class="stk stk-author">SOURCES DISAGREE</span>' if entry.get("disagreement") else ""
+        parts.append(f'<details><summary>{e(", ".join(inside).capitalize())}</summary><dl>'
+                     + "".join(folded + more) + "</dl></details>")
+        if flag:
+            parts[1] = parts[1].replace("</p>", flag + "</p>", 1)
+    else:
+        parts.append("<dl>" + "".join(facts + more) + "</dl>")
+    parts.append("</article>")
     return "\n".join(parts)
 
 
-# ---------------------------------------------------------------- tables
-
-def ledger_rows(entries, ctx, page, anchors=True):
-    rows = []
-    for en in entries:
-        stale = stale_tag() if ctx.stale(en) else ""
-        idattr = f' id="{e(en["id"])}"' if anchors else ""
-        rows.append(
-            f'<tr{idattr} data-project="{e(en["project"])}" data-state="{e(en["state"])}" '
-            f'data-verification="{e(en["verification"])}">'
-            f'<td class="mono"><a href="{entry_href(page, en["id"]) if not anchors else "#" + e(en["id"])}">{e(en["id"])}</a></td>'
-            f'<td>{e(project_name(ctx.site, en["project"]))}</td>'
-            f'<td>{state_tag(en["state"])}</td><td>{verif_tag(en["verification"])} {stale}</td>'
-            f'<td class="mono date">{e(en["as_of"])}</td><td>{e(en["claim"])}</td>'
-            f'<td>{text(en["does_not_show"])}</td></tr>')
-    return "".join(rows)
-
-
-def ledger_table(entries, ctx, page, caption, anchors=True, table_id=None):
-    tid = f' id="{table_id}"' if table_id else ""
-    head = "".join(f'<th scope="col">{h}</th>' for h in
-                   ["id", "Project", "State", "Verification", "As of", "Claim", "Does not show"])
-    return (f'<div class="scroll" role="region" aria-label="{e(caption)}" tabindex="0">'
-            f'<table class="ledger"{tid}><caption>{e(caption)}</caption><thead><tr>{head}</tr></thead>'
-            f'<tbody>{ledger_rows(entries, ctx, page, anchors)}</tbody></table></div>')
-
-
-def counts_table(counter, keys, caption, kind):
-    rows = []
-    for k in keys:
-        tag = state_tag(k) if kind == "state" else verif_tag(k)
-        gloss = STATE_GLOSS.get(k, "") if kind == "state" else (
-            "tier-1 artifact opened at a recorded commit" if k == "LINKED" else "not re-verified")
-        rows.append(f'<tr><td>{tag}</td><td class="num mono">{counter.get(k, 0)}</td>'
-                    f'<td class="gloss">{e(gloss)}</td></tr>')
-    return (f'<table class="counts"><caption>{e(caption)}</caption>'
-            f'<thead><tr><th scope="col">Label</th><th scope="col">Entries</th><th scope="col">Means</th></tr></thead>'
-            f'<tbody>{"".join(rows)}</tbody></table>')
-
-
-def sort_entries(entries, site):
-    order = {p["slug"]: i for i, p in enumerate(site["projects"])}
+def family_groups(entries, ctx, page, anchor=True, show_project=False, details=True, level="h3"):
+    """Done / Failed / Unfinished groups; a family with no entries renders nothing."""
+    out = []
     sidx = {s: i for i, s in enumerate(STATES)}
-    return sorted(entries, key=lambda x: (order.get(x["project"], 99), sidx[x["state"]], x["id"]))
+    for key, label, states in FAMILIES:
+        group = sorted([x for x in entries if x["state"] in states], key=lambda x: (sidx[x["state"]], x["id"]))
+        if not group:
+            continue
+        tags = "\n".join(tag(x, ctx, page, anchor=anchor, show_project=show_project, details=details) for x in group)
+        out.append(f'<div class="famgroup" data-family="{key}"><{level} class="fam">'
+                   f'<span class="tape {key}">{shape(FAMILY_SHAPE[key])}{e(label)}</span>'
+                   f'<span class="n">{len(group)}</span></{level}>{tags}</div>')
+    return "".join(out)
+
+
+# ---------------------------------------------------------------- about
+
+def skills_html(site, page, ctx):
+    lis = []
+    for sk in site.get("skills", []):
+        ids = [i for i in sk.get("backed_by", []) if i in ctx.by_id]
+        if ids:
+            seen = "seen in " + ", ".join(
+                f'<a href="{e(entry_home_href(page, ctx.by_id[i]))}">#{e(i)}</a>' for i in ids)
+        else:
+            seen = '<span class="stk stk-author">AUTHOR-REPORTED</span>'
+        note = f' <span class="seen">({e(sk["note"])})</span>' if sk.get("note") else ""
+        lis.append(f'<li>{e(sk["name"])} <span class="seen">{seen}</span>{note}</li>')
+    return "<ul>" + "".join(lis) + "</ul>"
+
+
+def about_dl(site, page, ctx):
+    projs = ", ".join(f'<a href="{rel(page, "projects/" + p["slug"] + "/index.html")}">{e(p["name"])}</a>'
+                      for p in site["projects"])
+    return f"""<dl class="about">
+<dt>Education</dt><dd>{e(site['education'])} <span class="seen">Source: {e(site['education_source'])}.</span></dd>
+<dt>Focus</dt><dd>{e(site['focus'])}</dd>
+<dt>Skills</dt><dd>{skills_html(site, page, ctx)}<span class="seen">{e(site.get('skills_source', ''))}.</span></dd>
+<dt>Projects</dt><dd>{projs}</dd>
+<dt>Contact</dt><dd>{text(site['contact'])}</dd>
+</dl>"""
+
+
+def project_rows(entries, site, page, group):
+    rows = []
+    for p in site["projects"]:
+        if p.get("group") != group:
+            continue
+        mine = [x for x in entries if x["project"] == p["slug"]]
+        rows.append(f'<li class="projrow"><div><a class="pname" href="{rel(page, "projects/" + p["slug"] + "/index.html")}">'
+                    f'{e(p["name"])}</a><span class="psub">{e(p["subtitle"])}</span></div>{strip(mine)}</li>')
+    return '<ul class="projrows">' + "".join(rows) + "</ul>"
 
 
 # ---------------------------------------------------------------- pages
@@ -276,55 +368,34 @@ def sort_entries(entries, site):
 def page_home(entries, ctx):
     page = "index.html"
     site = ctx.site
-    sc = Counter(x["state"] for x in entries)
+    fc = family_counts(entries)
     vc = Counter(x["verification"] for x in entries)
     stale_n = sum(1 for x in entries if ctx.stale(x))
-    unknown_n = sum(1 for x in entries if is_unknown(x["evidence"]) or is_unknown(x["does_not_show"]))
     disagree_n = sum(1 for x in entries if x.get("disagreement"))
-    done_n = sum(sc[s] for s in DONE_STATES)
-    nd_n = sum(sc[s] for s in NOT_DONE_STATES)
-    paras = "".join(f"<p>{e(p)}</p>" for p in site["work_paragraph"])
+    targets = {"done": "ledger/index.html", "failed": "not-done/index.html",
+               "unfinished": "not-done/index.html#unfinished"}
+    counts = "".join(
+        f'<li><a href="{rel(page, targets[k])}"><span class="bigtape {k}">{shape(FAMILY_SHAPE[k])}'
+        f'{e(label)}<span class="num">{fc[k]}</span></span></a></li>' for k, label, _s in FAMILIES)
+    newest = sorted(entries, key=lambda x: (x["as_of"], x["id"]), reverse=True)[:3]
     body = f"""
-<section class="lead grid">
-<h1 class="title">Ledger</h1>
-<div class="id-block mono">
-<p>{e(site['name'])}</p>
-<p>{e(site['line'])}</p>
-<p>Contact: {text(site['contact'])}</p>
-</div>
+<section class="lead">
+<h1 class="title">{e(site['name'])}</h1>
+<p class="tagline">{e(site['line'])}</p>
+<ul class="counts" aria-label="Entries by family, computed from the ledger">{counts}</ul>
+<p class="wallnote">{len(entries)} public entries: {vc.get('LINKED', 0)} linked to a commit, {vc.get('AUTHOR-REPORTED', 0)} author-reported, {stale_n} stale, {disagree_n} where sources disagree. Counts are computed at build time.</p>
 </section>
-<section class="split grid" aria-label="Counts by state, computed from the ledger">
-<div class="half">
-<h2>Done side <span class="mono n">{done_n}</span></h2>
-{counts_table(sc, DONE_STATES, "Built and measured", "state")}
-</div>
-<div class="half">
-<h2>Not-done side <span class="mono n">{nd_n}</span></h2>
-{counts_table(sc, NOT_DONE_STATES, "Not done, blocked, killed, negative", "state")}
-<p><a href="{rel(page, 'not-done/index.html')}">Read the not-done side in full</a></p>
-</div>
-</section>
-<section class="grid strip" aria-label="Counts by verification, computed from the ledger">
-<div class="half">
-{counts_table(vc, VERIFICATIONS, "By verification", "verification")}
-</div>
-<div class="half mono small">
-<p>{stale_tag()} {stale_n} of {len(entries)} entries are older than 90 days.</p>
-<p><span class="unknown">UNKNOWN</span> {unknown_n} entries have no evidence pointer or an unknown "does not show".</p>
-<p><span class="flag sigflag">Sources disagree</span> on {disagree_n} entries; the site shows the higher tier and the disagreement.</p>
-<p>Counts are computed from content/ledger.yaml at build time. Hidden entries are not counted.</p>
-</div>
-</section>
-<section class="prose grid">
-<h2>What I work on</h2>
-<div class="col">{paras}<p class="mono small">Source: {e(site['work_paragraph_source'])}.</p></div>
-</section>
-<section>
-<h2>Every claim</h2>
-{ledger_table(sort_entries(entries, site), ctx, page, "All public ledger entries", anchors=False)}
-</section>
+<section aria-labelledby="h-research"><h2 class="band" id="h-research">Research</h2>
+{project_rows(entries, site, page, "research")}</section>
+<section aria-labelledby="h-other"><h2 class="band" id="h-other">Other work</h2>
+{project_rows(entries, site, page, "other")}</section>
+<section aria-labelledby="h-about"><h2 class="band" id="h-about">About</h2>
+<div class="sheet">{about_dl(site, page, ctx)}
+<p><a href="{rel(page, 'about/index.html')}">More: what I am looking at next, and open threads</a></p></div></section>
+<section aria-labelledby="h-new"><h2 class="band" id="h-new">Newest entries <a class="small" href="{rel(page, 'ledger/index.html')}">all {len(entries)}</a></h2>
+{"".join(tag(x, ctx, page, anchor=False) for x in newest)}</section>
 """
-    return layout(page, "Ledger", body, ctx)
+    return layout(page, "Ledger summary", body, ctx)
 
 
 def untested_built(entries):
@@ -334,29 +405,30 @@ def untested_built(entries):
 def page_not_done(entries, ctx):
     page = "not-done/index.html"
     site = ctx.site
+    order = FAILED_STATES[::-1] + ["BLOCKED", "NOT-DONE", "DESIGN-ONLY", "IN-PROGRESS"]
     blocks = []
-    for st in ["NEGATIVE-RESULT", "KILLED", "BLOCKED", "NOT-DONE", "DESIGN-ONLY", "IN-PROGRESS"]:
+    for st in order:
         group = sort_entries([x for x in entries if x["state"] == st], site)
-        inner = "\n".join(entry_block(x, ctx, page) for x in group) or "<p>None.</p>"
-        blocks.append(f'<section class="group" id="state-{slug(st)}"><h2>{state_tag(st)} '
-                      f'<span class="mono n">{len(group)}</span></h2>'
-                      f'<p class="gloss">{e(STATE_GLOSS[st])}</p>{inner}</section>')
+        inner = "\n".join(tag(x, ctx, page) for x in group) or "<p>None.</p>"
+        first = ' id="unfinished"' if st == "BLOCKED" else ""
+        blocks.append(f'<section{first}><h2 class="band" id="state-{slug(st)}">{state_tag(st)}'
+                      f'<span class="strip">{len(group)} · {e(STATE_GLOSS[st])}</span></h2>{inner}</section>')
     ut = sort_entries(untested_built(entries), site)
     ut_rows = "".join(
         f'<li><a class="mono" href="{entry_href(page, x["id"])}">#{e(x["id"])}</a> {e(x["claim"])}'
-        f' <span class="dns">Does not show: {text(x["does_not_show"])}</span></li>' for x in ut)
+        f'<br><span class="lbl">Does not show</span>{text(x["does_not_show"])}</li>' for x in ut)
     body = f"""
-<section class="lead grid">
+<section class="lead">
 <h1 class="title">Not done</h1>
 <p class="dek">Negative results, killed experiments, blockers, things I have not built, designs that are only designs, and built things nobody has measured. Same weight as the done side.</p>
 </section>
-<nav class="jump mono" aria-label="Jump to group"><ul>
-{"".join(f'<li><a href="#state-{slug(s)}">{e(s)}</a></li>' for s in ["NEGATIVE-RESULT", "KILLED", "BLOCKED", "NOT-DONE", "DESIGN-ONLY", "IN-PROGRESS"])}
-<li><a href="#untested">BUILT, NOT MEASURED</a></li></ul></nav>
+<nav class="jump" aria-label="Jump to group"><ul>
+{"".join(f'<li><a href="#state-{slug(s)}">{e(s)}</a></li>' for s in order)}
+<li><a href="#untested">Built, not measured</a></li></ul></nav>
 {"".join(blocks)}
-<section class="group" id="untested"><h2>{state_tag("BUILT")} but not measured <span class="mono n">{len(ut)}</span></h2>
-<p class="gloss">Built entries with no qualifying measurement in the evidence. Full entries are in the <a href="{rel(page, 'ledger/index.html')}">ledger</a> and on project pages.</p>
-<ul class="plain">{ut_rows}</ul></section>
+<section><h2 class="band" id="untested">Built, not measured <span class="strip">{len(ut)}</span></h2>
+<div class="sheet"><p>Built entries with no qualifying measurement in the evidence. Full tags are in the <a href="{rel(page, 'ledger/index.html')}">ledger</a> and on project pages.</p>
+<ul class="plain">{ut_rows}</ul></div></section>
 """
     return layout(page, "Not done", body, ctx)
 
@@ -364,21 +436,25 @@ def page_not_done(entries, ctx):
 FILTER_SCRIPT = """<script>
 (function () {
   var form = document.getElementById('filters');
-  var table = document.getElementById('ledger-table');
-  if (!form || !table) return;
+  var root = document.getElementById('ledger-tags');
+  if (!form || !root) return;
   form.hidden = false;
-  var rows = table.tBodies[0].rows;
+  var tags = root.querySelectorAll('article.tag');
   var out = document.getElementById('filter-count');
   function apply() {
-    var p = form.project.value, s = form.state.value, v = form.verification.value, n = 0;
-    for (var i = 0; i < rows.length; i++) {
-      var r = rows[i];
-      var show = (!p || r.getAttribute('data-project') === p) &&
-                 (!s || r.getAttribute('data-state') === s) &&
-                 (!v || r.getAttribute('data-verification') === v);
-      r.hidden = !show; if (show) n++;
+    var p = form.project.value, s = form.state.value, v = form.verification.value, n = 0, i;
+    for (i = 0; i < tags.length; i++) {
+      var t = tags[i];
+      var show = (!p || t.getAttribute('data-project') === p) &&
+                 (!s || t.getAttribute('data-state') === s) &&
+                 (!v || t.getAttribute('data-verification') === v);
+      t.hidden = !show; if (show) n++;
     }
-    out.textContent = n + ' of ' + rows.length + ' entries shown';
+    var groups = root.querySelectorAll('.famgroup, section.proj');
+    for (i = 0; i < groups.length; i++) {
+      groups[i].hidden = !groups[i].querySelector('article.tag:not([hidden])');
+    }
+    out.textContent = n + ' of ' + tags.length + ' entries shown';
   }
   form.addEventListener('change', apply);
   form.addEventListener('reset', function () { setTimeout(apply, 0); });
@@ -406,8 +482,21 @@ def facet_links(page, entries, site):
         links = " ".join(
             f'<a href="{rel(page, f"ledger/{facet}/{slug(v)}/index.html")}">{e(facet_label(site, facet, v))}</a>'
             for v in values)
-        out.append(f"<li><span class=\"mono\">{facet}:</span> {links}</li>")
+        out.append(f"<li>{facet}: {links}</li>")
     return "<ul class=\"facets\">" + "".join(out) + "</ul>"
+
+
+def ledger_sections(entries, ctx, page, anchor):
+    site = ctx.site
+    out = []
+    for p in site["projects"]:
+        mine = [x for x in entries if x["project"] == p["slug"]]
+        if not mine:
+            continue
+        out.append(f'<section class="proj" id="p-{e(p["slug"])}" data-project="{e(p["slug"])}">'
+                   f'<h2 class="band"><a href="{rel(page, "projects/" + p["slug"] + "/index.html")}">{e(p["name"])}</a>'
+                   f'{strip(mine)}</h2>{family_groups(mine, ctx, page, anchor=anchor)}</section>')
+    return "".join(out)
 
 
 def page_ledger(entries, ctx):
@@ -417,43 +506,57 @@ def page_ledger(entries, ctx):
 
     def select(name, values):
         opts = "".join(f'<option value="{e(v)}">{e(facet_label(site, name, v))}</option>' for v in values)
-        return (f'<label>{name} <select name="{name}"><option value="">all</option>{opts}</select></label>')
+        return f'<label>{name} <select name="{name}"><option value="">all</option>{opts}</select></label>'
 
     body = f"""
-<section class="lead grid">
-<h1 class="title">Full ledger</h1>
-<p class="dek">Every public claim, one row each. Each row has a stable anchor: ledger/#id. Full detail for each entry follows the table.</p>
+<section class="lead">
+<h1 class="title">Ledger</h1>
+<p class="dek">Every public claim, one tag each, grouped by project and then by done, failed and unfinished. Each tag has a stable anchor: ledger/#id. Evidence for each tag opens under it.</p>
 </section>
 <section aria-label="Filters">
-<form id="filters" class="filters mono" hidden>
+<form id="filters" class="filters" hidden>
 {select("project", fv["project"])} {select("state", fv["state"])} {select("verification", fv["verification"])}
 <button type="reset">clear</button> <output id="filter-count" aria-live="polite"></output>
 </form>
-<div class="mono small"><p>Filter pages (work without JavaScript):</p>{facet_links(page, entries, site)}</div>
+<p class="wallnote">Filter pages (work without JavaScript):</p>{facet_links(page, entries, site)}
 </section>
-{ledger_table(sort_entries(entries, site), ctx, page, "Ledger", anchors=True, table_id="ledger-table")}
-<section class="details">
-<h2>Entries in full</h2>
-{"".join(entry_block(x, ctx, page).replace(f'id="{x["id"]}"', f'id="full-{x["id"]}"', 1) for x in sort_entries(entries, site))}
-</section>
+<div id="ledger-tags">
+{ledger_sections(entries, ctx, page, anchor=True)}
+</div>
 """
-    return layout(page, "Full ledger", body, ctx, script=FILTER_SCRIPT)
+    return layout(page, "Ledger", body, ctx, script=FILTER_SCRIPT)
 
 
 def page_facet(entries, ctx, facet, value):
     page = f"ledger/{facet}/{slug(value)}/index.html"
     site = ctx.site
-    sub = sort_entries([x for x in entries if x[facet] == value], site)
+    sub = [x for x in entries if x[facet] == value]
     label = facet_label(site, facet, value)
     body = f"""
-<section class="lead grid">
+<section class="lead">
 <h1 class="title">{e(label)}</h1>
-<p class="dek mono">Ledger filtered by {e(facet)} = {e(value)}: {len(sub)} of {len(entries)} entries. <a href="{rel(page, 'ledger/index.html')}">All entries</a>.</p>
+<p class="dek">Ledger filtered by {e(facet)} = {e(value)}: {len(sub)} of {len(entries)} entries. <a href="{rel(page, 'ledger/index.html')}">All entries</a>.</p>
+{facet_links(page, entries, site)}
 </section>
-<div class="mono small">{facet_links(page, entries, site)}</div>
-{ledger_table(sub, ctx, page, f"Ledger: {facet} {value}", anchors=False)}
+{ledger_sections(sub, ctx, page, anchor=False)}
 """
     return layout(page, f"Ledger: {label}", body, ctx)
+
+
+def page_projects(entries, ctx):
+    page = "projects/index.html"
+    site = ctx.site
+    body = f"""
+<section class="lead">
+<h1 class="title">Projects</h1>
+<p class="dek">Research on verifying AI output, and other work. The chips count each project's ledger entries by family.</p>
+</section>
+<section aria-labelledby="h-research"><h2 class="band" id="h-research">Research</h2>
+{project_rows(entries, site, page, "research")}</section>
+<section aria-labelledby="h-other"><h2 class="band" id="h-other">Other work</h2>
+{project_rows(entries, site, page, "other")}</section>
+"""
+    return layout(page, "Projects", body, ctx)
 
 
 def page_project(proj, entries, ctx):
@@ -465,9 +568,10 @@ def page_project(proj, entries, ctx):
         f'<li>{e(by[i]["claim"])} <a class="mono" href="#{e(i)}">#{e(i)}</a></li>'
         for i in proj["what_it_is_ids"] if i in by)
 
-    def section(title, sid, items, empty):
-        inner = "\n".join(entry_block(x, ctx, page) for x in items) or f"<p>{empty}</p>"
-        return f'<section class="group" id="{sid}"><h2>{e(title)}</h2>{inner}</section>'
+    def section(title, sid, items, empty, extra=""):
+        inner = "\n".join(tag(x, ctx, page, show_project=False, details=False) for x in items) \
+            or f'<div class="sheet"><p>{empty}</p></div>'
+        return f'<section><h2 class="band" id="{sid}">{e(title)}<span class="strip">{len(items)} {"entry" if len(items) == 1 else "entries"}</span></h2>{inner}{extra}</section>'
 
     exists = [x for x in mine if x["state"] in ("BUILT", "IN-PROGRESS")]
     measured = [x for x in mine if x["state"] == "MEASURED"]
@@ -476,10 +580,9 @@ def page_project(proj, entries, ctx):
     dns = "".join(
         f'<li><a class="mono" href="#{e(x["id"])}">#{e(x["id"])}</a> {text(x["does_not_show"])}</li>'
         for x in mine)
-    disagree = [x for x in mine if x.get("disagreement")]
     dis_html = "".join(
         f'<li><a class="mono" href="#{e(x["id"])}">#{e(x["id"])}</a> <span class="sig">{e(x["disagreement"])}</span></li>'
-        for x in disagree)
+        for x in mine if x.get("disagreement"))
     oq = "".join(
         "<li>" + e(q["q"]) + " <span class=\"mono small\">from " +
         ", ".join(f'<a href="{e(entry_home_href(page, ctx.by_id[i]))}">#{e(i)}</a>' for i in q["ids"]) +
@@ -504,38 +607,37 @@ def page_project(proj, entries, ctx):
               for l in site.get("extra_links", {}).get(proj["slug"], [])]
     if links:
         repo_links = "<p>Public locations named in the evidence:</p><ul>" + "".join(links) + "</ul>"
-    other = sorted({k[0] for k in ev_index} - set(pub) - {"vault", "seed", "—"})
+    other = sorted({k[0] for k in ev_index} - set(pub) - {"vault", "seed", "author", "—"})
     if other:
         repo_links += ("<p>Repos with no public URL on this site (visibility not confirmed): "
                        + ", ".join(f'<span class="mono">{e(r)}</span>' for r in other) + ". "
                        + text("UNKNOWN — author to supply") + "</p>")
+    dis_block = f"<div class='sheet'><h3>Where sources disagree</h3><ul class='plain'>{dis_html}</ul></div>" if dis_html else ""
 
     body = f"""
-<section class="lead grid">
+<section class="lead">
 <h1 class="title">{e(proj['name'])}</h1>
-<p class="dek">{e(proj['subtitle'])}</p>
+<p class="tagline">{e(proj['subtitle'])}</p>
+<p class="wallnote">{strip(mine)}</p>
 </section>
-<nav class="jump mono" aria-label="Sections"><ol>
+<nav class="jump" aria-label="Sections"><ol>
 <li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
-<li><a href="#measured">What was measured</a></li><li><a href="#not-measured">What was not measured or built</a></li>
-<li><a href="#weak">Known weaknesses and negative results</a></li><li><a href="#open">Open questions</a></li>
+<li><a href="#measured">What was measured</a></li><li><a href="#not-measured">Not measured or built</a></li>
+<li><a href="#weak">Weaknesses and negative results</a></li><li><a href="#open">Open questions</a></li>
 <li><a href="#evidence">Evidence</a></li></ol></nav>
-<section class="group" id="what"><h2>What it is</h2><ul class="plain">{what}</ul></section>
+<section><h2 class="band" id="what">What it is</h2><div class="sheet"><ul class="plain">{what}</ul></div></section>
 {section("What exists", "exists", exists, "No BUILT or IN-PROGRESS entries.")}
-{section("What was measured", "measured", measured, "No entry meets MEASURED: number, denominator, dataset, synthetic flag, system and date all known. Numbers that fall short are shown with their entries below.")}
-<section class="group" id="not-measured"><h2>What was not measured or built</h2>
-{"".join(entry_block(x, ctx, page) for x in not_built) or "<p>No NOT-DONE, DESIGN-ONLY or BLOCKED entries.</p>"}
-<h3>What each entry's evidence does not show</h3><ul class="plain dnslist">{dns}</ul></section>
-<section class="group" id="weak"><h2>Known weaknesses and negative results</h2>
-{"".join(entry_block(x, ctx, page) for x in weak) or "<p>No NEGATIVE-RESULT or KILLED entries.</p>"}
-{"<h3>Where sources disagree</h3><ul class='plain'>" + dis_html + "</ul>" if dis_html else ""}</section>
-<section class="group" id="open"><h2>Open questions</h2><ul class="plain">{oq}</ul></section>
-<section class="group" id="evidence"><h2>Evidence</h2>
+{section("What was measured", "measured", measured, "No entry meets MEASURED: number, denominator, dataset, synthetic flag, system and date all known. Numbers that fall short are shown with their entries.")}
+{section("Not measured or built", "not-measured", not_built, "No NOT-DONE, DESIGN-ONLY or BLOCKED entries.",
+         extra=f'<div class="sheet"><h3>What each entry does not show</h3><ul class="plain">{dns}</ul></div>')}
+{section("Weaknesses and negative results", "weak", weak, "No NEGATIVE-RESULT or KILLED entries.", extra=dis_block)}
+<section><h2 class="band" id="open">Open questions</h2><div class="sheet"><ul class="plain">{oq}</ul></div></section>
+<section><h2 class="band" id="evidence">Evidence</h2><div class="sheet">
 {repo_links}
 <div class="scroll" role="region" aria-label="Evidence index" tabindex="0"><table class="nums">
 <caption>Every evidence pointer used on this page</caption>
 <thead><tr><th scope="col">Repo / source</th><th scope="col">Branch</th><th scope="col">SHA</th><th scope="col">Path</th><th scope="col">Used by</th></tr></thead>
-<tbody>{ev_rows}</tbody></table></div></section>
+<tbody>{ev_rows}</tbody></table></div></div></section>
 """
     return layout(page, proj["name"], body, ctx)
 
@@ -550,14 +652,13 @@ def page_about(entries, ctx):
                            + ", ".join(f'<a href="{e(entry_home_href(page, ctx.by_id[i]))}">#{e(i)}</a>' for i in q["ids"])
                            + "</span></li>")
     body = f"""
-<section class="lead grid">
+<section class="lead">
 <h1 class="title">About</h1>
+<p class="tagline">{e(site['line'])}</p>
 </section>
-<section class="prose grid"><h2>Education</h2><div class="col"><p>{e(site['education'])}</p>
-<p class="mono small">Source: {e(site['education_source'])}.</p></div></section>
-<section class="prose grid"><h2>What I am looking at next</h2><div class="col"><p>{text(site['next'])}</p>
+<div class="sheet">{about_dl(site, page, ctx)}</div>
+<section><h2 class="band" id="next">What I am looking at next</h2><div class="sheet"><p>{text(site['next'])}</p>
 <p>Open threads recorded in the evidence, not a plan:</p><ul class="plain">{"".join(threads)}</ul></div></section>
-<section class="prose grid"><h2>Contact</h2><div class="col"><p>{text(site['contact'])}</p></div></section>
 """
     return layout(page, "About", body, ctx)
 
@@ -570,7 +671,7 @@ def page_colophon(entries, ctx, walk, checks, n_hidden):
         rows = []
         for c in checks["checks"]:
             res = c["result"]
-            cls = "ok" if res == "PASS" else "sig"
+            cls = "" if res == "PASS" else "sig"
             rows.append(f'<tr><td>{e(c["name"])}</td><td class="mono">{e(c["command"])}</td>'
                         f'<td class="mono {cls}">{e(res)}</td><td>{e(c["detail"])}</td></tr>')
         checks_html = (f'<p class="mono small">Recorded by verify/verify.py on {e(checks["date"])} against the build '
@@ -585,19 +686,19 @@ def page_colophon(entries, ctx, walk, checks, n_hidden):
         checks_html = f"<p>{text('UNKNOWN — checks not yet recorded for this build')}</p>"
     lv = Counter(x["verification"] for x in entries)
     body = f"""
-<section class="lead grid">
+<section class="lead">
 <h1 class="title">Colophon</h1>
 <p class="dek">How this site was built, what it was built from, and what was and was not checked about it.</p>
 </section>
-<section class="prose grid"><h2>Build</h2><div class="col">
+<section><h2 class="band" id="build">Build</h2><div class="sheet">
 <p>One ledger file (content/ledger.yaml) is the only source of factual sentences. A Python 3 standard-library script validates it and writes static HTML to dist/. The build fails, and writes nothing, if a MEASURED entry lacks its metric, value, denominator, dataset, synthetic flag, system, date or evidence; if a KILLED entry lacks its criterion; if a BLOCKED entry lacks its blocker; if a LINKED entry lacks a tier-1 path with branch and SHA; or if any entry lacks as_of or "does not show". STALE is computed at build time.</p>
-<p>No dependencies, no third-party requests, no fonts, no analytics, no cookies. Type is a system stack: Helvetica Neue / Arial for text, the platform monospace for data. Every page works without JavaScript; the only script filters the ledger table, and the same filters exist as plain pages. Served by Python's http.server bound to the loopback interface only.</p>
+<p>No dependencies, no third-party requests, no analytics, no cookies. Type: Barlow Condensed (SIL Open Font License; files and licence served from this site's fonts/ folder) for headings and claims, the platform serif for prose, the platform monospace for data. Colour marks one thing only: black tape is done, red tape is failed, yellow tape on a manila tag is unfinished. Every state also carries its word and a shape. Every page works without JavaScript; the only script filters the ledger, and the same filters exist as plain pages. Served by Python's http.server bound to the loopback interface only.</p>
 <p>Entries: {len(entries)} public ({lv.get('LINKED', 0)} LINKED, {lv.get('AUTHOR-REPORTED', 0)} AUTHOR-REPORTED); {n_hidden} hidden by default and not published.</p>
 <p>The site was assembled by an AI coding agent working from my repositories and notes, under rules that forbid inventing or rounding numbers. The ledger is the place to check it.</p>
 </div></section>
-<section class="prose grid"><h2>Context walked</h2><div class="col"><p class="mono small">{e(walk['method'])} Walk date {e(walk['walk_date'])}.</p><ul class="plain">{walked}</ul></div></section>
-<section class="prose grid"><h2>Context not walked</h2><div class="col"><p>Absence from this walk is not evidence of absence.</p><ul class="plain">{not_walked}</ul></div></section>
-<section><h2>Checks on the site itself</h2>{checks_html}</section>
+<section><h2 class="band" id="walked">Context walked</h2><div class="sheet"><p class="mono small">{e(walk['method'])} Walk date {e(walk['walk_date'])}.</p><ul class="plain">{walked}</ul></div></section>
+<section><h2 class="band" id="not-walked">Context not walked</h2><div class="sheet"><p>Absence from this walk is not evidence of absence.</p><ul class="plain">{not_walked}</ul></div></section>
+<section><h2 class="band" id="checks">Checks on the site itself</h2><div class="sheet">{checks_html}</div></section>
 """
     return layout(page, "Colophon", body, ctx)
 
@@ -631,10 +732,12 @@ def build_site(all_entries, site, walk, checks, build_date):
     entries = [x for x in all_entries if x["visibility"] == "public"]
     n_hidden = len(all_entries) - len(entries)
     ctx = Ctx(site, build_date, {x["id"]: x for x in entries})
+    refs = [i for sk in site.get("skills", []) for i in sk.get("backed_by", [])]
     for p in site["projects"]:
-        for i in p["what_it_is_ids"] + [i for q in p["open_questions"] for i in q["ids"]]:
-            if i not in ctx.by_id:
-                raise ValueError(f"site.json references unknown or hidden entry {i}")
+        refs += p["what_it_is_ids"] + [i for q in p["open_questions"] for i in q["ids"]]
+    for i in refs:
+        if i not in ctx.by_id:
+            raise ValueError(f"site.json references unknown or hidden entry {i}")
     pages = OrderedDict()
     pages["index.html"] = page_home(entries, ctx)
     pages["not-done/index.html"] = page_not_done(entries, ctx)
@@ -642,6 +745,7 @@ def build_site(all_entries, site, walk, checks, build_date):
     for facet, values in facet_values(entries, site).items():
         for v in values:
             pages[f"ledger/{facet}/{slug(v)}/index.html"] = page_facet(entries, ctx, facet, v)
+    pages["projects/index.html"] = page_projects(entries, ctx)
     for p in site["projects"]:
         pages[f"projects/{p['slug']}/index.html"] = page_project(p, entries, ctx)
     pages["about/index.html"] = page_about(entries, ctx)

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; font-src 'self'; script-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<title>TunedIn — Kristian Krattiger</title>
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<svg class="defs" aria-hidden="true" focusable="false" width="0" height="0"><defs>
+<symbol id="s-measured" viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" fill="currentColor"/></symbol>
+<symbol id="s-built" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="s-in-progress" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="2" y="2" width="4" height="8" fill="currentColor"/></symbol>
+<symbol id="s-design-only" viewBox="0 0 12 12"><polygon points="6,1 11,6 6,11 1,6" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="s-blocked" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="2" y="5" width="8" height="2" fill="currentColor"/></symbol>
+<symbol id="s-not-done" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+<symbol id="s-killed" viewBox="0 0 12 12"><path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" stroke-width="2.2" fill="none"/></symbol>
+<symbol id="s-negative-result" viewBox="0 0 12 12"><polygon points="1.5,2.5 10.5,2.5 6,10.5" fill="currentColor"/></symbol>
+</defs></svg>
+<header class="masthead">
+<p class="who"><a href="../../index.html">Kristian Krattiger</a></p>
+<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../colophon/index.html">Colophon</a></li></ul></nav>
+</header>
+<main id="main" tabindex="-1">
+
+<section class="lead">
+<h1 class="title">TunedIn</h1>
+<p class="tagline">Desktop ticketing app, ISDS 309</p>
+<p class="wallnote"><span class="strip"><span class="chip done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-measured"/></svg>Done 1</span><span class="chip failed zero"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-killed"/></svg>Failed 0</span><span class="chip unfinished"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-not-done"/></svg>Unfinished 1</span></span></p>
+</section>
+<nav class="jump" aria-label="Sections"><ol>
+<li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
+<li><a href="#measured">What was measured</a></li><li><a href="#not-measured">Not measured or built</a></li>
+<li><a href="#weak">Weaknesses and negative results</a></li><li><a href="#open">Open questions</a></li>
+<li><a href="#evidence">Evidence</a></li></ol></nav>
+<section><h2 class="band" id="what">What it is</h2><div class="sheet"><ul class="plain"><li>TunedIn is a .NET 8 WinForms ticketing app built for ISDS 309 (Spring 2025): login, ticket-pack selection, cart, payment and receipt screens over a shared core library, with comma-delimited text files as storage. <a class="mono" href="#tunedin-app">#tunedin-app</a></li></ul></div></section>
+<section><h2 class="band" id="exists">What exists<span class="strip">1 entry</span></h2><article class="tag done" id="tunedin-app" data-project="tunedin" data-state="BUILT" data-verification="AUTHOR-REPORTED">
+<p class="meta"><span class="tape done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-built"/></svg>BUILT</span> <span class="stk stk-author">AUTHOR-REPORTED</span> <a class="eid" href="../../ledger/index.html#tunedin-app">#tunedin-app</a> <span class="asof">as of 2026-09-15</span></p>
+<p class="claim">TunedIn is a .NET 8 WinForms ticketing app built for ISDS 309 (Spring 2025): login, ticket-pack selection, cart, payment and receipt screens over a shared core library, with comma-delimited text files as storage.</p>
+<p class="dns"><span class="lbl">Does not show</span>That it builds today; it was not built for this site. It is not under version control, so no commit pins this description. Whether it was solo or group work is not recorded.</p>
+<dl><dt>Verification</dt><dd class="sig">Author-reported, not re-verified. No tier-1 artifact containing this claim was opened for this site.</dd><dt>Evidence</dt><dd><ul class="ev"><li><span class="mono">ISDS309_TunedIn (n/a (not under git)) : README.md</span> <span class="tier">tier 2</span> — file mtime 2026-09-15</li><li><span class="mono">ISDS309_TunedIn (n/a (not under git)) : ISDS309.Core</span> <span class="tier">tier 1</span> — Domain, Enums, Services folders present; not pinned to a commit</li></ul></dd></dl>
+</article></section>
+<section><h2 class="band" id="measured">What was measured<span class="strip">0 entries</span></h2><div class="sheet"><p>No entry meets MEASURED: number, denominator, dataset, synthetic flag, system and date all known. Numbers that fall short are shown with their entries.</p></div></section>
+<section><h2 class="band" id="not-measured">Not measured or built<span class="strip">1 entry</span></h2><article class="tag unfinished" id="tunedin-gaps" data-project="tunedin" data-state="NOT-DONE" data-verification="AUTHOR-REPORTED">
+<p class="meta"><span class="tape unfinished"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-not-done"/></svg>NOT-DONE</span> <span class="stk stk-author">AUTHOR-REPORTED</span> <a class="eid" href="../../ledger/index.html#tunedin-gaps">#tunedin-gaps</a> <span class="asof">as of 2026-09-15</span></p>
+<p class="claim">Known gaps, from the project&#x27;s own README: login does not check credentials against stored data, data is not saved automatically on exit, and there is no error handling around the app&#x27;s main loop.</p>
+<p class="dns"><span class="lbl">Does not show</span>Whether any gap was fixed after the README was written.</p>
+<dl><dt>Verification</dt><dd class="sig">Author-reported, not re-verified. No tier-1 artifact containing this claim was opened for this site.</dd><dt>Evidence</dt><dd><ul class="ev"><li><span class="mono">ISDS309_TunedIn (n/a (not under git)) : README.md</span> <span class="tier">tier 2</span> — Known limitations / TODOs</li></ul></dd></dl>
+</article><div class="sheet"><h3>What each entry does not show</h3><ul class="plain"><li><a class="mono" href="#tunedin-app">#tunedin-app</a> That it builds today; it was not built for this site. It is not under version control, so no commit pins this description. Whether it was solo or group work is not recorded.</li><li><a class="mono" href="#tunedin-gaps">#tunedin-gaps</a> Whether any gap was fixed after the README was written.</li></ul></div></section>
+<section><h2 class="band" id="weak">Weaknesses and negative results<span class="strip">0 entries</span></h2><div class="sheet"><p>No NEGATIVE-RESULT or KILLED entries.</p></div></section>
+<section><h2 class="band" id="open">Open questions</h2><div class="sheet"><ul class="plain"><li>Were the README&#x27;s known gaps ever closed? <span class="mono small">from <a href="#tunedin-gaps">#tunedin-gaps</a></span><br><span class="small">Would resolve it: A credential check against stored users and a save on exit.</span></li></ul></div></section>
+<section><h2 class="band" id="evidence">Evidence</h2><div class="sheet">
+<p>Repos with no public URL on this site (visibility not confirmed): <span class="mono">ISDS309_TunedIn</span>. <span class="unknown">UNKNOWN — author to supply</span></p>
+<div class="scroll" role="region" aria-label="Evidence index" tabindex="0"><table class="nums">
+<caption>Every evidence pointer used on this page</caption>
+<thead><tr><th scope="col">Repo / source</th><th scope="col">Branch</th><th scope="col">SHA</th><th scope="col">Path</th><th scope="col">Used by</th></tr></thead>
+<tbody><tr><td class="mono">ISDS309_TunedIn</td><td class="mono">n/a (not under git)</td><td class="mono">n/a</td><td class="mono">README.md</td><td class="mono"><a href="#tunedin-app">#tunedin-app</a> <a href="#tunedin-gaps">#tunedin-gaps</a></td></tr><tr><td class="mono">ISDS309_TunedIn</td><td class="mono">n/a (not under git)</td><td class="mono">n/a</td><td class="mono">ISDS309.Core</td><td class="mono"><a href="#tunedin-app">#tunedin-app</a></td></tr></tbody></table></div></div></section>
+
+</main>
+<footer class="foot">
+<p>Built 2026-11-22 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
+Machine-readable: <a href="../../ledger.json">ledger.json</a>.</p>
+</footer>
+
+</body>
+</html>

@@ -3,27 +3,25 @@
 Derived from the FORM and VOICE sections of the brief. Checked against the output
 before finishing (`python verify/verify.py --banned` enforces the mechanical part).
 
-## Form
+## Form (restyled 2026-11-22; design: docs/superpowers/specs/2026-11-22-restyle-design.md)
 
-- Warm industrial minimalism: Bauhaus grid, brutalist honesty of structure,
-  deep-club restraint, faded SoCal / central-coast paper.
-- Rigid visible grid. Hairline rules (1px) separate everything. No cards, no
-  shadows, no rounded corners (border-radius: 0 everywhere).
-- Big asymmetric type for page titles (left-aligned, oversized, off-centre
-  against the grid). Body text in a plain sans stack. Data, status, ids, dates,
-  counts and evidence in monospace.
-- Flat surfaces. One subtle grain/fade texture, CSS only, at very low opacity.
-- Palette:
-  - Light: sun-bleached warm paper background, warm charcoal ink.
-  - Dark (prefers-color-scheme: dark): deep warm charcoal background, paper ink.
-  - One oxidized signal accent (rust).
-- **Color encodes epistemic status and nothing else.** The accent marks what is
-  NOT re-verified: AUTHOR-REPORTED, UNKNOWN, STALE, and disagreements between
-  sources. LINKED evidence is plain ink. Links, headings and decoration never
-  use the accent.
-- **Color is never the only carrier.** Every state has a text label AND a
-  distinct shape; every verification level has a text label AND a distinct
-  border style (solid = LINKED, dashed = AUTHOR-REPORTED).
+- Concrete wall, punched tags, label tape. Reference: the secondhand, layered side
+  of Shimokitazawa. Cohesive, imposing (the facts are hard to avoid), minimal (a
+  hiring manager gets it in one pass).
+- **Wall**: concrete grey (light) / asphalt (dark). Page chrome sits on the wall.
+- **Tags**: every ledger entry is a white tag with a hard ink border and a square
+  punch hole. Tags stay light in dark mode. Prose and tables sit on white sheets.
+- **Type**: Barlow Condensed (bundled, OFL) for headings, claims, tape and counts;
+  the platform serif for prose; the platform monospace for data, ids and dates.
+- No rounded corners, no shadows, no gradients, no grain. The only tilt is a
+  1-degree rotation on label tape.
+- **Colour encodes epistemic family and nothing else.**
+  - Done (MEASURED, BUILT): black tape, white tag.
+  - Failed (KILLED, NEGATIVE-RESULT): red tape, white tag.
+  - Unfinished (IN-PROGRESS, DESIGN-ONLY, BLOCKED, NOT-DONE): yellow tape, manila tag.
+  - Verification stickers: LINKED = solid outline; AUTHOR-REPORTED = dashed red;
+    STALE = black sticker. UNKNOWN = red dashed underline.
+- **Colour is never the only carrier.** Every state has its word and a shape:
 
   | State | Shape |
   |---|---|
@@ -36,10 +34,9 @@ before finishing (`python verify/verify.py --banned` enforces the mechanical par
   | KILLED | cross |
   | NEGATIVE-RESULT | downward triangle |
 
-- The "not done" side carries the same typographic weight as the "done" side:
-  same type size, same table, same placement rules. Negative results are never
-  greyed out, collapsed or footnoted.
-- All palette pairs must pass WCAG AA (4.5:1 for text) in both schemes.
+- The not-done side carries the same weight as the done side: same tag, same
+  type size, same placement. Failed and unfinished counts are as large as done.
+- All palette pairs must pass WCAG AA (4.5:1 text, 3:1 non-text) in both schemes.
 
 ## Avoid (hard bans)
 

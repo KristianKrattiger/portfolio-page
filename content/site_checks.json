@@ -1,11 +1,11 @@
 {
-  "date": "2026-11-20",
+  "date": "2026-11-22",
   "checks": [
     {
       "name": "Validator test suite (incl. must-fail cases)",
       "command": "python -m unittest discover -s tests",
       "result": "PASS",
-      "detail": "Ran 42 tests in 0.002s / OK"
+      "detail": "Ran 43 tests in 0.003s / OK"
     },
     {
       "name": "Build fails on invalid ledgers",
@@ -15,63 +15,63 @@
     },
     {
       "name": "Deterministic build",
-      "command": "python build.py --date 2026-11-20 (twice, sha256 over all files)",
+      "command": "python build.py --date 2026-11-22 (twice, sha256 over all files)",
       "result": "PASS",
-      "detail": "build 1 f5ae5773bb030693..., build 2 f5ae5773bb030693..."
+      "detail": "build 1 72b83d882fae34be..., build 2 72b83d882fae34be..."
     },
     {
       "name": "Every LINKED entry: path exists at SHA, SHA on named branch",
       "command": "git cat-file -e <sha>:<path>; git merge-base --is-ancestor <sha> <branch>",
       "result": "PASS",
-      "detail": "15 LINKED entries, 37 evidence items checked"
+      "detail": "21 LINKED entries, 55 evidence items checked"
     },
     {
       "name": "No external hosts beyond evidence links; no secrets, IPs, *.ts.net names, hostnames, analytics",
       "command": "regex scan of every file in dist/",
       "result": "PASS",
-      "detail": "allowed hosts seen: ['github.com', 'kristiankrattiger.github.io', 'www.w3.org']; other hosts: 0 (w3.org is the SVG namespace inside a CSS data URI, never fetched)"
+      "detail": "allowed hosts seen: ['github.com', 'kristiankrattiger.github.io']; other hosts: 0 (w3.org is the SVG namespace inside a CSS data URI, never fetched)"
     },
     {
       "name": "Internal link check (files and #fragments)",
       "command": "html.parser over dist/*.html",
       "result": "PASS",
-      "detail": "989 internal links in 23 pages"
+      "detail": "1226 internal links in 30 pages"
     },
     {
       "name": "HTML well-formedness (tag balance, duplicate ids)",
       "command": "stdlib html.parser structural check",
       "result": "PASS",
-      "detail": "23 pages"
+      "detail": "30 pages"
     },
     {
       "name": "WCAG AA contrast, every palette pair, both schemes",
       "command": "WCAG 2.x relative-luminance formula",
       "result": "PASS",
-      "detail": "light ink/paper 14.07 (need 4.5); light ink/paper-2 12.37 (need 4.5); light ink-2/paper 7.55 (need 4.5); light ink-2/paper-2 6.64 (need 4.5); light signal/paper 6.05 (need 4.5); light signal/paper-2 5.32 (need 4.5); light rule-soft/paper 3.34 (need 3.0); light rule/paper 14.07 (need 3.0); dark ink/paper 14.13 (need 4.5); dark ink/paper-2 12.62 (need 4.5); dark ink-2/paper 8.01 (need 4.5); dark ink-2/paper-2 7.15 (need 4.5); dark signal/paper 7.14 (need 4.5); dark signal/paper-2 6.37 (need 4.5); dark rule-soft/paper 3.78 (need 3.0); dark rule/paper 14.13 (need 3.0)"
+      "detail": "light wall-ink/wall 10.99 (need 4.5); light wall-ink-2/wall 7.55 (need 4.5); light wall-rule/wall 10.99 (need 3.0); light ink/tag 18.42 (need 4.5); light ink/manila 13.23 (need 4.5); light ink-2/tag 9.74 (need 4.5); light ink-2/manila 6.99 (need 4.5); light signal/tag 7.73 (need 4.5); light signal/manila 5.56 (need 4.5); light rule-soft/tag 4.67 (need 3.0); light rule-soft/manila 3.35 (need 3.0); light tape-done-ink/tape-done 16.71 (need 4.5); light tape-failed-ink/tape-failed 7.73 (need 4.5); light tape-unf-ink/tape-unf 11.20 (need 4.5); light tape-edge/wall 10.99 (need 3.0); light rule/tag 18.42 (need 3.0); dark wall-ink/wall 14.18 (need 4.5); dark wall-ink-2/wall 7.87 (need 4.5); dark wall-rule/wall 4.75 (need 3.0); dark ink/tag 14.90 (need 4.5); dark ink/manila 11.19 (need 4.5); dark ink-2/tag 8.64 (need 4.5); dark ink-2/manila 6.48 (need 4.5); dark signal/tag 7.48 (need 4.5); dark signal/manila 5.61 (need 4.5); dark rule-soft/tag 4.30 (need 3.0); dark rule-soft/manila 3.23 (need 3.0); dark tape-done-ink/tape-done 16.71 (need 4.5); dark tape-failed-ink/tape-failed 7.73 (need 4.5); dark tape-unf-ink/tape-unf 11.20 (need 4.5); dark tape-edge/wall 14.18 (need 3.0); dark rule/tag 14.90 (need 3.0)"
     },
     {
       "name": "Banned phrases/patterns from STYLE.md and private-topic terms",
       "command": "regex over visible text, ledger.json, CSS",
       "result": "PASS",
-      "detail": "21 phrases, 13 private terms, 8 CSS patterns, emoji ranges"
+      "detail": "21 phrases, 13 private terms, 5 hashed names, 8 CSS patterns, emoji ranges"
     },
     {
       "name": "Keyboard basics (static): skip link, native controls, no positive tabindex, visible focus",
       "command": "html.parser + CSS scan",
       "result": "PASS",
-      "detail": "23 pages"
+      "detail": "30 pages"
     },
     {
       "name": "Pages render with JS off",
       "command": "static check + msedge --headless --dump-dom on a script-stripped copy",
       "result": "PASS",
-      "detail": "ledger table has 35 rows server-rendered for 35 public entries; JS-only filter form hidden by default: True; headless Edge on a script-stripped copy (1 script blocks removed): 23/23 pages render main+footer, ledger shows 35 rows, filter form stays hidden=True; with scripts: form revealed=True, counter='35 of 35 entries shown'"
+      "detail": "ledger has 45 tags server-rendered for 45 public entries; JS-only filter form hidden by default: True; headless Edge on a script-stripped copy (1 script blocks removed): 30/30 pages render main+footer, ledger shows 45 tags, filter form stays hidden=True; with scripts: form revealed=True, counter='45 of 45 entries shown'"
     },
     {
       "name": "Live: every route returns 200 from the loopback server",
-      "command": "HTTP GET x26 (URL in the final report, not published)",
+      "command": "HTTP GET x36 (URL in the final report, not published)",
       "result": "PASS",
-      "detail": "/ 200; /about/ 200; /colophon/ 200; /index.html 200; /ledger.json 200; /ledger/ 200; /ledger/project/gin/ 200; /ledger/project/latch/ 200; /ledger/project/receipts/ 200; /ledger/project/sear/ 200; /ledger/state/blocked/ 200; /ledger/state/built/ 200; /ledger/state/design-only/ 200; /ledger/state/in-progress/ 200; /ledger/state/killed/ 200; /ledger/state/measured/ 200; /ledger/state/negative-result/ 200; /ledger/state/not-done/ 200; /ledger/verification/author-reported/ 200; /ledger/verification/linked/ 200; /not-done/ 200; /projects/gin/ 200; /projects/latch/ 200; /projects/receipts/ 200; /projects/sear/ 200; /style.css 200"
+      "detail": "/ 200; /about/ 200; /colophon/ 200; /fonts/BarlowCondensed-ExtraBold.ttf 200; /fonts/BarlowCondensed-SemiBold.ttf 200; /fonts/OFL.txt 200; /index.html 200; /ledger.json 200; /ledger/ 200; /ledger/project/gin/ 200; /ledger/project/latch/ 200; /ledger/project/priceriot/ 200; /ledger/project/qsr-erp/ 200; /ledger/project/receipts/ 200; /ledger/project/sear/ 200; /ledger/project/tunedin/ 200; /ledger/state/blocked/ 200; /ledger/state/built/ 200; /ledger/state/design-only/ 200; /ledger/state/in-progress/ 200; /ledger/state/killed/ 200; /ledger/state/measured/ 200; /ledger/state/negative-result/ 200; /ledger/state/not-done/ 200; /ledger/verification/author-reported/ 200; /ledger/verification/linked/ 200; /not-done/ 200; /projects/ 200; /projects/gin/ 200; /projects/latch/ 200; /projects/priceriot/ 200; /projects/qsr-erp/ 200; /projects/receipts/ 200; /projects/sear/ 200; /projects/tunedin/ 200; /style.css 200"
     }
   ],
   "not_run": [
@@ -89,7 +89,7 @@
     },
     {
       "name": "Automated visual regression test",
-      "reason": "none exists; instead the agent looked at headless-Edge screenshots (1280px dark and light, a 375px iframe for phone width) on 2026-11-20, which found and led to fixing a phone-width horizontal overflow; no human has reviewed the design"
+      "reason": "none exists; instead the agent looked at headless-Edge screenshots (1280px dark and light, a 375px iframe for phone width) on 2026-11-20 and again after the 2026-11-22 restyle, which found and led to fixing phone-width overflows; the author chose the direction from mockups but has not reviewed the built pages"
     },
     {
       "name": "Re-running the source repos' own test suites",

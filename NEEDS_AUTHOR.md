@@ -22,3 +22,7 @@
 | 18 | Hidden entries | Opt in (set visibility "public") for offscreen-surfboards / offscreen-280z, if wanted. |
 | 19 | Merkle sync, streaming | gin-federation leans on the README for these two sub-projects. Say whether you want their metrics files linked. |
 | 20 | Education | Confirm the wording. It came from the brief and was not checked against a record. |
+| 21 | tunedin-app | Was TunedIn solo or group work, and which parts were yours? It is not under git, so nothing pins it. |
+| 22 | PriceRiot, QSR ERP | Repo visibility. Both have GitHub remotes, but public status was not confirmed, so no links are shown. |
+| 23 | Skills | Excel (Analytic Solver, Data Science tabs), SAP and ISDS 474 data mining show as AUTHOR-REPORTED. A course project, file or certificate would let them link to evidence. |
+| 24 | Design | Review the built pages (the direction was chosen from mockups). Barlow Condensed was picked over Archivo Narrow by the agent. |
