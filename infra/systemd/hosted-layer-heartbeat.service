@@ -1,0 +1,9 @@
+[Unit]
+Description=External dead-man's switch heartbeat ping for Beelink SER
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/hosted-layer/restic.env
+ExecStart=/usr/bin/bash -c 'test -n "${HEALTHCHECKS_HEARTBEAT_URL:-}" && curl -fsS --max-time 10 --retry 2 "$HEALTHCHECKS_HEARTBEAT_URL" > /dev/null'

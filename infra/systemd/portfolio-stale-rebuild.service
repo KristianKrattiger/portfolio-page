@@ -1,0 +1,22 @@
+[Unit]
+Description=Rebuild ~/portfolio for current date to refresh 90-day STALE badges
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=deploy
+Group=deploy
+EnvironmentFile=-/etc/hosted-layer/stale.env
+ExecStart=/srv/hosted-layer/scripts/rebuild-stale.sh
+
+# Sandboxing (deploy has no root and no Docker socket access)
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/hosted-layer/portfolio
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true

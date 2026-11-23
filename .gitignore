@@ -1,2 +1,5 @@
 __pycache__/
 .superpowers/
+.env
+infra/.env
+infra/host/restic.env

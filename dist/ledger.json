@@ -1,6 +1,6 @@
 {
   "generated_from": "content/ledger.yaml",
-  "build_date": "2026-11-22",
+  "build_date": "2026-11-23",
   "stale_rule": "as_of older than 90 days before build_date; month-precision dates count from the 1st",
   "hidden_entries_excluded": 2,
   "counts": {

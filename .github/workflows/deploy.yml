@@ -1,0 +1,108 @@
+name: Verify and Deploy Portfolio
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portfolio-deploy
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run validator unit tests
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Build static site
+        run: python3 build.py
+
+      - name: Run CI-safe site verification
+        run: python3 verify/verify.py --skip-local-repos --no-write
+
+      - name: Package dist artifact
+        run: tar -C dist -czf dist.tar.gz .
+
+      - name: Upload built dist tarball
+        uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-dist
+          path: dist.tar.gz
+          retention-days: 7
+
+  deploy:
+    needs: verify
+    # Set repository variable ENABLE_BEELINK_DEPLOY=true once Beelink secrets are configured.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.ENABLE_BEELINK_DEPLOY == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download built dist tarball
+        uses: actions/download-artifact@v4
+        with:
+          name: portfolio-dist
+
+      - name: Connect to Tailnet (ephemeral tag:ci node)
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+
+      - name: Configure SSH for Beelink deploy user
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          BEELINK_TS_HOST: ${{ secrets.BEELINK_TS_HOST }}
+          BEELINK_SSH_HOST_KEY: ${{ secrets.BEELINK_SSH_HOST_KEY }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          printf '%s %s\n' "$BEELINK_TS_HOST" "$BEELINK_SSH_HOST_KEY" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Stream artifact and run atomic deploy on Beelink SER
+        env:
+          BEELINK_TS_HOST: ${{ secrets.BEELINK_TS_HOST }}
+          RELEASE_ID: ${{ github.sha }}
+        run: |
+          SHORT_SHA="${RELEASE_ID:0:12}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o ConnectTimeout=15 \
+            "deploy@${BEELINK_TS_HOST}" \
+            "/srv/hosted-layer/scripts/deploy-portfolio.sh ${SHORT_SHA}" < dist.tar.gz
+
+      - name: Verify public domain (optional once domain is set)
+        if: ${{ vars.PORTFOLIO_DOMAIN != '' }}
+        env:
+          PORTFOLIO_DOMAIN: ${{ vars.PORTFOLIO_DOMAIN }}
+        run: |
+          for route in "/" "/ledger/" "/not-done/" "/colophon/" "/ledger.json" "/style.css"; do
+            code="$(curl -sS -o /dev/null -w '%{http_code}' "https://${PORTFOLIO_DOMAIN}${route}")"
+            echo "GET https://${PORTFOLIO_DOMAIN}${route} -> ${code}"
+            test "$code" = "200"
+          done
+
+      - name: Purge Cloudflare cache (optional)
+        if: ${{ vars.PORTFOLIO_DOMAIN != '' && secrets.CF_ZONE_ID != '' && secrets.CF_API_TOKEN != '' }}
+        env:
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          curl -fsS -X POST "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache" \
+            -H "Authorization: Bearer ${CF_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}' > /dev/null

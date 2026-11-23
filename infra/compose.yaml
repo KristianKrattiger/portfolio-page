@@ -1,0 +1,87 @@
+# Core hosted layer for headless EndeavourOS Beelink SER.
+# Install location on host: /srv/hosted-layer/compose.yaml
+#
+# Hard rule: NEVER bind container ports to 0.0.0.0 (Docker bypasses host ufw/nftables).
+# Public traffic arrives strictly via outbound Cloudflare Tunnel -> edge-net -> caddy:80.
+# Local diagnostics and admin UIs bind strictly to 127.0.0.1 (reachable over Tailscale/SSH).
+
+name: hosted-layer
+
+services:
+  caddy:
+    image: caddy:2.8-alpine
+    container_name: hosted-caddy
+    restart: unless-stopped
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 128m
+    pids_limit: 64
+    tmpfs:
+      - /tmp
+      - /config
+      - /data
+    ports:
+      # Loopback only — used by deploy-portfolio.sh smoke test & local health checks.
+      - "127.0.0.1:8787:80"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Mount parent directory (NOT portfolio/current directly) so relative symlink swaps
+      # (current -> releases/<id>) take effect atomically without restarting Caddy.
+      - ./portfolio:/srv/portfolio:ro
+    networks:
+      - edge-net
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:80/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: hosted-cloudflared
+    restart: unless-stopped
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 128m
+    pids_limit: 64
+    command: tunnel --no-autoupdate --metrics 0.0.0.0:2000 run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?set CLOUDFLARE_TUNNEL_TOKEN in .env}
+    depends_on:
+      caddy:
+        condition: service_healthy
+    networks:
+      - edge-net
+    # Note: cloudflare/cloudflared is distroless (no sh/wget/curl).
+    # Probe http://cloudflared:2000/ready from uptime-kuma on edge-net.
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: hosted-uptime-kuma
+    profiles: ["monitoring"]
+    restart: unless-stopped
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 256m
+    pids_limit: 128
+    ports:
+      # Loopback only — access via SSH tunnel or `tailscale serve`. Never expose publicly.
+      - "127.0.0.1:3001:3001"
+    volumes:
+      - ./data/uptime-kuma:/app/data
+    networks:
+      - edge-net
+
+networks:
+  edge-net:
+    name: edge-net
+    driver: bridge

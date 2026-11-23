@@ -1,0 +1,21 @@
+// Reference Tailscale ACL policy snippet (merge into your Tailscale Admin Console -> Access Controls).
+// Gives GitHub Actions ephemeral tag:ci nodes SSH (22/tcp) ONLY to tag:beelink,
+// while giving your admin account full access to the mini PC.
+{
+  "tagOwners": {
+    "tag:beelink": ["autogroup:admin"],
+    "tag:ci": ["autogroup:admin"]
+  },
+  "acls": [
+    {
+      "action": "accept",
+      "src": ["autogroup:admin"],
+      "dst": ["tag:beelink:*"]
+    },
+    {
+      "action": "accept",
+      "src": ["tag:ci"],
+      "dst": ["tag:beelink:22"]
+    }
+  ]
+}

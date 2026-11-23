@@ -13,6 +13,7 @@ import json
 import os
 import re
 import shutil
+import socket
 import subprocess
 import sys
 import tempfile
@@ -166,6 +167,11 @@ ALLOWED_URL_PREFIXES = ("https://github.com/KristianKrattiger/", "https://kristi
 
 def check_external_and_secrets():
     hosts, bad = set(), []
+    host_names = [
+        h for h in {os.environ.get("COMPUTERNAME", ""), socket.gethostname()}
+        if h and len(h) >= 3 and h.lower() != "localhost"
+    ]
+    machine_rx = re.compile("|".join(re.escape(h) for h in sorted(host_names)), re.I) if host_names else re.compile(r"@@none@@")
     secret_patterns = {
         "IPv4 address": re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b"),
         "tailnet (*.ts.net) name": re.compile(r"[a-z0-9-]+\.ts\.net", re.I),
@@ -174,7 +180,7 @@ def check_external_and_secrets():
         "api key": re.compile(r"sk-[A-Za-z0-9]{16,}|ghp_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|BEGIN [A-Z ]*PRIVATE KEY|xox[bp]-"),
         "env assignment": re.compile(r"(?:API_KEY|TOKEN|SECRET|PASSWORD)\s*=\s*\S+", re.I),
         "localhost": re.compile(r"localhost", re.I),
-        "machine name": re.compile(re.escape(os.environ.get("COMPUTERNAME", "@@none@@")), re.I),
+        "machine name": machine_rx,
         "analytics/cookies": re.compile(r"google-analytics|googletagmanager|gtag\(|plausible|umami|document\.cookie|<script[^>]+src=", re.I),
     }
     for rel in dist_files():
@@ -449,7 +455,9 @@ def main():
     ap.add_argument("--live", help="base URL of a running server")
     ap.add_argument("--date", default=os.environ.get("PORTFOLIO_BUILD_DATE", dt.date.today().isoformat()))
     ap.add_argument("--no-write", action="store_true")
-    args = ap.parse_args()
+    ap.add_argument("--skip-local-repos", action="store_true",
+                    help="skip LINKED-at-SHA checks against local workstation clones (for CI / server deploys)")
+    args = ap.parse_args(argv if "argv" in locals() else None)
 
     check_tests()
     check_build_fails_on_bad_ledger()
@@ -458,7 +466,11 @@ def main():
     if p.returncode != 0:
         print(p.stderr)
         sys.exit(1)
-    check_linked_at_sha()
+    if args.skip_local_repos:
+        not_run("Every LINKED entry: path exists at SHA, SHA on named branch",
+                "skipped via --skip-local-repos (local source repos unavailable in this environment)")
+    else:
+        check_linked_at_sha()
     check_external_and_secrets()
     parsed = check_links_and_html()
     check_contrast()
