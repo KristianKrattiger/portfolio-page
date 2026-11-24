@@ -1,11 +1,11 @@
 {
-  "date": "2026-11-23",
+  "date": "2026-11-24",
   "checks": [
     {
       "name": "Validator test suite (incl. must-fail cases)",
       "command": "python -m unittest discover -s tests",
       "result": "PASS",
-      "detail": "Ran 43 tests in 0.002s / OK"
+      "detail": "Ran 43 tests in 0.003s / OK"
     },
     {
       "name": "Build fails on invalid ledgers",
@@ -15,15 +15,15 @@
     },
     {
       "name": "Deterministic build",
-      "command": "python build.py --date 2026-11-23 (twice, sha256 over all files)",
+      "command": "python build.py --date 2026-11-24 (twice, sha256 over all files)",
       "result": "PASS",
-      "detail": "build 1 884a889aac123389..., build 2 884a889aac123389..."
+      "detail": "build 1 401fc5d1075ae6b1..., build 2 401fc5d1075ae6b1..."
     },
     {
       "name": "Every LINKED entry: path exists at SHA, SHA on named branch",
       "command": "git cat-file -e <sha>:<path>; git merge-base --is-ancestor <sha> <branch>",
       "result": "PASS",
-      "detail": "26 LINKED entries, 65 evidence items checked"
+      "detail": "30 LINKED entries, 80 evidence items checked"
     },
     {
       "name": "No external hosts beyond evidence links; no secrets, IPs, *.ts.net names, hostnames, analytics",
@@ -35,13 +35,13 @@
       "name": "Internal link check (files and #fragments)",
       "command": "html.parser over dist/*.html",
       "result": "PASS",
-      "detail": "1241 internal links in 29 pages"
+      "detail": "1362 internal links in 31 pages"
     },
     {
       "name": "HTML well-formedness (tag balance, duplicate ids)",
       "command": "stdlib html.parser structural check",
       "result": "PASS",
-      "detail": "29 pages"
+      "detail": "31 pages"
     },
     {
       "name": "WCAG AA contrast, every palette pair, both schemes",
@@ -59,22 +59,20 @@
       "name": "Keyboard basics (static): skip link, native controls, no positive tabindex, visible focus",
       "command": "html.parser + CSS scan",
       "result": "PASS",
-      "detail": "29 pages"
+      "detail": "31 pages"
     },
     {
       "name": "Pages render with JS off",
       "command": "static check + msedge --headless --dump-dom on a script-stripped copy",
       "result": "PASS",
-      "detail": "ledger has 50 tags server-rendered for 50 public entries; JS-only filter form hidden by default: True; headless Edge on a script-stripped copy (1 script blocks removed): 29/29 pages render main+footer, ledger shows 50 tags, filter form stays hidden=True; with scripts: form revealed=True, counter='50 of 50 entries shown'"
-    },
-    {
-      "name": "Live: every route returns 200 from the loopback server",
-      "command": "HTTP GET x35 (URL in the final report, not published)",
-      "result": "PASS",
-      "detail": "/ 200; /about/ 200; /fonts/BarlowCondensed-ExtraBold.ttf 200; /fonts/BarlowCondensed-SemiBold.ttf 200; /fonts/OFL.txt 200; /index.html 200; /ledger.json 200; /ledger/ 200; /ledger/project/gin/ 200; /ledger/project/latch/ 200; /ledger/project/priceriot/ 200; /ledger/project/qsr-erp/ 200; /ledger/project/receipts/ 200; /ledger/project/sear/ 200; /ledger/project/tunedin/ 200; /ledger/state/blocked/ 200; /ledger/state/built/ 200; /ledger/state/design-only/ 200; /ledger/state/in-progress/ 200; /ledger/state/killed/ 200; /ledger/state/measured/ 200; /ledger/state/negative-result/ 200; /ledger/state/not-done/ 200; /ledger/verification/author-reported/ 200; /ledger/verification/linked/ 200; /not-done/ 200; /projects/ 200; /projects/gin/ 200; /projects/latch/ 200; /projects/priceriot/ 200; /projects/qsr-erp/ 200; /projects/receipts/ 200; /projects/sear/ 200; /projects/tunedin/ 200; /style.css 200"
+      "detail": "ledger has 54 tags server-rendered for 54 public entries; JS-only filter form hidden by default: True; headless Edge on a script-stripped copy (1 script blocks removed): 31/31 pages render main+footer, ledger shows 54 tags, filter form stays hidden=True; with scripts: form revealed=True, counter='54 of 54 entries shown'"
     }
   ],
   "not_run": [
+    {
+      "name": "Live route check",
+      "reason": "no --live URL given in this run"
+    },
     {
       "name": "Full W3C/Nu HTML validation",
       "reason": "no validator on this machine (no vnu, tidy or java); a stdlib structural check ran instead"

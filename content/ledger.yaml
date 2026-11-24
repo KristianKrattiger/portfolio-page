@@ -14,6 +14,9 @@
 #   ISDS454_QSR_ERP  main 72a912e; extensions-plan 35eec27 (checkout on extensions-plan, clean)
 #   ISDS309_TunedIn  not under git; README mtime 2026-09-15
 #   GIN              alewife bc5b455 (worktree 'Additonal-testing', clean; local only, not on any remote)
+# Added 2026-11-24 (read-only):
+#   backstop            stage1-build b7de6a6 (clean; local only)
+#   backstop-diagnosis  main dbf2465 (clean; local only)
 [
 {
   "id": "gin-sear-decode-constraint",
@@ -1339,6 +1342,93 @@
     }
   ],
   "does_not_show": "A fair comparison: plain RAG refused 9 of 12 queries, including answerable ones, so its 7 claims are a thin sample. Twelve queries on a synthetic corpus is small. It also shows SEAR copying planted falsehoods verbatim, as in sear-poisoned-fork: verbatim grounding does not catch a wrong source.",
+  "visibility": "public"
+},
+{
+  "id": "backstop-stage1-stop-gate",
+  "project": "backstop",
+  "claim": "A preregistered error-triggered stop gate on BFCL multi-turn (llama3.1:8b and qwen2.5:7b) lifted per-turn recovery after an unresolved tool error, but failed to raise task success significantly and tripped both harm guardrails (registered verdict: guardrail failed — gain not clean).",
+  "state": "NEGATIVE-RESULT",
+  "verification": "LINKED",
+  "as_of": "2026-11-21",
+  "evidence": [
+    {"repo": "backstop", "path": "study/analysis/report.txt", "branch": "stage1-build", "sha": "b7de6a6", "tier": 1, "dirty": false, "note": "registered confirmatory analysis"},
+    {"repo": "backstop", "path": "study/RESULTS.md", "branch": "stage1-build", "sha": "b7de6a6", "tier": 1, "dirty": false, "note": "verdict: guardrail failed — gain not clean"},
+    {"repo": "backstop", "path": "docs/WHY.md", "branch": "stage1-build", "sha": "b7de6a6", "tier": 2, "dirty": false, "note": "post-hoc and probe analysis splitting llama (execution-limited) vs qwen (diagnosis-limited)"}
+  ],
+  "results": [
+    {"metric": "H3 recovery, clean history (N2 vs N0)", "value": "0.143 vs 0.039 (Holm p = 0.0016)", "denominator": "26/182 vs 7/181 clean-history trigger turns", "dataset": "BFCL multi-turn (150 base / 150 miss_func / 150 miss_param per model)", "synthetic": false, "system": "llama3.1:8b + qwen2.5:7b pooled, Ollama", "date": "2026-11-21"},
+    {"metric": "H1 task success (N2 vs N0)", "value": "0.160 vs 0.127 (Holm p = 0.0787, fails)", "denominator": "48/300 vs 38/300 base tasks (16 vs 6)", "dataset": "same", "synthetic": false, "system": "same", "date": "2026-11-21"},
+    {"metric": "G1 wrongly refused stop-correct turns (N2)", "value": "0.116 (upper 0.139 vs 0.05 limit, fails)", "denominator": "71/612 stop-correct turns", "dataset": "same", "synthetic": false, "system": "same", "date": "2026-11-21"},
+    {"metric": "G2 wrong actions ratio N2/N0", "value": "1.436 (95th pct 1.744 vs 1.10 limit, fails)", "denominator": "300 base tasks", "dataset": "same", "synthetic": false, "system": "same", "date": "2026-11-21"}
+  ],
+  "does_not_show": "That every small model fails for the same reason (follow-up probes split llama as execution-limited and qwen as diagnosis-limited), or behavior on silent errors that return no tool error.",
+  "visibility": "public"
+},
+{
+  "id": "backstop-diagnosis-confirmatory",
+  "project": "backstop",
+  "claim": "A preregistered artifact-only diagnosis (built from error text and tool schemas, zero ground truth) lifted qwen2.5:7b error recovery from 16.0% to 42.1% and whole-task success by +5.7 percentage points with clean G1, but failed the post-fork wrong-action guardrail G2 (registered verdict: Gain not clean).",
+  "state": "NEGATIVE-RESULT",
+  "verification": "LINKED",
+  "as_of": "2026-11-24",
+  "evidence": [
+    {"repo": "backstop-diagnosis", "path": "study/analysis/report.txt", "branch": "main", "sha": "dbf2465", "tier": 1, "dirty": false, "note": "registered confirmatory analysis, N=843 (registered code snapshot 6156dd6)"},
+    {"repo": "backstop-diagnosis", "path": "study/PREREG.md", "branch": "main", "sha": "dbf2465", "tier": 1, "dirty": false, "note": "frozen registration, byte-identical to 57c1c4a"},
+    {"repo": "backstop-diagnosis", "path": "docs/FINDINGS.md", "branch": "main", "sha": "dbf2465", "tier": 2, "dirty": false, "note": "official close-out findings synthesis"},
+    {"repo": "backstop-diagnosis", "path": "evidence/outputs/posthoc_g2.txt", "branch": "main", "sha": "dbf2465", "tier": 1, "dirty": false, "note": "post-hoc G2 breakdown (call volume + blind N2 fallback)"}
+  ],
+  "results": [
+    {"metric": "H1 recovery D vs N2 (class-B refused turns)", "value": "0.421 vs 0.160 (lb 0.375 vs 0.24 floor, Holm p = 0.0001)", "denominator": "126/299 vs 44/275 turns (76.5% of oracle H gain)", "dataset": "pools/test.jsonl (BFCL simulated apps generator, first 843 tasks)", "synthetic": true, "system": "qwen2.5:7b, seed 1, branched SharedChat", "date": "2026-11-22"},
+    {"metric": "H2 whole-task success D vs N0", "value": "0.388 vs 0.331 (+5.7 pp, Holm p = 0.0000)", "denominator": "327/843 vs 279/843 tasks (58 rescued, 10 lost)", "dataset": "same", "synthetic": true, "system": "same", "date": "2026-11-22"},
+    {"metric": "G1 pushed stop-correct turns (D)", "value": "0.040 (Wilson upper 0.0576 vs 0.1390 ceiling, holds)", "denominator": "18/454 stop-correct turns", "dataset": "same", "synthetic": true, "system": "same", "date": "2026-11-22"},
+    {"metric": "G2 post-fork wrong actions D/N0", "value": "2.579 (95th pct 3.524 vs 1.744 ceiling, fails)", "denominator": "503 vs 195 post-fork wrong actions across 843 tasks (2.24x call volume)", "dataset": "same", "synthetic": true, "system": "same", "date": "2026-11-22"}
+  ],
+  "does_not_show": "Generalization across model families (failed H1 on ministral-3:8b and gemma4:e4b), transfer outside BFCL's eight simulated apps, or silent-failure coverage. Confirmatory N was reduced from 1,000 to 843 after a harness integer-serialization bug at task 844; the labelled secondary N=1,000 set matches every conclusion.",
+  "visibility": "public"
+},
+{
+  "id": "backstop-diagnosis-cross-family",
+  "project": "backstop",
+  "claim": "Exploratory cross-family testing showed artifact-only diagnosis is uneven across 7–9B model families and did not generalize over plain refusal on either gemma4:e4b (which already self-recovers on plain refusal) or ministral-3:8b (which failed to convert D's hints); an external tau2-bench smoke gate failed below a zero-tool floor and was dropped.",
+  "state": "NEGATIVE-RESULT",
+  "verification": "LINKED",
+  "as_of": "2026-11-24",
+  "evidence": [
+    {"repo": "backstop-diagnosis", "path": "extension/analysis/report.txt", "branch": "main", "sha": "dbf2465", "tier": 1, "dirty": false, "note": "Part 2A cross-family summary (N=250 each)"},
+    {"repo": "backstop-diagnosis", "path": "extension/analysis/gemma4-e4b_report.txt", "branch": "main", "sha": "dbf2465", "tier": 1, "dirty": false, "note": "gemma4:e4b full report"},
+    {"repo": "backstop-diagnosis", "path": "extension/analysis/ministral-3-8b_report.txt", "branch": "main", "sha": "dbf2465", "tier": 1, "dirty": false, "note": "ministral-3:8b full report"},
+    {"repo": "backstop-diagnosis", "path": "external/runs/tau2_retail_qwen2.5-7b_report.txt", "branch": "main", "sha": "dbf2465", "tier": 1, "dirty": false, "note": "Part 2B tau2-bench retail smoke gate (failed; dropped)"}
+  ],
+  "results": [
+    {"metric": "gemma4:e4b H1 recovery D vs N2 (exploratory)", "value": "0.467 vs 0.447 (Holm p = 0.3635, fails; oracle H = 0.489)", "denominator": "21/45 vs 21/47 turns (task pass +6.0 pp over N0, 15/0, but N2 already +5.6 pp)", "dataset": "extension/pool_ext.jsonl (first 250 fresh tasks)", "synthetic": true, "system": "gemma4:e4b, seed 1", "date": "2026-11-23"},
+    {"metric": "ministral-3:8b H1 recovery D vs N2 (exploratory)", "value": "0.185 vs 0.218 (Holm p = 0.7880, fails; oracle H = 0.373)", "denominator": "10/54 vs 12/55 turns (task pass 0.244 vs N0 0.232, 4/1, Holm p = 0.3750)", "dataset": "same", "synthetic": true, "system": "ministral-3:8b, seed 1", "date": "2026-11-23"},
+    {"metric": "D wrong/call on hint-fired vs blind N2-fallback turns (3 families)", "value": "0.061 / 0.108 / 0.020 vs 0.170 / 0.178 / 0.174", "denominator": "qwen2.5:7b (843), ministral-3:8b (250), gemma4:e4b (250)", "dataset": "pools/test.jsonl + extension/pool_ext.jsonl", "synthetic": true, "system": "all three 7–9B families", "date": "2026-11-23"},
+    {"metric": "tau2-bench retail smoke gate (N0 vs zero-tool floor)", "value": "0.050 vs 0.100 (dropped)", "denominator": "1/20 vs 2/20 retail tasks (0 DB-modifying tasks passed)", "dataset": "sierra-research/tau2-bench retail (first 20 tasks)", "synthetic": false, "system": "qwen2.5:7b agent + user simulator", "date": "2026-11-23"}
+  ],
+  "does_not_show": "Confirmatory cross-family bounds (exploratory, N=250, single seed) or behavior on external benchmarks where small models clear a zero-tool floor. Five older 7–9B models also failed the tool-calling smoke gate before selection.",
+  "visibility": "public"
+},
+{
+  "id": "backstop-diagnosis-hint-only",
+  "project": "backstop",
+  "claim": "In an exploratory follow-up, dropping the blind N2 fallback (D_only: refuse a stop only when diagnose() produces a hint) preserved 100% of task-success gains across all three models while eliminating regressions at N=843/250 and cutting post-fork wrong actions by 73–79%, though gains remained uneven across families.",
+  "state": "MEASURED",
+  "verification": "LINKED",
+  "as_of": "2026-11-24",
+  "evidence": [
+    {"repo": "backstop-diagnosis", "path": "extension/analysis/hint_only_qwen_843.txt", "branch": "main", "sha": "dbf2465", "tier": 1, "dirty": false, "note": "D_only vs D on qwen2.5:7b N=843"},
+    {"repo": "backstop-diagnosis", "path": "extension/analysis/hint_only_gemma4_250.txt", "branch": "main", "sha": "dbf2465", "tier": 1, "dirty": false, "note": "D_only vs D on gemma4:e4b N=250"},
+    {"repo": "backstop-diagnosis", "path": "extension/analysis/hint_only_ministral_250.txt", "branch": "main", "sha": "dbf2465", "tier": 1, "dirty": false, "note": "D_only vs D on ministral-3:8b N=250"},
+    {"repo": "backstop-diagnosis", "path": "extension/hint_only.py", "branch": "main", "sha": "dbf2465", "tier": 1, "dirty": false, "note": "exploratory hint-gated stop gate implementation"}
+  ],
+  "measurements": [
+    {"metric": "qwen2.5:7b D_only task pass vs N0 (exploratory)", "value": "0.389 vs 0.331 (49 rescued, 0 lost, Holm p = 0.0000)", "denominator": "328/843 vs 279/843 tasks (N=1,000: 395/1000, 56 rescued / 1 lost)", "dataset": "pools/test.jsonl (same N=843 / N=1,000 tasks; exploratory)", "synthetic": true, "system": "qwen2.5:7b, D_only arm, seed 1", "date": "2026-11-23"},
+    {"metric": "qwen2.5:7b D_only post-fork wrong actions & per-call rate vs N0", "value": "1.484x point ratio (p95 2.111 vs 1.744); 0.0580 vs 0.0838 wrong/call", "denominator": "135 vs 91 post-fork wrong actions; high-stakes 10 vs 11; whole-task 1.036x N0", "dataset": "same (N=843)", "synthetic": true, "system": "same", "date": "2026-11-23"},
+    {"metric": "gemma4:e4b D_only task pass & post-fork wrong vs N0", "value": "0.552 vs 0.496 (14 rescued, 0 lost); 4 vs 1 post-fork wrong", "denominator": "138/250 vs 124/250 tasks (G1 = 0/139; whole-task wrong 1.049x N0)", "dataset": "extension/pool_ext.jsonl (first 250 tasks; exploratory)", "synthetic": true, "system": "gemma4:e4b, D_only arm, seed 1", "date": "2026-11-23"},
+    {"metric": "ministral-3:8b D_only task pass & post-fork wrong vs N0", "value": "0.244 vs 0.232 (3 rescued, 0 lost, Holm p = 0.2500); 15 vs 4 post-fork wrong", "denominator": "61/250 vs 58/250 tasks (G1 = 0/139; down from 72 wrong under D)", "dataset": "same (N=250)", "synthetic": true, "system": "ministral-3:8b, D_only arm, seed 1", "date": "2026-11-23"}
+  ],
+  "does_not_show": "Prospective out-of-sample confirmation (D_only was designed from post-hoc G2 findings and evaluated on the same test sets, not unseen seeds). Under the strict registered G2 bootstrap 95th-percentile rule, D_only still misses 1.744 (p95 2.111 on qwen; inf on gemma4) because matching N0 on >80% of tasks shrinks the post-fork denominator. Ministral remains null.",
   "visibility": "public"
 }
 ]

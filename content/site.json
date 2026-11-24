@@ -195,6 +195,34 @@
       "group": "research"
     },
     {
+      "slug": "backstop",
+      "name": "Backstop + Diagnosis",
+      "subtitle": "Error-triggered stop gates and artifact-only diagnosis for small-model tool agents",
+      "what_it_is_ids": [
+        "backstop-stage1-stop-gate",
+        "backstop-diagnosis-confirmatory",
+        "backstop-diagnosis-cross-family",
+        "backstop-diagnosis-hint-only"
+      ],
+      "open_questions": [
+        {
+          "q": "Does the hint-only gate (D_only) preserve qwen2.5:7b's zero-regression lift on completely unseen seeds under a preregistered harm guardrail?",
+          "ids": [
+            "backstop-diagnosis-hint-only"
+          ],
+          "resolves": "A new preregistered run on untouched seeds (e.g., extension/pool_ext.jsonl tasks 251–500) paired with a call-normalized or risk-weighted guardrail."
+        },
+        {
+          "q": "Does error+schema diagnosis transfer outside BFCL's eight simulated apps, and does it remain useful as stronger small models self-recover on bare refusals?",
+          "ids": [
+            "backstop-diagnosis-cross-family"
+          ],
+          "resolves": "An external tool-use benchmark where unmodified 7–9B models clear a zero-tool floor, tested across multiple model families."
+        }
+      ],
+      "group": "research"
+    },
+    {
       "slug": "priceriot",
       "name": "PriceRiot",
       "group": "other",
@@ -299,7 +327,8 @@
       "name": "Local LLM evaluation harnesses; preregistered studies with kill criteria",
       "backed_by": [
         "gin-nc-baseline",
-        "latch-pilot-killed"
+        "latch-pilot-killed",
+        "backstop-diagnosis-confirmatory"
       ]
     },
     {

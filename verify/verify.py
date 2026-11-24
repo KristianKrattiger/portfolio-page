@@ -446,7 +446,7 @@ def check_nojs(parsed):
 
 ROUTES = ["/", "/index.html", "/not-done/", "/ledger/", "/ledger.json", "/about/", "/style.css",
           "/projects/", "/projects/gin/", "/projects/sear/", "/projects/receipts/", "/projects/latch/",
-          "/projects/priceriot/", "/projects/qsr-erp/", "/projects/tunedin/",
+          "/projects/backstop/", "/projects/priceriot/", "/projects/qsr-erp/", "/projects/tunedin/",
           "/fonts/BarlowCondensed-SemiBold.ttf", "/fonts/BarlowCondensed-ExtraBold.ttf", "/fonts/OFL.txt"]
 
 

@@ -11,7 +11,7 @@ import re
 STATES = ["MEASURED", "BUILT", "IN-PROGRESS", "DESIGN-ONLY", "BLOCKED",
           "NOT-DONE", "KILLED", "NEGATIVE-RESULT"]
 VERIFICATIONS = ["LINKED", "AUTHOR-REPORTED"]
-PROJECTS = ["gin", "sear", "receipts", "latch", "priceriot", "qsr-erp", "tunedin", "offscreen"]
+PROJECTS = ["gin", "sear", "receipts", "latch", "backstop", "priceriot", "qsr-erp", "tunedin", "offscreen"]
 VISIBILITIES = ["public", "hidden"]
 MEASUREMENT_FIELDS = ["metric", "value", "denominator", "dataset", "synthetic",
                       "system", "date"]
