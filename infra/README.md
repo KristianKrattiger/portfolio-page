@@ -96,7 +96,7 @@ Infrastructure configs, scripts, systemd units, and CI/CD workflow for self-host
 1. Provision `/srv/hosted-layer`:
    ```bash
    sudo install -d -m 755 /srv/hosted-layer/{caddy,scripts,data/uptime-kuma}
-   sudo install -d -m 755 -o deploy -g deploy /srv/hosted-layer/portfolio/releases
+   sudo install -d -m 755 -o deploy -g deploy /srv/hosted-layer/portfolio /srv/hosted-layer/portfolio/releases
    sudo install -Dm644 infra/compose.yaml /srv/hosted-layer/compose.yaml
    sudo install -Dm644 infra/caddy/Caddyfile /srv/hosted-layer/caddy/Caddyfile
    sudo install -Dm755 infra/scripts/deploy-portfolio.sh /srv/hosted-layer/scripts/deploy-portfolio.sh
