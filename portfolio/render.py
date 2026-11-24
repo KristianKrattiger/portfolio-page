@@ -350,6 +350,10 @@ def contact_html(contact):
             gh = contact["github"].strip()
             label = gh.replace("https://", "").replace("http://", "").rstrip("/")
             parts.append(f'<a href="{e(gh)}" rel="noreferrer">{e(label)}</a>')
+        if contact.get("linkedin"):
+            li = contact["linkedin"].strip()
+            label = li.replace("https://www.", "").replace("https://", "").replace("http://www.", "").replace("http://", "").rstrip("/")
+            parts.append(f'<a href="{e(li)}" rel="noreferrer">{e(label)}</a>')
         if parts:
             return " · ".join(parts)
     return text(contact)

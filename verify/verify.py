@@ -162,7 +162,7 @@ def check_linked_at_sha():
 
 URL_RE = re.compile(r"""(?:https?:)?//[^\s"'<>)]+""")
 ALLOWED_URL_PREFIXES = ("https://github.com/KristianKrattiger", "https://kristiankrattiger.github.io/receipts/",
-                        "http://www.w3.org/2000/svg")
+                        "https://www.linkedin.com/in/kristiankratt/", "http://www.w3.org/2000/svg")
 
 
 def allowed_contact_emails():

@@ -3,7 +3,8 @@
   "line": "AI verification and grounding: what I built, what I measured, and what didn't work.",
   "contact": {
     "email": "kristiankratt@gmail.com",
-    "github": "https://github.com/KristianKrattiger"
+    "github": "https://github.com/KristianKrattiger",
+    "linkedin": "https://www.linkedin.com/in/kristiankratt/"
   },
   "education": "CSUF senior. BA Business Administration (Information Systems), minor in Computer Science.",
   "education_source": "author's brief (not re-verified against a record)",
@@ -343,8 +344,17 @@
   ],
   "skills_source": "list supplied by the author on 2026-11-22; entries marked 'seen in' link to a ledger entry whose evidence shows the skill in use",
   "ai_disclosure": {
-    "tagline": "AI coding assistants helped build this site. Here is where they were used and where the boundary sits.",
+    "tagline": "AI coding assistants helped build this site. Here is which models were used, how I reviewed and iterated on every output, and where the boundary sits.",
     "sections": [
+      {
+        "id": "models",
+        "heading": "Models used",
+        "intro": "Two model families were used as coding and editing assistants while building and hosting this site:",
+        "items": [
+          "Claude (Anthropic): initial static site generator, candidate ledger extraction from local repositories and notes, and visual restyling.",
+          "Gemini (Google): EndeavourOS Beelink hosting setup, container and deployment fixes, and follow-up site edits."
+        ]
+      },
       {
         "id": "helped",
         "heading": "Where AI helped",
@@ -354,6 +364,14 @@
           "Ledger assembly: extracting candidate entries, commit hashes, and file paths from local repositories and notes into content/ledger.yaml for review.",
           "Hosting and deployment: writing Docker, Caddy, Cloudflare Tunnel, systemd, and GitHub Actions configs under infra/ and .github/workflows/.",
           "Prose drafting: initial wording for navigation, layout copy, and repository documentation."
+        ]
+      },
+      {
+        "id": "review",
+        "heading": "Review and iteration",
+        "paragraphs": [
+          "No generated output went live unreviewed. I checked each page, wording pass, and ledger entry myself and iterated through many rounds of revision before publishing.",
+          "Earlier passes were discarded or reworked when the visual style looked generic, when narrow screens overflowed, when prose overstated what the evidence supported, or when hosting configs failed live checks. Every revision still had to pass the validator test suite, deterministic build, and verification script before deploying."
         ]
       },
       {
@@ -371,7 +389,7 @@
         "heading": "Why state this here",
         "paragraphs": [
           "My work is about AI verification and grounding: systems where a model may propose, but a deterministic check decides what gets admitted.",
-          "Applying that same rule to the portfolio means stating plainly where AI assisted in building the site, and letting the ledger, commit hashes, and build checks carry the evidence instead of prose."
+          "Applying that same rule to the portfolio means stating plainly which models assisted, how their output was reviewed across iterations, and letting the ledger, commit hashes, and build checks carry the evidence instead of prose."
         ]
       }
     ]
