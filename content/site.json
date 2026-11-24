@@ -341,5 +341,39 @@
       ]
     }
   ],
-  "skills_source": "list supplied by the author on 2026-11-22; entries marked 'seen in' link to a ledger entry whose evidence shows the skill in use"
+  "skills_source": "list supplied by the author on 2026-11-22; entries marked 'seen in' link to a ledger entry whose evidence shows the skill in use",
+  "ai_disclosure": {
+    "tagline": "AI coding assistants helped build this site. Here is where they were used and where the boundary sits.",
+    "sections": [
+      {
+        "id": "helped",
+        "heading": "Where AI helped",
+        "intro": "AI coding assistants were used as build and editing tools for the site itself:",
+        "items": [
+          "Static site generator: drafting and iterating on build.py, portfolio/render.py, portfolio/validate.py, CSS layout, and verify/verify.py.",
+          "Ledger assembly: extracting candidate entries, commit hashes, and file paths from local repositories and notes into content/ledger.yaml for review.",
+          "Hosting and deployment: writing Docker, Caddy, Cloudflare Tunnel, systemd, and GitHub Actions configs under infra/ and .github/workflows/.",
+          "Prose drafting: initial wording for navigation, layout copy, and repository documentation."
+        ]
+      },
+      {
+        "id": "boundary",
+        "heading": "What AI does not decide",
+        "intro": "The factual record and publication gates do not rest on model output:",
+        "items": [
+          "Build-time checks: every claim renders from content/ledger.yaml and is checked deterministically by build.py and verify/verify.py. A MEASURED entry fails the build without explicit metrics, denominators, datasets, and evidence pointers; a LINKED entry requires a file path, branch, and commit SHA.",
+          "Visible uncertainty: unverified statements are labeled AUTHOR-REPORTED, STALE (older than 90 days), or UNKNOWN rather than filled in with generated prose.",
+          "Author direction: I chose the visual direction, scope, which entries are public or hidden, and what gets published."
+        ]
+      },
+      {
+        "id": "why",
+        "heading": "Why state this here",
+        "paragraphs": [
+          "My work is about AI verification and grounding: systems where a model may propose, but a deterministic check decides what gets admitted.",
+          "Applying that same rule to the portfolio means stating plainly where AI assisted in building the site, and letting the ledger, commit hashes, and build checks carry the evidence instead of prose."
+        ]
+      }
+    ]
+  }
 }

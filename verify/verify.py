@@ -444,7 +444,7 @@ def check_nojs(parsed):
     record("Pages render with JS off", "static check + msedge --headless --dump-dom on a script-stripped copy", ok, detail)
 
 
-ROUTES = ["/", "/index.html", "/not-done/", "/ledger/", "/ledger.json", "/about/", "/style.css",
+ROUTES = ["/", "/index.html", "/not-done/", "/ledger/", "/ledger.json", "/about/", "/ai/", "/style.css",
           "/projects/", "/projects/gin/", "/projects/sear/", "/projects/receipts/", "/projects/latch/",
           "/projects/backstop/", "/projects/priceriot/", "/projects/qsr-erp/", "/projects/tunedin/",
           "/fonts/BarlowCondensed-SemiBold.ttf", "/fonts/BarlowCondensed-ExtraBold.ttf", "/fonts/OFL.txt"]

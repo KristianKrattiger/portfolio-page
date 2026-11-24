@@ -156,7 +156,8 @@ def strip(entries):
 
 def nav(page, site):
     items = [("ledger/index.html", "Ledger"), ("not-done/index.html", "Not done"),
-             ("projects/index.html", "Projects"), ("about/index.html", "About")]
+             ("projects/index.html", "Projects"), ("about/index.html", "About"),
+             ("ai/index.html", "AI disclosure")]
     lis = []
     for target, label in items:
         cur = ' aria-current="page"' if target == page else ""
@@ -693,6 +694,34 @@ def page_about(entries, ctx):
     return layout(page, "About", body, ctx)
 
 
+def page_ai(entries, ctx):
+    page = "ai/index.html"
+    disc = ctx.site["ai_disclosure"]
+    sections = []
+    for sec in disc["sections"]:
+        parts = []
+        if sec.get("intro"):
+            parts.append(f'<p>{e(sec["intro"])}</p>')
+        if sec.get("items"):
+            lis = "".join(f"<li>{e(it)}</li>" for it in sec["items"])
+            parts.append(f'<ul class="plain">{lis}</ul>')
+        for para in sec.get("paragraphs", []):
+            parts.append(f"<p>{e(para)}</p>")
+        sections.append(
+            f'<section aria-labelledby="{e(sec["id"])}">'
+            f'<h2 class="band" id="{e(sec["id"])}">{e(sec["heading"])}</h2>'
+            f'<div class="sheet">{"".join(parts)}</div></section>'
+        )
+    body = f"""
+<section class="lead">
+<h1 class="title">AI disclosure</h1>
+<p class="tagline">{e(disc['tagline'])}</p>
+</section>
+{"".join(sections)}
+"""
+    return layout(page, "AI disclosure", body, ctx)
+
+
 # ---------------------------------------------------------------- json
 
 def ledger_json(entries, ctx, n_hidden):
@@ -740,6 +769,7 @@ def build_site(all_entries, site, build_date):
     for p in site["projects"]:
         pages[f"projects/{p['slug']}/index.html"] = page_project(p, entries, ctx)
     pages["about/index.html"] = page_about(entries, ctx)
+    pages["ai/index.html"] = page_ai(entries, ctx)
     pages["ledger.json"] = ledger_json(entries, ctx, n_hidden)
     from .style import CSS
     pages["style.css"] = CSS

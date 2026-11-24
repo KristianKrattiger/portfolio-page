@@ -1,6 +1,6 @@
 # Colophon
 
-How this site is built, hosted, verified, and what context it was built from. (Kept in the repository rather than published as a web page.)
+How this site is built, hosted, verified, and what context it was built from. (Kept in the repository; the published `/colophon/` web page was replaced by `/ai/` for AI disclosure.)
 
 ## Build
 
