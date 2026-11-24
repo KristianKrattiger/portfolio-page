@@ -2,8 +2,6 @@
 
 | # | Where | What is needed |
 |---|---|---|
-| 1 | Home, About | **Contact** method to publish. |
-| 2 | About | **What you are looking at next**, in your words. The page lists open threads from the evidence instead. |
 | 3 | gin-smuggled-pairs | Source for "6 of 21 negative pairs were smuggled contradictions". No artifact was found in the GIN repo or the distilled sessions. Give a path or drop it. |
 | 4 | sear-review-gaps | The review document behind "narrator-probe denominators, inverted control values, misattributed failure states", plus the fix status of each. |
 | 5 | assay-testing | What "testing NOT-DONE" means, given that the repo has 23 test files, a smoke test and CI. |

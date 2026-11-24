@@ -1,10 +1,13 @@
 {
   "name": "Kristian Krattiger",
   "line": "AI verification and grounding: what I built, what I measured, and what didn't work.",
-  "contact": "UNKNOWN — author to supply",
+  "contact": {
+    "email": "kristiankratt@gmail.com",
+    "github": "https://github.com/KristianKrattiger"
+  },
   "education": "CSUF senior. BA Business Administration (Information Systems), minor in Computer Science.",
   "education_source": "author's brief (not re-verified against a record)",
-  "next": "UNKNOWN — author to supply",
+  "next": "I'm looking at finishing my degree at CSUF, finishing up the QSR ERP system, and finding a full-time position.",
   "work_paragraph": [
     "I build systems where a model may propose but a deterministic check decides what gets admitted, and where the system says so out loud when it cannot support an answer. GIN is the frame. SEAR and Receipts with Assay are slices of it. Latch tested GIN's gate idea on small-model reasoning.",
     "Some of it held on small sets. Some of it failed under criteria I wrote down before running it. Both sides are below, with the same weight, and each line links to its evidence."

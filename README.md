@@ -9,5 +9,5 @@ Ledger-first personal site. Source of truth: `content/ledger.yaml` (schema in SP
     powershell -File service/install-service.ps1     # persistent, user-level (Startup folder)
     powershell -File service/uninstall-service.ps1
 
-After editing the ledger: run verify, then build again so the colophon carries the results.
-Docs: STYLE.md, SPEC.md, PLAN.md, ASSUMPTIONS.md, SOURCES.md, NEEDS_AUTHOR.md.
+After editing the ledger: run `python build.py` and `python verify/verify.py`.
+Docs: COLOPHON.md, STYLE.md, SPEC.md, PLAN.md, ASSUMPTIONS.md, SOURCES.md, NEEDS_AUTHOR.md, infra/README.md.

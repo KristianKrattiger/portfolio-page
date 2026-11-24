@@ -161,12 +161,24 @@ def check_linked_at_sha():
 
 
 URL_RE = re.compile(r"""(?:https?:)?//[^\s"'<>)]+""")
-ALLOWED_URL_PREFIXES = ("https://github.com/KristianKrattiger/", "https://kristiankrattiger.github.io/receipts/",
+ALLOWED_URL_PREFIXES = ("https://github.com/KristianKrattiger", "https://kristiankrattiger.github.io/receipts/",
                         "http://www.w3.org/2000/svg")
+
+
+def allowed_contact_emails():
+    site_path = os.path.join(ROOT, "content", "site.json")
+    if not os.path.exists(site_path):
+        return set()
+    with open(site_path, encoding="utf-8") as fh:
+        contact = json.load(fh).get("contact")
+    if isinstance(contact, dict) and contact.get("email"):
+        return {contact["email"].strip().lower()}
+    return set()
 
 
 def check_external_and_secrets():
     hosts, bad = set(), []
+    allowed_emails = allowed_contact_emails()
     host_names = [
         h for h in {os.environ.get("COMPUTERNAME", ""), socket.gethostname()}
         if h and len(h) >= 3 and h.lower() != "localhost"
@@ -196,6 +208,8 @@ def check_external_and_secrets():
                     bad.append(f"{rel}: disallowed URL host")
         for name, rx in secret_patterns.items():
             for m in rx.finditer(txt):
+                if name == "email" and m.group(0).lower() in allowed_emails:
+                    continue
                 bad.append(f"{rel}: {name}")  # never echo the match: it would be republished
     record("No external hosts beyond evidence links; no secrets, IPs, *.ts.net names, hostnames, analytics",
            "regex scan of every file in dist/", not bad,
@@ -430,7 +444,7 @@ def check_nojs(parsed):
     record("Pages render with JS off", "static check + msedge --headless --dump-dom on a script-stripped copy", ok, detail)
 
 
-ROUTES = ["/", "/index.html", "/not-done/", "/ledger/", "/ledger.json", "/about/", "/colophon/", "/style.css",
+ROUTES = ["/", "/index.html", "/not-done/", "/ledger/", "/ledger.json", "/about/", "/style.css",
           "/projects/", "/projects/gin/", "/projects/sear/", "/projects/receipts/", "/projects/latch/",
           "/projects/priceriot/", "/projects/qsr-erp/", "/projects/tunedin/",
           "/fonts/BarlowCondensed-SemiBold.ttf", "/fonts/BarlowCondensed-ExtraBold.ttf", "/fonts/OFL.txt"]

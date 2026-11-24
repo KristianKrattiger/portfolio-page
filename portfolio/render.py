@@ -156,8 +156,7 @@ def strip(entries):
 
 def nav(page, site):
     items = [("ledger/index.html", "Ledger"), ("not-done/index.html", "Not done"),
-             ("projects/index.html", "Projects"), ("about/index.html", "About"),
-             ("colophon/index.html", "Colophon")]
+             ("projects/index.html", "Projects"), ("about/index.html", "About")]
     lis = []
     for target, label in items:
         cur = ' aria-current="page"' if target == page else ""
@@ -340,6 +339,21 @@ def skills_html(site, page, ctx):
     return "<ul>" + "".join(lis) + "</ul>"
 
 
+def contact_html(contact):
+    if isinstance(contact, dict):
+        parts = []
+        if contact.get("email"):
+            em = contact["email"].strip()
+            parts.append(f'<a href="mailto:{e(em)}">{e(em)}</a>')
+        if contact.get("github"):
+            gh = contact["github"].strip()
+            label = gh.replace("https://", "").replace("http://", "").rstrip("/")
+            parts.append(f'<a href="{e(gh)}" rel="noreferrer">{e(label)}</a>')
+        if parts:
+            return " · ".join(parts)
+    return text(contact)
+
+
 def about_dl(site, page, ctx):
     projs = ", ".join(f'<a href="{rel(page, "projects/" + p["slug"] + "/index.html")}">{e(p["name"])}</a>'
                       for p in site["projects"])
@@ -348,7 +362,7 @@ def about_dl(site, page, ctx):
 <dt>Focus</dt><dd>{e(site['focus'])}</dd>
 <dt>Skills</dt><dd>{skills_html(site, page, ctx)}<span class="seen">{e(site.get('skills_source', ''))}.</span></dd>
 <dt>Projects</dt><dd>{projs}</dd>
-<dt>Contact</dt><dd>{text(site['contact'])}</dd>
+<dt>Contact</dt><dd>{contact_html(site['contact'])}</dd>
 </dl>"""
 
 
@@ -679,46 +693,6 @@ def page_about(entries, ctx):
     return layout(page, "About", body, ctx)
 
 
-def page_colophon(entries, ctx, walk, checks, n_hidden):
-    page = "colophon/index.html"
-    walked = "".join(f"<li><strong>{e(w['what'])}.</strong> {e(w['detail'])}</li>" for w in walk["walked"])
-    not_walked = "".join(f"<li>{e(x)}</li>" for x in walk["not_walked"])
-    if checks:
-        rows = []
-        for c in checks["checks"]:
-            res = c["result"]
-            cls = "" if res == "PASS" else "sig"
-            rows.append(f'<tr><td>{e(c["name"])}</td><td class="mono">{e(c["command"])}</td>'
-                        f'<td class="mono {cls}">{e(res)}</td><td>{e(c["detail"])}</td></tr>')
-        checks_html = (f'<p class="mono small">Recorded by verify/verify.py on {e(checks["date"])} against the build '
-                       f'immediately before this one; the same script was re-run on this build (see the final report).</p>'
-                       f'<div class="scroll" role="region" aria-label="Site checks" tabindex="0"><table class="nums">'
-                       f'<caption>The site\'s own ledger: what was checked</caption><thead><tr><th scope="col">Check</th>'
-                       f'<th scope="col">Command</th><th scope="col">Result</th><th scope="col">Detail</th></tr></thead>'
-                       f'<tbody>{"".join(rows)}</tbody></table></div>')
-        nr = "".join(f"<li><strong>{e(x['name'])}:</strong> NOT RUN. {e(x['reason'])}</li>" for x in checks.get("not_run", []))
-        checks_html += f"<h3>Not checked</h3><ul class='plain'>{nr}</ul>"
-    else:
-        checks_html = f"<p>{text('UNKNOWN — checks not yet recorded for this build')}</p>"
-    lv = Counter(x["verification"] for x in entries)
-    body = f"""
-<section class="lead">
-<h1 class="title">Colophon</h1>
-<p class="dek">How this site was built, what it was built from, and what was and was not checked about it.</p>
-</section>
-<section><h2 class="band" id="build">Build</h2><div class="sheet">
-<p>One ledger file (content/ledger.yaml) is the only source of factual sentences. A Python 3 standard-library script validates it and writes static HTML to dist/. The build fails, and writes nothing, if a MEASURED entry lacks its metric, value, denominator, dataset, synthetic flag, system, date or evidence; if a KILLED entry lacks its criterion; if a BLOCKED entry lacks its blocker; if a LINKED entry lacks a tier-1 path with branch and SHA; or if any entry lacks as_of or "does not show". STALE is computed at build time.</p>
-<p>No dependencies, no third-party requests, no analytics, no cookies. Type: Barlow Condensed (SIL Open Font License; files and licence served from this site's fonts/ folder) for headings and claims, the platform serif for prose, the platform monospace for data. Colour marks one thing only: black tape is done, red tape is failed, yellow tape on a manila tag is unfinished. Every state also carries its word and a shape. Every page works without JavaScript; the only script filters the ledger, and the same filters exist as plain pages. Served by Python's http.server bound to the loopback interface only.</p>
-<p>Entries: {len(entries)} public ({lv.get('LINKED', 0)} LINKED, {lv.get('AUTHOR-REPORTED', 0)} AUTHOR-REPORTED); {n_hidden} hidden by default and not published.</p>
-<p>The site was assembled by an AI coding agent working from my repositories and notes, under rules that forbid inventing or rounding numbers. The ledger is the place to check it.</p>
-</div></section>
-<section><h2 class="band" id="walked">Context walked</h2><div class="sheet"><p class="mono small">{e(walk['method'])} Walk date {e(walk['walk_date'])}.</p><ul class="plain">{walked}</ul></div></section>
-<section><h2 class="band" id="not-walked">Context not walked</h2><div class="sheet"><p>Absence from this walk is not evidence of absence.</p><ul class="plain">{not_walked}</ul></div></section>
-<section><h2 class="band" id="checks">Checks on the site itself</h2><div class="sheet">{checks_html}</div></section>
-"""
-    return layout(page, "Colophon", body, ctx)
-
-
 # ---------------------------------------------------------------- json
 
 def ledger_json(entries, ctx, n_hidden):
@@ -744,7 +718,7 @@ def ledger_json(entries, ctx, n_hidden):
 
 # ---------------------------------------------------------------- entry point
 
-def build_site(all_entries, site, walk, checks, build_date):
+def build_site(all_entries, site, build_date):
     entries = [x for x in all_entries if x["visibility"] == "public"]
     n_hidden = len(all_entries) - len(entries)
     ctx = Ctx(site, build_date, {x["id"]: x for x in entries})
@@ -766,7 +740,6 @@ def build_site(all_entries, site, walk, checks, build_date):
     for p in site["projects"]:
         pages[f"projects/{p['slug']}/index.html"] = page_project(p, entries, ctx)
     pages["about/index.html"] = page_about(entries, ctx)
-    pages["colophon/index.html"] = page_colophon(entries, ctx, walk, checks, n_hidden)
     pages["ledger.json"] = ledger_json(entries, ctx, n_hidden)
     from .style import CSS
     pages["style.css"] = CSS

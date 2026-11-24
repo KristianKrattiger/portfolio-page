@@ -43,10 +43,8 @@ def main(argv=None):
         return 1
 
     site = load_json(os.path.join(ROOT, "content", "site.json"))
-    walk = load_json(os.path.join(ROOT, "content", "walk.json"))
-    checks = load_json(os.path.join(ROOT, "content", "site_checks.json"), default=None)
 
-    pages = render.build_site(entries, site, walk, checks, build_date)
+    pages = render.build_site(entries, site, build_date)
 
     out = os.path.abspath(args.out)
     if os.path.isdir(out):

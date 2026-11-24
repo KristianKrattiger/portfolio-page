@@ -90,7 +90,7 @@ jobs:
         env:
           PORTFOLIO_DOMAIN: ${{ vars.PORTFOLIO_DOMAIN }}
         run: |
-          for route in "/" "/ledger/" "/not-done/" "/colophon/" "/ledger.json" "/style.css"; do
+          for route in "/" "/ledger/" "/not-done/" "/about/" "/ledger.json" "/style.css"; do
             code="$(curl -sS -o /dev/null -w '%{http_code}' "https://${PORTFOLIO_DOMAIN}${route}")"
             echo "GET https://${PORTFOLIO_DOMAIN}${route} -> ${code}"
             test "$code" = "200"
