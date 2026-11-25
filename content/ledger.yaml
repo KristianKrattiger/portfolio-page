@@ -594,7 +594,7 @@
   ],
   "does_not_show": "Any result for free-form SLM chains vs gated SLM chains vs one SLM at equal token budget. The Latch pilot and study 3 tested single-model gates only. The sprawl note the seed points to was not found: the Sprawl folder on disk is empty.",
   "disagreement": "The seed describes a three-arm experiment. HISTORY.md records a five-arm design (single CoT, free multi-SLM, single + gate, multi + gate + agreement, self-consistency). Neither has been run in its multi-model form. These are related to, but not the same work as, latch-pilot-killed and latch-study3-agent-gate.",
-  "visibility": "public"
+  "visibility": "hidden"
 },
 {
   "id": "offscreen-surfboards",
@@ -1132,7 +1132,7 @@
       "note": "Domain, Enums, Services folders present; not pinned to a commit"
     }
   ],
-  "does_not_show": "That it builds today; it was not built for this site. It is not under version control, so no commit pins this description. Whether it was solo or group work is not recorded.",
+  "does_not_show": "That it builds today (not built for this site, and not under Git version control). Known README limitations from the archived coursework delivery remain: login does not check credentials against stored data, state is not auto-saved on exit, and the main loop has no top-level error handling.",
   "visibility": "public"
 },
 {
@@ -1154,7 +1154,7 @@
     }
   ],
   "does_not_show": "Whether any gap was fixed after the README was written.",
-  "visibility": "public"
+  "visibility": "hidden"
 },
 {
   "id": "gin-stress-first-run",

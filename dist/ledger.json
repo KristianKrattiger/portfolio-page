@@ -2,21 +2,21 @@
   "generated_from": "content/ledger.yaml",
   "build_date": "2026-11-25",
   "stale_rule": "as_of older than 90 days before build_date; month-precision dates count from the 1st",
-  "hidden_entries_excluded": 2,
+  "hidden_entries_excluded": 4,
   "counts": {
     "by_state": {
       "MEASURED": 9,
       "BUILT": 17,
       "IN-PROGRESS": 3,
-      "DESIGN-ONLY": 5,
+      "DESIGN-ONLY": 4,
       "BLOCKED": 1,
-      "NOT-DONE": 4,
+      "NOT-DONE": 3,
       "KILLED": 1,
       "NEGATIVE-RESULT": 16
     },
     "by_verification": {
       "LINKED": 32,
-      "AUTHOR-REPORTED": 24
+      "AUTHOR-REPORTED": 22
     },
     "stale": 9
   },
@@ -1592,47 +1592,6 @@
       "stale": false
     },
     {
-      "as_of": "2026-11-17",
-      "claim": "A gated chain of small language models (GIN's sole-writer gate pointed inward at inference steps) is a hypothesis only; no multi-model arm has been run.",
-      "disagreement": "The seed describes a three-arm experiment. HISTORY.md records a five-arm design (single CoT, free multi-SLM, single + gate, multi + gate + agreement, self-consistency). Neither has been run in its multi-model form. These are related to, but not the same work as, latch-pilot-killed and latch-study3-agent-gate.",
-      "does_not_show": "Any result for free-form SLM chains vs gated SLM chains vs one SLM at equal token budget. The Latch pilot and study 3 tested single-model gates only. The sprawl note the seed points to was not found: the Sprawl folder on disk is empty.",
-      "evidence": [
-        {
-          "repo": "Latch",
-          "path": "docs/HISTORY.md",
-          "branch": "study3-agent-gate",
-          "sha": "cdcd512",
-          "tier": 2,
-          "dirty": false,
-          "note": "origin 2026-11-06; 5-arm design incl. multi-SLM arms 1 and 3"
-        },
-        {
-          "repo": "Latch",
-          "path": "PREREG.md",
-          "branch": "study3-agent-gate",
-          "sha": "cdcd512",
-          "tier": 2,
-          "dirty": false,
-          "note": "section 2: 'multi-model arms 1/3 excluded by scope'"
-        },
-        {
-          "repo": "Latch",
-          "path": "study3/RESULTS.md",
-          "branch": "study3-agent-gate",
-          "sha": "cdcd512",
-          "tier": 2,
-          "dirty": false,
-          "note": "arms A0-A3 are all single-model"
-        }
-      ],
-      "id": "latch-gated-slm-chain",
-      "project": "latch",
-      "state": "DESIGN-ONLY",
-      "verification": "AUTHOR-REPORTED",
-      "visibility": "public",
-      "stale": false
-    },
-    {
       "as_of": "2026-11-11",
       "claim": "The Latch pilot, a typed-operator admission gate against free chain-of-thought on multi-hop QA, was killed at its preregistered G3 gate: the gated arm scored 37.5% at full coverage against 80.6% for chain-of-thought.",
       "disagreement": "The McNemar statistic on the 32 jointly answered questions (b=4, c=2) appears as chi2 = 0.167 in POSTMORTEM.md and the vault, and as chi2 = 0.67, p = 0.41 in paper.tex. Both come from the same cells; the site builder's reading is that one uses a continuity correction, which the author has not confirmed. Neither changes the kill.",
@@ -2663,7 +2622,7 @@
     {
       "as_of": "2026-09-15",
       "claim": "TunedIn is a .NET 8 WinForms ticketing app built for ISDS 309 (Spring 2025): login, ticket-pack selection, cart, payment and receipt screens over a shared core library, with comma-delimited text files as storage.",
-      "does_not_show": "That it builds today; it was not built for this site. It is not under version control, so no commit pins this description. Whether it was solo or group work is not recorded.",
+      "does_not_show": "That it builds today (not built for this site, and not under Git version control). Known README limitations from the archived coursework delivery remain: login does not check credentials against stored data, state is not auto-saved on exit, and the main loop has no top-level error handling.",
       "evidence": [
         {
           "repo": "ISDS309_TunedIn",
@@ -2687,28 +2646,6 @@
       "id": "tunedin-app",
       "project": "tunedin",
       "state": "BUILT",
-      "verification": "AUTHOR-REPORTED",
-      "visibility": "public",
-      "stale": false
-    },
-    {
-      "as_of": "2026-09-15",
-      "claim": "Known gaps, from the project's own README: login does not check credentials against stored data, data is not saved automatically on exit, and there is no error handling around the app's main loop.",
-      "does_not_show": "Whether any gap was fixed after the README was written.",
-      "evidence": [
-        {
-          "repo": "ISDS309_TunedIn",
-          "path": "README.md",
-          "branch": "n/a (not under git)",
-          "sha": "n/a",
-          "tier": 2,
-          "dirty": false,
-          "note": "Known limitations / TODOs"
-        }
-      ],
-      "id": "tunedin-gaps",
-      "project": "tunedin",
-      "state": "NOT-DONE",
       "verification": "AUTHOR-REPORTED",
       "visibility": "public",
       "stale": false

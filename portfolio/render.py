@@ -141,12 +141,14 @@ def family_counts(entries):
     return {k: c.get(k, 0) for k, _l, _s in FAMILIES}
 
 
-def strip(entries):
-    """Small family-count chips; zero counts are shown dashed, never hidden."""
+def strip(entries, hide_zero_unfinished=False):
+    """Small family-count chips; zero counts are shown dashed except Unfinished 0 on completed projects."""
     fc = family_counts(entries)
     chips = []
     for key, label, _s in FAMILIES:
         n = fc[key]
+        if hide_zero_unfinished and key == "unfinished" and n == 0:
+            continue
         cls = f"chip {key}" + (" zero" if n == 0 else "")
         chips.append(f'<span class="{cls}">{shape(FAMILY_SHAPE[key])}{e(label)} {n}</span>')
     return '<span class="strip">' + "".join(chips) + "</span>"
@@ -451,7 +453,8 @@ def project_rows(entries, site, page, group):
             f'<li class="projrow"><div><div class="phead">'
             f'<a class="pname" href="{rel(page, "projects/" + p["slug"] + "/index.html")}">{e(p["name"])}</a>'
             f'{status_stamp(p)}</div>'
-            f'<span class="psub">{e(desc)}</span>{meta_html}</div>{strip(mine)}</li>'
+            f'<span class="psub">{e(desc)}</span>{meta_html}</div>'
+            f'{strip(mine, hide_zero_unfinished=(p.get("status") == "completed"))}</li>'
         )
     return '<ul class="projrows">' + "".join(rows) + "</ul>"
 
@@ -644,7 +647,8 @@ def ledger_sections(entries, ctx, page, anchor):
             continue
         out.append(f'<section class="proj" id="p-{e(p["slug"])}" data-project="{e(p["slug"])}">'
                    f'<h2 class="band"><a href="{rel(page, "projects/" + p["slug"] + "/index.html")}">{e(p["name"])}</a>'
-                   f'{strip(mine)}</h2>{family_groups(mine, ctx, page, anchor=anchor)}</section>')
+                   f'{strip(mine, hide_zero_unfinished=(p.get("status") == "completed"))}</h2>'
+                   f'{family_groups(mine, ctx, page, anchor=anchor)}</section>')
     return "".join(out)
 
 
@@ -848,7 +852,7 @@ def page_project(proj, entries, ctx):
 <h1 class="title">{e(proj['name'])}{status_stamp(proj)}</h1>
 <p class="tagline">{e(proj['subtitle'])}</p>
 {meta_line}
-<p class="wallnote">{strip(mine)}</p>
+<p class="wallnote">{strip(mine, hide_zero_unfinished=(proj.get("status") == "completed"))}</p>
 {closed_banner}
 </section>
 <nav class="jump" aria-label="Sections"><ol>
@@ -936,10 +940,15 @@ def page_resume(entries, ctx):
             mine = [x for x in entries if x["project"] == p["slug"]]
             pfc = family_counts(mine)
             meta = f' <span class="seen">({e(p["meta"])})</span>' if p.get("meta") else ""
+            counts_s = (
+                f'Done {pfc["done"]} · Failed {pfc["failed"]}'
+                if p.get("status") == "completed" and pfc["unfinished"] == 0
+                else f'Done {pfc["done"]} · Failed {pfc["failed"]} · Unfinished {pfc["unfinished"]}'
+            )
             lis.append(
                 f'<li><strong><a href="{rel(page, "projects/" + p["slug"] + "/index.html")}">{e(p["name"])}</a></strong>'
                 f'{status_stamp(p)}{meta} — {e(p.get("summary") or p["subtitle"])} '
-                f'<span class="seen">[Done {pfc["done"]} · Failed {pfc["failed"]} · Unfinished {pfc["unfinished"]}]</span></li>'
+                f'<span class="seen">[{counts_s}]</span></li>'
             )
         return '<ul class="plain">' + "".join(lis) + "</ul>"
 

@@ -345,7 +345,7 @@
       "name": "Latch",
       "status": "completed",
       "status_label": "Completed",
-      "closed_note": "Closed after three preregistered studies (commit cdcd512): the Study 1 pilot was killed at G3, Study 2 failed to beat plain self-consistency, and Study 3's tool-call provenance gate returned a null verdict. Results and postmortems are preserved as negative findings.",
+      "closed_note": "Closed after three preregistered studies (commit cdcd512): the Study 1 pilot was killed at G3, Study 2 failed to beat plain self-consistency, and Study 3's tool-call provenance gate returned a null verdict. Multi-model SLM chains were excluded by scope in PREREG.md; results and postmortems are preserved as negative findings.",
       "subtitle": "Preregistered mechanical admission and provenance gates for small-model reasoning and tool calls",
       "summary": "Tested whether typed-operator and tool-parameter provenance gates improve 3B–14B model reliability across three preregistered studies—documenting why abstention and false-alarm overhead killed or nulled every arm.",
       "meta": "Python · Qwen2.5 3B–14B · 2WikiMultihopQA · BFCL v4 · Preregistered Studies",
@@ -422,13 +422,6 @@
             "latch-study3-agent-gate"
           ],
           "resolves": "A new registered study (named in study 3's limitations)."
-        },
-        {
-          "q": "Does a gated chain of small models behave differently from one gated model?",
-          "ids": [
-            "latch-gated-slm-chain"
-          ],
-          "resolves": "Running the multi-model arms, which no study so far has."
         }
       ],
       "group": "research"
@@ -686,9 +679,12 @@
       "slug": "tunedin",
       "name": "TunedIn",
       "group": "other",
+      "status": "completed",
+      "status_label": "Completed",
+      "closed_note": "Completed as a Spring 2025 coursework deliverable (CSUF ISDS 309). Archived as-is with known README limitations documented under Key tradeoff & failure mode.",
       "subtitle": "Layered .NET 8 desktop ticketing architecture with decoupled core domain and service layer",
       "summary": "Structured a multi-screen desktop ticketing workflow (login, ticket-pack selection, cart, payment, receipts) over a separated ISDS309.Core domain/services library backed by delimited flat-file persistence.",
-      "meta": "C# / .NET 8 WinForms · Layered Architecture · CSUF ISDS 309",
+      "meta": "Completed · C# / .NET 8 WinForms · Layered Architecture · CSUF ISDS 309",
       "what_it_is_ids": [
         "tunedin-app"
       ],
@@ -722,22 +718,22 @@
             "entry_id": "tunedin-app"
           },
           {
-            "label": "Architecture overview & documented known gaps",
+            "label": "Architecture overview & documented known limitations",
             "repo": "ISDS309_TunedIn",
             "branch": "n/a (not under git)",
             "sha": "n/a",
             "path": "README.md",
-            "entry_id": "tunedin-gaps"
+            "entry_id": "tunedin-app"
           }
         ]
       },
       "open_questions": [
         {
-          "q": "Were the README's known gaps ever closed?",
+          "q": "Would adding stored credential validation, exit auto-save, and Git versioning make it production-ready?",
           "ids": [
-            "tunedin-gaps"
+            "tunedin-app"
           ],
-          "resolves": "A credential check against stored users and a save on exit."
+          "resolves": "Archived as a completed Spring 2025 coursework project; no further development planned."
         }
       ]
     }
