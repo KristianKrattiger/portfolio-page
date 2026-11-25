@@ -11,6 +11,7 @@
     "linkedin": "https://www.linkedin.com/in/kristiankratt/"
   },
   "education": "B.A. Business Administration (Information Systems), Minor in Computer Science — California State University, Fullerton (Senior)",
+  "resume_summary": "Information Systems & Computer Science senior at CSUF building applied AI evaluation tools, relational databases, ETL pipelines, and operational applications across Python, SQL/SQLite, TypeScript, C++17, and C#/.NET. Experienced leading a multi-developer ERP database and Flask framework build, designing reproducible test harnesses, and documenting both working systems and measured failure modes. Targeting early-career roles in Applied AI Engineering, Systems Architecture, and Technology Risk / Consulting.",
   "next": "Completing my degree at CSUF, finishing the QSR ERP implementation, and targeting early-career roles in Applied AI Engineering, Systems Architecture, and Technology Risk / Consulting.",
   "work_paragraph": [
     "Probabilistic systems are allowed to propose; deterministic systems decide what gets admitted, executed, or recorded. GIN is the architectural frame. SEAR, Receipts with Assay, Latch, and Backstop test specific verification and control gates under preregistered criteria.",

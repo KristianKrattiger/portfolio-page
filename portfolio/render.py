@@ -934,8 +934,8 @@ def page_resume(entries, ctx):
 </section>
 <div class="sheet">
 <div class="resume-head"><h2>{e(site['name'])}</h2><p class="mono small">{contact_html(site['contact'], page=page)}</p></div>
-<h3>Core thesis &amp; target focus</h3>
-<p>{e(site['focus'])} {e(site['next'])}</p>
+<h3>Overview</h3>
+<p>{e(site.get('resume_summary') or site['next'])}</p>
 <h3>Education</h3>
 <p>{e(site['education'])}</p>
 <h3>Capabilities</h3>
