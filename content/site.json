@@ -343,6 +343,9 @@
     {
       "slug": "latch",
       "name": "Latch",
+      "status": "completed",
+      "status_label": "Completed",
+      "closed_note": "Closed after three preregistered studies (commit cdcd512): the Study 1 pilot was killed at G3, Study 2 failed to beat plain self-consistency, and Study 3's tool-call provenance gate returned a null verdict. Results and postmortems are preserved as negative findings.",
       "subtitle": "Preregistered mechanical admission and provenance gates for small-model reasoning and tool calls",
       "summary": "Tested whether typed-operator and tool-parameter provenance gates improve 3B–14B model reliability across three preregistered studies—documenting why abstention and false-alarm overhead killed or nulled every arm.",
       "meta": "Python · Qwen2.5 3B–14B · 2WikiMultihopQA · BFCL v4 · Preregistered Studies",
@@ -433,6 +436,9 @@
     {
       "slug": "backstop",
       "name": "Backstop + Diagnosis",
+      "status": "completed",
+      "status_label": "Completed",
+      "closed_note": "Closed after Stage 1 (b7de6a6), confirmatory N=843 artifact-only diagnosis, cross-family extension, and exploratory D_only follow-up (dbf2465): official close-out findings are synthesized in docs/FINDINGS.md.",
       "subtitle": "Error-triggered stop gates and artifact-only diagnosis for small-model tool agents",
       "summary": "Intercepts premature agent stops after unresolved tool errors and injects deterministic hints parsed strictly from error text and tool schemas (zero ground truth), audited under Holm-Bonferroni and harm guardrails.",
       "meta": "Python · Ollama (Qwen2.5 / Llama3.1 / Gemma4 / Ministral) · BFCL · Holm-Bonferroni & Wilson Bounds",
