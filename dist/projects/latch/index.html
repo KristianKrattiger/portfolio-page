@@ -3,9 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index, follow">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; font-src 'self'; script-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <title>Latch — Kristian Krattiger</title>
+<meta name="description" content="Tested whether typed-operator and tool-parameter provenance gates improve 3B–14B model reliability across three preregistered studies—documenting why abstention and false-alarm overhead killed or nulled every arm.">
+<link rel="canonical" href="https://krattiger.dev/projects/latch/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Kristian Krattiger">
+<meta property="og:title" content="Latch — Kristian Krattiger">
+<meta property="og:description" content="Tested whether typed-operator and tool-parameter provenance gates improve 3B–14B model reliability across three preregistered studies—documenting why abstention and false-alarm overhead killed or nulled every arm.">
+<meta property="og:url" content="https://krattiger.dev/projects/latch/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Latch — Kristian Krattiger">
+<meta name="twitter:description" content="Tested whether typed-operator and tool-parameter provenance gates improve 3B–14B model reliability across three preregistered studies—documenting why abstention and false-alarm overhead killed or nulled every arm.">
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
@@ -22,20 +33,29 @@
 </defs></svg>
 <header class="masthead">
 <p class="who"><a href="../../index.html">Kristian Krattiger</a></p>
-<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../ai/index.html">AI disclosure</a></li></ul></nav>
+<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../resume/index.html">Resume</a></li><li><a href="../../ai/index.html">AI disclosure</a></li></ul></nav>
 </header>
 <main id="main" tabindex="-1">
 
 <section class="lead">
 <h1 class="title">Latch</h1>
-<p class="tagline">Mechanical admission gates for small-model reasoning</p>
+<p class="tagline">Preregistered mechanical admission and provenance gates for small-model reasoning and tool calls</p>
+<p class="wallnote">Python · Qwen2.5 3B–14B · 2WikiMultihopQA · BFCL v4 · Preregistered Studies</p>
 <p class="wallnote"><span class="strip"><span class="chip done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-measured"/></svg>Done 1</span><span class="chip failed"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-killed"/></svg>Failed 3</span><span class="chip unfinished"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-not-done"/></svg>Unfinished 1</span></span></p>
 </section>
 <nav class="jump" aria-label="Sections"><ol>
-<li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
+<li><a href="#overview">Overview</a></li><li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
 <li><a href="#measured">What was measured</a></li><li><a href="#not-measured">Not measured or built</a></li>
 <li><a href="#weak">Weaknesses and negative results</a></li><li><a href="#open">Open questions</a></li>
 <li><a href="#evidence">Evidence</a></li></ol></nav>
+<section aria-labelledby="overview"><h2 class="band" id="overview">Architectural overview</h2>
+<div class="sheet"><h3>Problem &amp; architectural thesis</h3><p>Small models make silent reasoning errors and issue wrong state-changing tool calls. Latch tested whether forcing models through strict mechanical admission schemas and parameter-provenance gates beats unconstrained chain-of-thought or plain tool calling under preregistered pass/kill criteria.</p>
+<h3>Control flow</h3>
+<ol class="flow" aria-label="Latch control flow"><li class="flow-step"><span class="flow-stage">Propose</span><span class="flow-title">Small Model Proposal (Qwen2.5 3B–14B)</span><p class="flow-detail">Emits formal operator steps (Studies 1–2 on 2WikiMultihopQA) or state-changing tool calls (Study 3 on BFCL multi-turn).</p></li><li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 14" focusable="false"><path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></li><li class="flow-step gate"><span class="flow-stage">Deterministic Gate</span><span class="flow-title">Operator Schema &amp; Provenance Gate</span><p class="flow-detail">Validates typed operator contracts and checks whether state-changing tool parameters trace to verified prior context.</p></li><li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 14" focusable="false"><path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></li><li class="flow-step"><span class="flow-stage">Commit / Refuse</span><span class="flow-title">Admit or Abstain / Block</span><p class="flow-detail">Admits valid outputs or blocks/abstains on contract failure, evaluated strictly against preregistered McNemar and margin bars.</p></li></ol></div>
+<div class="casegrid">
+<div class="sheet"><h3>Key tradeoff &amp; failure mode</h3><p>All three studies missed their preregistered promotion bars: the Study 1 pilot was killed at G3 (37.5% vs 80.6% CoT accuracy at full coverage due to 55.6% abstention); Study 2 agreement flagged errors (2.80% vs 9.47%) but failed to beat plain self-consistency (+0.32 pp, 95% CI [-0.90, +1.59]); Study 3 cut wrong state-changing actions across 3B/7B/14B but triggered 9.3%–33.5% false alarms and reduced task success by up to 5.3 pp.</p></div>
+<div class="sheet"><h3>Direct code &amp; artifact links</h3><ul class="plain"><li><strong>Pilot preregistration (G1–G3 criteria)</strong> — <span class="mono">Latch @ cdcd512 : PREREG.md</span> <span class="seen">(<a href="#latch-pilot-killed">#latch-pilot-killed</a>)</span></li><li><strong>G3 kill postmortem</strong> — <span class="mono">Latch @ cdcd512 : docs/POSTMORTEM.md</span> <span class="seen">(<a href="#latch-pilot-killed">#latch-pilot-killed</a>)</span></li><li><strong>Study 2 agreement vs self-consistency report</strong> — <span class="mono">Latch @ cdcd512 : study2/phase2/analysis/phase2_report.txt</span> <span class="seen">(<a href="#latch-study2-agreement">#latch-study2-agreement</a>)</span></li><li><strong>Study 3 tool-call provenance gate results</strong> — <span class="mono">Latch @ cdcd512 : study3/RESULTS.md</span> <span class="seen">(<a href="#latch-study3-agent-gate">#latch-study3-agent-gate</a>)</span></li></ul></div>
+</div></section>
 <section><h2 class="band" id="what">What it is</h2><div class="sheet"><ul class="plain"><li>The Latch pilot, a typed-operator admission gate against free chain-of-thought on multi-hop QA, was killed at its preregistered G3 gate: the gated arm scored 37.5% at full coverage against 80.6% for chain-of-thought. <a class="mono" href="#latch-pilot-killed">#latch-pilot-killed</a></li><li>A preregistered provenance gate for small-model tool calls cut wrong state-changing actions at every model size, but cost more task success and correct actions than the registered margins allowed, so the verdict was null. <a class="mono" href="#latch-study3-agent-gate">#latch-study3-agent-gate</a></li></ul></div></section>
 <section><h2 class="band" id="exists">What exists<span class="strip">1 entry</span></h2><article class="tag done" id="latch-paper" data-project="latch" data-state="BUILT" data-verification="LINKED">
 <p class="meta"><span class="tape done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-built"/></svg>BUILT</span> <span class="stk stk-linked">LINKED</span> <a class="eid" href="../../ledger/index.html#latch-paper">#latch-paper</a> <span class="asof">as of 2026-11-11</span></p>
@@ -78,8 +98,8 @@
 
 </main>
 <footer class="foot">
-<p>Built 2026-11-24 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
-Machine-readable: <a href="../../ledger.json">ledger.json</a>.</p>
+<p>Built 2026-11-25 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
+Machine-readable: <a href="../../ledger.json">ledger.json</a> · <a href="../../resume/index.html">Resume</a> · <a href="../../ai/index.html">AI disclosure</a>.</p>
 </footer>
 
 </body>

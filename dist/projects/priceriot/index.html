@@ -3,9 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index, follow">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; font-src 'self'; script-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <title>PriceRiot — Kristian Krattiger</title>
+<meta name="description" content="Combines a C++17/pybind11 A* navmesh store-simulation engine with a POS transaction cleaning and SKU-mapping ETL pipeline, exposed through FastAPI/Vue 3 and Streamlit decision-support dashboards.">
+<link rel="canonical" href="https://krattiger.dev/projects/priceriot/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Kristian Krattiger">
+<meta property="og:title" content="PriceRiot — Kristian Krattiger">
+<meta property="og:description" content="Combines a C++17/pybind11 A* navmesh store-simulation engine with a POS transaction cleaning and SKU-mapping ETL pipeline, exposed through FastAPI/Vue 3 and Streamlit decision-support dashboards.">
+<meta property="og:url" content="https://krattiger.dev/projects/priceriot/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PriceRiot — Kristian Krattiger">
+<meta name="twitter:description" content="Combines a C++17/pybind11 A* navmesh store-simulation engine with a POS transaction cleaning and SKU-mapping ETL pipeline, exposed through FastAPI/Vue 3 and Streamlit decision-support dashboards.">
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
@@ -22,20 +33,29 @@
 </defs></svg>
 <header class="masthead">
 <p class="who"><a href="../../index.html">Kristian Krattiger</a></p>
-<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../ai/index.html">AI disclosure</a></li></ul></nav>
+<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../resume/index.html">Resume</a></li><li><a href="../../ai/index.html">AI disclosure</a></li></ul></nav>
 </header>
 <main id="main" tabindex="-1">
 
 <section class="lead">
 <h1 class="title">PriceRiot</h1>
-<p class="tagline">Retail-store simulation for synthetic transaction data</p>
+<p class="tagline">C++17 discrete-event retail simulation core, POS CSV ETL pipeline, and analytics stack</p>
+<p class="wallnote">C++17 · pybind11 · Python ETL · FastAPI + Vue 3 · Streamlit</p>
 <p class="wallnote"><span class="strip"><span class="chip done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-measured"/></svg>Done 3</span><span class="chip failed zero"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-killed"/></svg>Failed 0</span><span class="chip unfinished"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-not-done"/></svg>Unfinished 1</span></span></p>
 </section>
 <nav class="jump" aria-label="Sections"><ol>
-<li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
+<li><a href="#overview">Overview</a></li><li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
 <li><a href="#measured">What was measured</a></li><li><a href="#not-measured">Not measured or built</a></li>
 <li><a href="#weak">Weaknesses and negative results</a></li><li><a href="#open">Open questions</a></li>
 <li><a href="#evidence">Evidence</a></li></ol></nav>
+<section aria-labelledby="overview"><h2 class="band" id="overview">Architectural overview</h2>
+<div class="sheet"><h3>Problem &amp; architectural thesis</h3><p>Retail analytics and queuing models often lack clean, repeatable transaction datasets tied to physical floor layouts. PriceRiot pairs an ETL parameter extractor over historical POS CSVs with a C++17 discrete-event agent simulation core exposed cleanly to Python.</p>
+<h3>Control flow</h3>
+<ol class="flow" aria-label="PriceRiot control flow"><li class="flow-step"><span class="flow-stage">Propose / Ingest</span><span class="flow-title">POS CSV ETL &amp; YAML Store Spec</span><p class="flow-detail">Cleans raw POS transaction exports, maps SKUs, extracts arrival/basket parameters, and loads YAML store geometry.</p></li><li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 14" focusable="false"><path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></li><li class="flow-step gate"><span class="flow-stage">Deterministic Core</span><span class="flow-title">C++17 Engine + pybind11 Boundary</span><p class="flow-detail">Runs deterministic A* navmesh pathfinding for customer and worker agents across typed C++/Python bindings.</p></li><li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 14" focusable="false"><path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></li><li class="flow-step"><span class="flow-stage">Commit / Analyze</span><span class="flow-title">Synthetic Transaction Logs &amp; Dashboards</span><p class="flow-detail">Outputs structured transaction and queue logs to FastAPI/Vue 3 run comparison, Streamlit dashboards, and Jupyter notebooks.</p></li></ol></div>
+<div class="casegrid">
+<div class="sheet"><h3>Key tradeoff &amp; failure mode</h3><p>The simulation kernel, ETL ingestion pipeline, and analytics apps all run, but extracted parameters have not yet been calibrated or scored against held-out real store sales. Dynamic pricing hooks, queued-run worker updates (POST /api/runs/{id}/workers), layout optimization, and front-end tests remain unbuilt.</p></div>
+<div class="sheet"><h3>Direct code &amp; artifact links</h3><ul class="plain"><li><strong>C++17 pybind11 module bindings</strong> — <span class="mono">PriceRiot @ 2870b22 : cxx/bindings</span> <span class="seen">(<a href="#priceriot-engine">#priceriot-engine</a>)</span></li><li><strong>POS ingestion &amp; SKU-mapping ETL</strong> — <span class="mono">PriceRiot @ 2870b22 : python/ingestion</span> <span class="seen">(<a href="#priceriot-pos-etl">#priceriot-pos-etl</a>)</span></li><li><strong>FastAPI backend routes</strong> — <span class="mono">PriceRiot @ 2870b22 : python/webapp/app.py</span> <span class="seen">(<a href="#priceriot-analysis-apps">#priceriot-analysis-apps</a>)</span></li><li><strong>Streamlit analytics dashboard</strong> — <span class="mono">PriceRiot @ 2870b22 : python/dashboard/app.py</span> <span class="seen">(<a href="#priceriot-analysis-apps">#priceriot-analysis-apps</a>)</span></li></ul></div>
+</div></section>
 <section><h2 class="band" id="what">What it is</h2><div class="sheet"><ul class="plain"><li>PriceRiot is a retail-store simulation: customer and worker agents pathfind (A* on a navmesh) through a YAML-defined store in a C++17 core exposed to Python through pybind11, and generate synthetic transaction records. <a class="mono" href="#priceriot-engine">#priceriot-engine</a></li><li>A POS ingestion pipeline cleans historical transaction CSVs, maps SKUs, and extracts simulation parameters, which the web app applies when a run has POS data attached. <a class="mono" href="#priceriot-pos-etl">#priceriot-pos-etl</a></li></ul></div></section>
 <section><h2 class="band" id="exists">What exists<span class="strip">3 entries</span></h2><article class="tag done" id="priceriot-analysis-apps" data-project="priceriot" data-state="BUILT" data-verification="LINKED">
 <p class="meta"><span class="tape done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-built"/></svg>BUILT</span> <span class="stk stk-linked">LINKED</span> <span class="stk stk-stale" title="as_of older than 90 days at build time">STALE</span> <a class="eid" href="../../ledger/index.html#priceriot-analysis-apps">#priceriot-analysis-apps</a> <span class="asof">as of 2026-07-23</span></p>
@@ -73,8 +93,8 @@
 
 </main>
 <footer class="foot">
-<p>Built 2026-11-24 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
-Machine-readable: <a href="../../ledger.json">ledger.json</a>.</p>
+<p>Built 2026-11-25 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
+Machine-readable: <a href="../../ledger.json">ledger.json</a> · <a href="../../resume/index.html">Resume</a> · <a href="../../ai/index.html">AI disclosure</a>.</p>
 </footer>
 
 </body>

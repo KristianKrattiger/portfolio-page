@@ -1,19 +1,21 @@
 {
+  "base_url": "https://krattiger.dev",
   "name": "Kristian Krattiger",
-  "line": "AI verification and grounding: what I built, what I measured, and what didn't work.",
+  "hero_headline": "Deterministic Verification, Control Gates & Evaluation for AI Systems",
+  "hero_subheadline": "I build and test reliability gates, grounding pipelines, and data-backed systems where probabilistic models meet strict correctness and auditability constraints—publishing both what works and what fails under preregistered checks.",
+  "line": "Deterministic verification, control gates, and evaluation for AI and data-backed systems.",
+  "description": "Portfolio and evidence ledger of Kristian Krattiger — Applied AI Engineering, Systems Architecture, and Technology Risk. Probabilistic models propose; deterministic checks decide what gets admitted, executed, or recorded.",
   "contact": {
     "email": "kristiankratt@gmail.com",
     "github": "https://github.com/KristianKrattiger",
     "linkedin": "https://www.linkedin.com/in/kristiankratt/"
   },
-  "education": "CSUF senior. BA Business Administration (Information Systems), minor in Computer Science.",
-  "education_source": "author's brief (not re-verified against a record)",
-  "next": "I'm looking at finishing my degree at CSUF, finishing up the QSR ERP system, and finding a full-time position.",
+  "education": "B.A. Business Administration (Information Systems), Minor in Computer Science — California State University, Fullerton (Senior)",
+  "next": "Completing my degree at CSUF, finishing the QSR ERP implementation, and targeting early-career roles in Applied AI Engineering, Systems Architecture, and Technology Risk / Consulting.",
   "work_paragraph": [
-    "I build systems where a model may propose but a deterministic check decides what gets admitted, and where the system says so out loud when it cannot support an answer. GIN is the frame. SEAR and Receipts with Assay are slices of it. Latch tested GIN's gate idea on small-model reasoning.",
-    "Some of it held on small sets. Some of it failed under criteria I wrote down before running it. Both sides are below, with the same weight, and each line links to its evidence."
+    "Probabilistic systems are allowed to propose; deterministic systems decide what gets admitted, executed, or recorded. GIN is the architectural frame. SEAR, Receipts with Assay, Latch, and Backstop test specific verification and control gates under preregistered criteria.",
+    "Some gates held on bounded sets. Others failed or were killed under criteria written before running them. Both sides appear here with equal weight, linked directly to primary artifacts."
   ],
-  "work_paragraph_source": "framing written for this site from the ledger entries it links to; 'GIN is the frame' and the slice list follow the author's vault note CALICHE/Projects/GIN/GIN.md; the Latch sentence follows Latch docs/HISTORY.md at cdcd512",
   "public_repos": {
     "GIN": "https://github.com/KristianKrattiger/GIN",
     "receipts": "https://github.com/KristianKrattiger/receipts"
@@ -29,7 +31,7 @@
   "extra_links": {
     "receipts": [
       {
-        "label": "Hosted Receipts ledgers (GitHub Pages, linked from the repo README)",
+        "label": "Hosted Receipts ledgers (GitHub Pages)",
         "url": "https://kristiankrattiger.github.io/receipts/"
       }
     ]
@@ -38,12 +40,69 @@
     {
       "slug": "gin",
       "name": "GIN",
-      "subtitle": "Grounded Intelligence Network",
+      "subtitle": "Grounded Intelligence Network — decode-time grounding, sole-writer graph admission, and mTLS federation",
+      "summary": "Prevents ungrounded LLM claims by constraining token generation to verbatim corpus spans and gating all graph state mutations through a single structural Bookkeeper across mTLS-federated nodes.",
+      "meta": "Python · Postgres + pgvector · llama-cpp-python · mTLS",
       "what_it_is_ids": [
         "gin-sear-decode-constraint",
         "gin-bookkeeper",
         "gin-federation"
       ],
+      "case_study": {
+        "problem": "Standard RAG pipelines let language models fabricate unsupported claims, silently merge conflicting sources, or write unverified assertions directly into persistent knowledge graphs. GIN separates probabilistic proposal from deterministic admission across decode-time token constraints, a sole-writer graph Bookkeeper, and trust-gated peer routing.",
+        "flow": [
+          {
+            "stage": "Propose",
+            "title": "Local LLM & Cartographer",
+            "detail": "Retrieves candidate chunks and proposes continuations (Mistral-7B / Qwen2.5-7B) or inter-document relations."
+          },
+          {
+            "stage": "Deterministic Gate",
+            "title": "SEAR Mask + Bookkeeper + Trust Gate",
+            "detail": "Logits processor masks tokens outside verbatim corpus spans; Bookkeeper checks confidence floor, anchors, and DAG acyclicity; mTLS router checks peer domain trust."
+          },
+          {
+            "stage": "Commit / Refuse",
+            "title": "Provenance-Stamped State or Refusal",
+            "detail": "Admits provenance-stamped graph nodes and grounded answers, or emits an explicit refusal when out-of-scope or untrusted."
+          }
+        ],
+        "tradeoff": "Verbatim decode constraints stopped token fabrication (0/21 on baseline, 0/50 adversarial decode trials), but cannot stop misleading juxtaposition or planted false sources (3/3 counterfactuals repeated). On the first all-layer stress run, production RRF peer selection dropped to 0.488 P@1, lexical-overlap verification accepted 15/16 adversarial probes, a forged peer chunk slipped through unverified, and issue-framing recall stayed 0/4 across 5 frozen encoders and 0/15 after patches.",
+        "artifacts": [
+          {
+            "label": "Decode-time logits constraint",
+            "repo": "GIN",
+            "branch": "main",
+            "sha": "84abb9a",
+            "path": "sear/processor.py",
+            "entry_id": "gin-sear-decode-constraint"
+          },
+          {
+            "label": "Sole-writer Bookkeeper gate",
+            "repo": "GIN",
+            "branch": "main",
+            "sha": "84abb9a",
+            "path": "gin/bookkeeper/bookkeeper.py",
+            "entry_id": "gin-bookkeeper"
+          },
+          {
+            "label": "Baseline SEAR vs RAG metrics",
+            "repo": "GIN",
+            "branch": "main",
+            "sha": "84abb9a",
+            "path": "data/eval_runs/20260702T012203Z/metrics.json",
+            "entry_id": "gin-nc-baseline"
+          },
+          {
+            "label": "All-layer stress benchmark report",
+            "repo": "GIN",
+            "branch": "alewife",
+            "sha": "bc5b455",
+            "path": "data/eval_runs/portfolio_stress/report.md",
+            "entry_id": "gin-stress-first-run"
+          }
+        ]
+      },
       "open_questions": [
         {
           "q": "Does the relation detector hold on a corpus written by someone blind to its internals? (The 2026-11-22 stress set does not answer this: its author shaped both the set and the fixes.)",
@@ -84,10 +143,67 @@
     {
       "slug": "sear",
       "name": "SEAR",
-      "subtitle": "Sparse Epistemically Anchored Reasoning, in two versions: token-level inside GIN, and verify-after in sear-demo",
+      "subtitle": "Sparse Epistemically Anchored Reasoning — decode-time constraints (GIN) and verify-after claim gating (sear-demo)",
+      "summary": "Compares two grounding architectures for LLM outputs: blocking unsupported tokens during decoding (GIN) versus filtering free-form drafts through NLI entailment and exact name/number checks (sear-demo).",
+      "meta": "Python · phi-4 · DeBERTa-v3 NLI · Deterministic Span Checks",
       "what_it_is_ids": [
         "sear-demo-pipeline"
       ],
+      "case_study": {
+        "problem": "Free-form RAG answers routinely blend retrieved facts with memorized claims, especially on near-miss or out-of-corpus queries. SEAR enforces that emitted claims trace back to retrieved chunks, replacing unsupported guesses with an explicit failure state.",
+        "flow": [
+          {
+            "stage": "Propose",
+            "title": "Draft Generation (phi-4)",
+            "detail": "Generates candidate claims citing retrieved chunks (or proposes tokens constrained by GIN's verbatim logits processor)."
+          },
+          {
+            "stage": "Deterministic Gate",
+            "title": "NLI Entailment + Name/Number Check",
+            "detail": "Verifies chunk entailment with nli-deberta-v3-base and checks that every name and number appears verbatim in the cited chunk."
+          },
+          {
+            "stage": "Commit / Refuse",
+            "title": "Grounded Answer or Explicit Refusal",
+            "detail": "Emits only claims that clear both checks; when zero claims survive, returns an explicit failure state instead of guessing."
+          }
+        ],
+        "tradeoff": "Refused 9/9 out-of-corpus and near-miss probes on a 27-probe smoke set, but over-refused 5 supportable probes (9/14 failure-state precision). Verification enforces the corpus rather than ground truth: poisoned chunks passed 5/5, and conflicting chunks were silently resolved to the model's parametric memory on 4/5 conflict probes (no conflict detector is built).",
+        "artifacts": [
+          {
+            "label": "Decode-time SEAR logits processor (in GIN)",
+            "repo": "GIN",
+            "branch": "main",
+            "sha": "84abb9a",
+            "path": "sear/processor.py",
+            "entry_id": "gin-sear-decode-constraint"
+          },
+          {
+            "label": "Verify-after pipeline config (phi-4 + DeBERTa NLI)",
+            "repo": "sear-demo",
+            "branch": "main",
+            "sha": "730ad1d",
+            "path": "config/default.yaml",
+            "entry_id": "sear-demo-pipeline"
+          },
+          {
+            "label": "Verify-after pipeline source",
+            "repo": "sear-demo",
+            "branch": "main",
+            "sha": "730ad1d",
+            "path": "src",
+            "entry_id": "sear-demo-pipeline"
+          },
+          {
+            "label": "Walkthrough and library-corpus design",
+            "repo": "sear-demo",
+            "branch": "main",
+            "sha": "730ad1d",
+            "path": "docs/DESIGN.md",
+            "entry_id": "sear-demo-status"
+          }
+        ]
+      },
       "open_questions": [
         {
           "q": "Can the gate tell when two cited chunks contradict each other?",
@@ -138,11 +254,68 @@
     {
       "slug": "receipts",
       "name": "Receipts + Assay",
-      "subtitle": "Vendor claims against independent sources, with a substring gate",
+      "subtitle": "Claim-audit pipeline and standalone TypeScript verification library (Assay v0.1.0)",
+      "summary": "Audits vendor claims against independent regulatory filings (SEC, NHTSA, IIHS) by letting a model propose candidate contradictions while discarding any quote a deterministic byte-offset gate cannot re-find.",
+      "meta": "TypeScript · Byte-Offset Quote Gate · SEC / NHTSA / IIHS · Assay v0.1.0",
       "what_it_is_ids": [
         "receipts-pipeline",
         "assay-library"
       ],
+      "case_study": {
+        "problem": "Automated due-diligence and compliance tools that summarize vendor pages with LLMs routinely hallucinate citations or silently omit sources they failed to fetch. Receipts and its extracted library Assay enforce verbatim byte-offset grounding and explicit 'not read' accounting.",
+        "flow": [
+          {
+            "stage": "Propose",
+            "title": "Source Fetch & Model Proposer",
+            "detail": "Fetches vendor pages alongside independent sources (SEC 10-K, NHTSA recalls, IIHS); an LLM proposes candidate claim-vs-source pairings."
+          },
+          {
+            "stage": "Deterministic Gate",
+            "title": "Assay Byte-Offset Substring Gate",
+            "detail": "Re-locates every quoted string verbatim in the fetched source bytes with exact offsets and discards unanchored quotes."
+          },
+          {
+            "stage": "Commit / Refuse",
+            "title": "Audited Ledger or Reasoned Refusal",
+            "detail": "Writes structured ledger rows (disputed, unverified, context_unverified) and explicitly records blocked sources as 'not read'."
+          }
+        ],
+        "tradeoff": "Exact substring checks stop fabricated quotes but do not prove a quote is a fair reading—an earlier divergent Tesla row had to be removed after catching a truncated Wikipedia sentence. A frontier-model relation check denied 30/30 no-relation pairs but admitted only 2/5 real relations (left off by default); G2 (0/16 attempts) and Reddit could not be fetched and remain logged as 'not read'.",
+        "artifacts": [
+          {
+            "label": "Receipts TypeScript engine source",
+            "repo": "receipts",
+            "branch": "main",
+            "sha": "9a0eeb8",
+            "path": "src",
+            "entry_id": "receipts-pipeline"
+          },
+          {
+            "label": "Committed Tesla FSD audited ledger (JSON)",
+            "repo": "receipts",
+            "branch": "main",
+            "sha": "9a0eeb8",
+            "path": "reports/tesla-fsd.json",
+            "entry_id": "receipts-tesla-ledger"
+          },
+          {
+            "label": "Relation-measure verifier eval spec (FAIL)",
+            "repo": "receipts",
+            "branch": "main",
+            "sha": "9a0eeb8",
+            "path": "docs/superpowers/specs/2026-09-25-relation-measure-check-design.md",
+            "entry_id": "receipts-relation-check"
+          },
+          {
+            "label": "Extracted Assay v0.1.0 library source",
+            "repo": "assay",
+            "branch": "main",
+            "sha": "2b6878e",
+            "path": "src",
+            "entry_id": "assay-library"
+          }
+        ]
+      },
       "open_questions": [
         {
           "q": "Can any relation check, local or frontier, admit real relations without admitting same-topic noise?",
@@ -165,11 +338,68 @@
     {
       "slug": "latch",
       "name": "Latch",
-      "subtitle": "Mechanical admission gates for small-model reasoning",
+      "subtitle": "Preregistered mechanical admission and provenance gates for small-model reasoning and tool calls",
+      "summary": "Tested whether typed-operator and tool-parameter provenance gates improve 3B–14B model reliability across three preregistered studies—documenting why abstention and false-alarm overhead killed or nulled every arm.",
+      "meta": "Python · Qwen2.5 3B–14B · 2WikiMultihopQA · BFCL v4 · Preregistered Studies",
       "what_it_is_ids": [
         "latch-pilot-killed",
         "latch-study3-agent-gate"
       ],
+      "case_study": {
+        "problem": "Small models make silent reasoning errors and issue wrong state-changing tool calls. Latch tested whether forcing models through strict mechanical admission schemas and parameter-provenance gates beats unconstrained chain-of-thought or plain tool calling under preregistered pass/kill criteria.",
+        "flow": [
+          {
+            "stage": "Propose",
+            "title": "Small Model Proposal (Qwen2.5 3B–14B)",
+            "detail": "Emits formal operator steps (Studies 1–2 on 2WikiMultihopQA) or state-changing tool calls (Study 3 on BFCL multi-turn)."
+          },
+          {
+            "stage": "Deterministic Gate",
+            "title": "Operator Schema & Provenance Gate",
+            "detail": "Validates typed operator contracts and checks whether state-changing tool parameters trace to verified prior context."
+          },
+          {
+            "stage": "Commit / Refuse",
+            "title": "Admit or Abstain / Block",
+            "detail": "Admits valid outputs or blocks/abstains on contract failure, evaluated strictly against preregistered McNemar and margin bars."
+          }
+        ],
+        "tradeoff": "All three studies missed their preregistered promotion bars: the Study 1 pilot was killed at G3 (37.5% vs 80.6% CoT accuracy at full coverage due to 55.6% abstention); Study 2 agreement flagged errors (2.80% vs 9.47%) but failed to beat plain self-consistency (+0.32 pp, 95% CI [-0.90, +1.59]); Study 3 cut wrong state-changing actions across 3B/7B/14B but triggered 9.3%–33.5% false alarms and reduced task success by up to 5.3 pp.",
+        "artifacts": [
+          {
+            "label": "Pilot preregistration (G1–G3 criteria)",
+            "repo": "Latch",
+            "branch": "study3-agent-gate",
+            "sha": "cdcd512",
+            "path": "PREREG.md",
+            "entry_id": "latch-pilot-killed"
+          },
+          {
+            "label": "G3 kill postmortem",
+            "repo": "Latch",
+            "branch": "study3-agent-gate",
+            "sha": "cdcd512",
+            "path": "docs/POSTMORTEM.md",
+            "entry_id": "latch-pilot-killed"
+          },
+          {
+            "label": "Study 2 agreement vs self-consistency report",
+            "repo": "Latch",
+            "branch": "study3-agent-gate",
+            "sha": "cdcd512",
+            "path": "study2/phase2/analysis/phase2_report.txt",
+            "entry_id": "latch-study2-agreement"
+          },
+          {
+            "label": "Study 3 tool-call provenance gate results",
+            "repo": "Latch",
+            "branch": "study3-agent-gate",
+            "sha": "cdcd512",
+            "path": "study3/RESULTS.md",
+            "entry_id": "latch-study3-agent-gate"
+          }
+        ]
+      },
       "open_questions": [
         {
           "q": "Does mechanical admission pay off only when a claim can be anchored to a literal artifact?",
@@ -199,12 +429,69 @@
       "slug": "backstop",
       "name": "Backstop + Diagnosis",
       "subtitle": "Error-triggered stop gates and artifact-only diagnosis for small-model tool agents",
+      "summary": "Intercepts premature agent stops after unresolved tool errors and injects deterministic hints parsed strictly from error text and tool schemas (zero ground truth), audited under Holm-Bonferroni and harm guardrails.",
+      "meta": "Python · Ollama (Qwen2.5 / Llama3.1 / Gemma4 / Ministral) · BFCL · Holm-Bonferroni & Wilson Bounds",
       "what_it_is_ids": [
         "backstop-stage1-stop-gate",
         "backstop-diagnosis-confirmatory",
         "backstop-diagnosis-cross-family",
         "backstop-diagnosis-hint-only"
       ],
+      "case_study": {
+        "problem": "Small tool-calling agents frequently give up right after a tool error instead of correcting the bad argument or missing prerequisite. Blindly forcing retries adds wrong actions; Backstop tests whether deterministic error+schema diagnosis turns runtime failure artifacts into safe recovery.",
+        "flow": [
+          {
+            "stage": "Propose",
+            "title": "Agent Premature Stop After Tool Error",
+            "detail": "Multi-turn tool agent (7B–9B) receives a runtime tool error and attempts to terminate the turn unresolved."
+          },
+          {
+            "stage": "Deterministic Gate",
+            "title": "Stop Gate + Artifact-Only diagnose()",
+            "detail": "Parses only the tool error string and active tool schema (zero ground truth) to decide whether an actionable repair hint exists."
+          },
+          {
+            "stage": "Commit / Refuse",
+            "title": "Refuse with Hint or Permit Stop (D_only)",
+            "detail": "Refuses premature stop with the deterministic diagnostic hint or permits clean termination; scored on H1/H2 lift plus G1/G2 harm ceilings."
+          }
+        ],
+        "tradeoff": "Stage 1 bare stop refusals tripped both harm guardrails. Confirmatory diagnosis (N=843, qwen2.5:7b) lifted recovery from 16.0% to 42.1% and whole-task success by +5.7 pp with clean G1 (4.0%), but failed G2 (2.579x post-fork wrong actions) because of blind fallback turns. Dropping blind fallbacks (D_only, exploratory) eliminated regressions (49 rescued, 0 lost) and cut wrong actions 73–79%, yet gains did not transfer uniformly across families (null on ministral-3:8b, redundant on gemma4:e4b) and an external tau2-bench smoke gate failed below the zero-tool floor.",
+        "artifacts": [
+          {
+            "label": "Stage 1 stop-gate verdict and metrics",
+            "repo": "backstop",
+            "branch": "stage1-build",
+            "sha": "b7de6a6",
+            "path": "study/RESULTS.md",
+            "entry_id": "backstop-stage1-stop-gate"
+          },
+          {
+            "label": "Frozen confirmatory preregistration",
+            "repo": "backstop-diagnosis",
+            "branch": "main",
+            "sha": "dbf2465",
+            "path": "study/PREREG.md",
+            "entry_id": "backstop-diagnosis-confirmatory"
+          },
+          {
+            "label": "Confirmatory analysis report (N=843)",
+            "repo": "backstop-diagnosis",
+            "branch": "main",
+            "sha": "dbf2465",
+            "path": "study/analysis/report.txt",
+            "entry_id": "backstop-diagnosis-confirmatory"
+          },
+          {
+            "label": "Hint-only gate implementation (D_only)",
+            "repo": "backstop-diagnosis",
+            "branch": "main",
+            "sha": "dbf2465",
+            "path": "extension/hint_only.py",
+            "entry_id": "backstop-diagnosis-hint-only"
+          }
+        ]
+      },
       "open_questions": [
         {
           "q": "Does the hint-only gate (D_only) preserve qwen2.5:7b's zero-regression lift on completely unseen seeds under a preregistered harm guardrail?",
@@ -227,11 +514,68 @@
       "slug": "priceriot",
       "name": "PriceRiot",
       "group": "other",
-      "subtitle": "Retail-store simulation for synthetic transaction data",
+      "subtitle": "C++17 discrete-event retail simulation core, POS CSV ETL pipeline, and analytics stack",
+      "summary": "Combines a C++17/pybind11 A* navmesh store-simulation engine with a POS transaction cleaning and SKU-mapping ETL pipeline, exposed through FastAPI/Vue 3 and Streamlit decision-support dashboards.",
+      "meta": "C++17 · pybind11 · Python ETL · FastAPI + Vue 3 · Streamlit",
       "what_it_is_ids": [
         "priceriot-engine",
         "priceriot-pos-etl"
       ],
+      "case_study": {
+        "problem": "Retail analytics and queuing models often lack clean, repeatable transaction datasets tied to physical floor layouts. PriceRiot pairs an ETL parameter extractor over historical POS CSVs with a C++17 discrete-event agent simulation core exposed cleanly to Python.",
+        "flow": [
+          {
+            "stage": "Propose / Ingest",
+            "title": "POS CSV ETL & YAML Store Spec",
+            "detail": "Cleans raw POS transaction exports, maps SKUs, extracts arrival/basket parameters, and loads YAML store geometry."
+          },
+          {
+            "stage": "Deterministic Core",
+            "title": "C++17 Engine + pybind11 Boundary",
+            "detail": "Runs deterministic A* navmesh pathfinding for customer and worker agents across typed C++/Python bindings."
+          },
+          {
+            "stage": "Commit / Analyze",
+            "title": "Synthetic Transaction Logs & Dashboards",
+            "detail": "Outputs structured transaction and queue logs to FastAPI/Vue 3 run comparison, Streamlit dashboards, and Jupyter notebooks."
+          }
+        ],
+        "tradeoff": "The simulation kernel, ETL ingestion pipeline, and analytics apps all run, but extracted parameters have not yet been calibrated or scored against held-out real store sales. Dynamic pricing hooks, queued-run worker updates (POST /api/runs/{id}/workers), layout optimization, and front-end tests remain unbuilt.",
+        "artifacts": [
+          {
+            "label": "C++17 pybind11 module bindings",
+            "repo": "PriceRiot",
+            "branch": "main",
+            "sha": "2870b22",
+            "path": "cxx/bindings",
+            "entry_id": "priceriot-engine"
+          },
+          {
+            "label": "POS ingestion & SKU-mapping ETL",
+            "repo": "PriceRiot",
+            "branch": "main",
+            "sha": "2870b22",
+            "path": "python/ingestion",
+            "entry_id": "priceriot-pos-etl"
+          },
+          {
+            "label": "FastAPI backend routes",
+            "repo": "PriceRiot",
+            "branch": "main",
+            "sha": "2870b22",
+            "path": "python/webapp/app.py",
+            "entry_id": "priceriot-analysis-apps"
+          },
+          {
+            "label": "Streamlit analytics dashboard",
+            "repo": "PriceRiot",
+            "branch": "main",
+            "sha": "2870b22",
+            "path": "python/dashboard/app.py",
+            "entry_id": "priceriot-analysis-apps"
+          }
+        ]
+      },
       "open_questions": [
         {
           "q": "Do the simulated shoppers reproduce a real store's transactions?",
@@ -247,12 +591,69 @@
       "slug": "qsr-erp",
       "name": "QSR ERP",
       "group": "other",
-      "subtitle": "Restaurant ERP database and app, ISDS 454 group project (I lead it)",
+      "subtitle": "Relational SQLite ERP schema, fail-fast modular Flask framework, and team architecture lead",
+      "summary": "Architected the normalized SQLite data contract (sales, recipes, inventory, scheduling, double-booking trigger, reporting views), deterministic 4-week seed generator, and PBKDF2/RBAC/CSRF Flask screen loader for a multi-developer ERP team.",
+      "meta": "Architecture & Team Lead · SQLite / SQL · Flask · CSUF ISDS 454",
       "what_it_is_ids": [
         "qsr-erp-database",
         "qsr-erp-framework",
         "qsr-erp-role"
       ],
+      "case_study": {
+        "problem": "Multi-developer enterprise applications break down when teams write ad-hoc queries without enforced relational invariants, auth checks, or clean module boundaries. QSR ERP puts schema constraints, reporting views, auth/CSRF guards, and fail-fast screen registration in a single shared foundation.",
+        "flow": [
+          {
+            "stage": "Propose / Submit",
+            "title": "Team Screen Modules & Operational POSTs",
+            "detail": "Independent feature folders register screens for sales imports, inventory/recipes, scheduling, and threshold alerts."
+          },
+          {
+            "stage": "Deterministic Gate",
+            "title": "Fail-Fast Loader, Auth/CSRF & SQLite Triggers",
+            "detail": "Screen loader halts startup on broken modules; PBKDF2 login, role guards, and CSRF check every POST; SQLite constraints and triggers block double-booking."
+          },
+          {
+            "stage": "Commit / Refuse",
+            "title": "Transactional Ledger & Reporting Views",
+            "detail": "Commits valid operational rows and serves pre-joined SQL reporting views for team BI screens, or rejects invalid writes."
+          }
+        ],
+        "tradeoff": "The relational schema, reporting views, deterministic 4-week seed generator, and Flask framework are built on main (30 commits), while teammates' feature screens remain in progress ahead of feature freeze. All current rows are generated sample data, and parked extensions (break-even simulator, database-grounded AI summaries, live POS onboarding) remain design-only.",
+        "artifacts": [
+          {
+            "label": "SQLite schema, constraints & double-booking trigger",
+            "repo": "ISDS454_QSR_ERP",
+            "branch": "main",
+            "sha": "72a912e",
+            "path": "db/schema.sql",
+            "entry_id": "qsr-erp-database"
+          },
+          {
+            "label": "SQL reporting views",
+            "repo": "ISDS454_QSR_ERP",
+            "branch": "main",
+            "sha": "72a912e",
+            "path": "db/views.sql",
+            "entry_id": "qsr-erp-database"
+          },
+          {
+            "label": "Fail-fast Flask screen loader",
+            "repo": "ISDS454_QSR_ERP",
+            "branch": "main",
+            "sha": "72a912e",
+            "path": "app/framework/loader.py",
+            "entry_id": "qsr-erp-framework"
+          },
+          {
+            "label": "PBKDF2 auth, role guards & CSRF",
+            "repo": "ISDS454_QSR_ERP",
+            "branch": "main",
+            "sha": "72a912e",
+            "path": "app/framework/auth.py",
+            "entry_id": "qsr-erp-framework"
+          }
+        ]
+      },
       "open_questions": [
         {
           "q": "Do the required screens land before the feature freeze?",
@@ -268,10 +669,51 @@
       "slug": "tunedin",
       "name": "TunedIn",
       "group": "other",
-      "subtitle": "Desktop ticketing app, ISDS 309",
+      "subtitle": "Layered .NET 8 desktop ticketing architecture with decoupled core domain and service layer",
+      "summary": "Structured a multi-screen desktop ticketing workflow (login, ticket-pack selection, cart, payment, receipts) over a separated ISDS309.Core domain/services library backed by delimited flat-file persistence.",
+      "meta": "C# / .NET 8 WinForms · Layered Architecture · CSUF ISDS 309",
       "what_it_is_ids": [
         "tunedin-app"
       ],
+      "case_study": {
+        "problem": "Small desktop applications often couple UI forms directly to storage files, making workflows brittle to extend. TunedIn separates domain models, enums, and ticketing services into a shared .NET 8 core library beneath the WinForms screens.",
+        "flow": [
+          {
+            "stage": "Propose / Input",
+            "title": "WinForms Ticketing Screens",
+            "detail": "Captures user actions across login, ticket-pack selection, cart management, and checkout screens."
+          },
+          {
+            "stage": "Domain Contract",
+            "title": "ISDS309.Core Domain & Services",
+            "detail": "Isolates domain entities, status enums, and cart/payment service logic from form event handlers."
+          },
+          {
+            "stage": "Commit / Output",
+            "title": "Receipts & Delimited File Storage",
+            "detail": "Generates order receipts and writes state to comma-delimited text files (with explicitly documented reliability gaps)."
+          }
+        ],
+        "tradeoff": "Built as an earlier desktop systems project and published with its known README limitations intact: login does not check credentials against stored user records, state is not auto-saved on exit, the main loop lacks top-level error handling, and the directory was not kept under Git version control.",
+        "artifacts": [
+          {
+            "label": "Core domain, enums & services library",
+            "repo": "ISDS309_TunedIn",
+            "branch": "n/a (not under git)",
+            "sha": "n/a",
+            "path": "ISDS309.Core",
+            "entry_id": "tunedin-app"
+          },
+          {
+            "label": "Architecture overview & documented known gaps",
+            "repo": "ISDS309_TunedIn",
+            "branch": "n/a (not under git)",
+            "sha": "n/a",
+            "path": "README.md",
+            "entry_id": "tunedin-gaps"
+          }
+        ]
+      },
       "open_questions": [
         {
           "q": "Were the README's known gaps ever closed?",
@@ -283,66 +725,89 @@
       ]
     }
   ],
-  "focus": "Verification and grounding of AI output: systems where a model may propose but a deterministic check decides what gets admitted.",
-  "skills": [
+  "focus": "Probabilistic systems are allowed to propose; deterministic systems decide what gets admitted, executed, or recorded.",
+  "skill_groups": [
     {
-      "name": "Python analytics stack: pandas, NumPy, Matplotlib, seaborn",
-      "backed_by": [
-        "priceriot-analysis-apps"
+      "category": "AI Reliability & Evaluation",
+      "items": [
+        {
+          "name": "Preregistered evaluation harnesses & statistical guardrails (Holm-Bonferroni correction, bootstrap CIs, Wilson bounds)",
+          "backed_by": [
+            "backstop-stage1-stop-gate",
+            "backstop-diagnosis-confirmatory",
+            "latch-study2-agreement"
+          ]
+        },
+        {
+          "name": "Deterministic admission & stop gates, artifact-only error diagnosis",
+          "backed_by": [
+            "gin-bookkeeper",
+            "latch-study3-agent-gate",
+            "backstop-diagnosis-hint-only"
+          ]
+        },
+        {
+          "name": "Decode-time token constraints & claim-grounding verifiers (NLI, byte-offset checks)",
+          "backed_by": [
+            "gin-sear-decode-constraint",
+            "gin-nc-baseline",
+            "sear-demo-pipeline"
+          ]
+        }
       ]
     },
     {
-      "name": "Streamlit dashboards",
-      "backed_by": [
-        "priceriot-analysis-apps"
+      "category": "Systems & Data Engineering",
+      "items": [
+        {
+          "name": "Relational schema & data contract design (SQLite, SQL, triggers, reporting views)",
+          "backed_by": [
+            "qsr-erp-database"
+          ]
+        },
+        {
+          "name": "Enterprise workflow & ERP architecture (modular Flask loaders, PBKDF2, RBAC, CSRF)",
+          "backed_by": [
+            "qsr-erp-framework",
+            "qsr-erp-role"
+          ]
+        },
+        {
+          "name": "ETL pipelines & synthetic transaction simulation (C++17, pybind11, Python)",
+          "backed_by": [
+            "priceriot-pos-etl",
+            "priceriot-engine"
+          ]
+        },
+        {
+          "name": "Verification libraries & layered application architecture (TypeScript, C# / .NET 8)",
+          "backed_by": [
+            "assay-library",
+            "receipts-pipeline",
+            "tunedin-app"
+          ]
+        }
       ]
     },
     {
-      "name": "ETL pipelines",
-      "backed_by": [
-        "priceriot-pos-etl"
-      ]
-    },
-    {
-      "name": "SQL and relational database design (SQLite)",
-      "backed_by": [
-        "qsr-erp-database"
-      ]
-    },
-    {
-      "name": "ERP design; SAP",
-      "backed_by": [
-        "qsr-erp-database"
-      ],
-      "note": "SAP experience is author-reported"
-    },
-    {
-      "name": "Excel, including Analytic Solver and the Data Science tabs",
-      "backed_by": []
-    },
-    {
-      "name": "Data mining techniques (ISDS 474)",
-      "backed_by": []
-    },
-    {
-      "name": "Local LLM evaluation harnesses; preregistered studies with kill criteria",
-      "backed_by": [
-        "gin-nc-baseline",
-        "latch-pilot-killed",
-        "backstop-diagnosis-confirmatory"
-      ]
-    },
-    {
-      "name": "Languages in the repos: Python, C++17, C# / .NET, TypeScript, SQL",
-      "backed_by": [
-        "priceriot-engine",
-        "tunedin-app",
-        "assay-library",
-        "qsr-erp-database"
+      "category": "Analytics & Decision Support",
+      "items": [
+        {
+          "name": "Python analytics stack (pandas, NumPy, Matplotlib, seaborn) & Streamlit dashboards",
+          "backed_by": [
+            "priceriot-analysis-apps"
+          ]
+        },
+        {
+          "name": "Excel (Analytic Solver, Data Science tools), SAP fundamentals & data mining",
+          "backed_by": [
+            "qsr-erp-database"
+          ],
+          "note": "coursework & ERP modeling"
+        }
       ]
     }
   ],
-  "skills_source": "list supplied by the author on 2026-11-22; entries marked 'seen in' link to a ledger entry whose evidence shows the skill in use",
   "ai_disclosure": {
     "tagline": "AI coding assistants helped build this site. Here is which models were used, how I reviewed and iterated on every output, and where the boundary sits.",
     "sections": [

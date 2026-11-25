@@ -161,8 +161,10 @@ def check_linked_at_sha():
 
 
 URL_RE = re.compile(r"""(?:https?:)?//[^\s"'<>)]+""")
-ALLOWED_URL_PREFIXES = ("https://github.com/KristianKrattiger", "https://kristiankrattiger.github.io/receipts/",
-                        "https://www.linkedin.com/in/kristiankratt/", "http://www.w3.org/2000/svg")
+ALLOWED_URL_PREFIXES = ("https://krattiger.dev", "https://github.com/KristianKrattiger",
+                        "https://kristiankrattiger.github.io/receipts/",
+                        "https://www.linkedin.com/in/kristiankratt/",
+                        "http://www.w3.org/2000/svg", "http://www.sitemaps.org/schemas/sitemap/0.9")
 
 
 def allowed_contact_emails():
@@ -444,7 +446,8 @@ def check_nojs(parsed):
     record("Pages render with JS off", "static check + msedge --headless --dump-dom on a script-stripped copy", ok, detail)
 
 
-ROUTES = ["/", "/index.html", "/not-done/", "/ledger/", "/ledger.json", "/about/", "/ai/", "/style.css",
+ROUTES = ["/", "/index.html", "/not-done/", "/ledger/", "/ledger.json", "/about/", "/resume/", "/ai/",
+          "/robots.txt", "/sitemap.xml", "/style.css",
           "/projects/", "/projects/gin/", "/projects/sear/", "/projects/receipts/", "/projects/latch/",
           "/projects/backstop/", "/projects/priceriot/", "/projects/qsr-erp/", "/projects/tunedin/",
           "/fonts/BarlowCondensed-SemiBold.ttf", "/fonts/BarlowCondensed-ExtraBold.ttf", "/fonts/OFL.txt"]

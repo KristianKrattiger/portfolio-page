@@ -111,13 +111,15 @@ Infrastructure configs, scripts, systemd units, and CI/CD workflow for self-host
    # Optional: enable Tailscale-only internal monitoring
    # sudo docker compose --profile monitoring up -d
    ```
-3. **Cloudflare Dashboard Edge Hygiene (mandatory for `~/portfolio`'s CSP and zero-tracking policy):**
+3. **Cloudflare Dashboard Edge Hygiene & Crawlability (mandatory for `~/portfolio`'s CSP, crawler access, and zero-tracking policy):**
    - **OFF:** Web Analytics / RUM
-   - **OFF:** Scrape Shield → Email Address Obfuscation
+   - **OFF:** Scrape Shield → Email Address Obfuscation (prevents broken `[email protected]` under strict CSP)
    - **OFF:** Speed → Optimization → Rocket Loader
    - **OFF:** Speed → Optimization → Speed Brain
-   - **ON:** Always Use HTTPS, TLS 1.3, Respect Origin `Cache-Control`
-   - Route `<yourdomain.com>` → `http://caddy:80` in the Tunnel's Public Hostname settings.
+   - **OFF:** Security → Settings → Browser Integrity Check (prevents HTTP 403 / error 1010 for external fetchers & ATS/link checkers)
+   - **OFF:** Security → Bots → Bot Fight Mode & AI Crawl Control / Managed `robots.txt` (lets origin `/robots.txt` and `/sitemap.xml` serve cleanly)
+   - **ON:** Always Use HTTPS, TLS 1.3, Caching → Configuration → Browser Cache TTL → Respect Existing Headers
+   - Route both `<yourdomain.com>` and `www.<yourdomain.com>` → `http://caddy:80` in the Tunnel's Public Hostname settings (`Caddyfile` 301-redirects `www` to apex).
 
 ---
 

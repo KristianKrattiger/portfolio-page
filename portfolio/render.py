@@ -154,10 +154,19 @@ def strip(entries):
 
 # ---------------------------------------------------------------- layout
 
+def canonical_url(site, page):
+    base = site.get("base_url", "https://krattiger.dev").rstrip("/")
+    if page == "index.html":
+        return base + "/"
+    if page.endswith("/index.html"):
+        return base + "/" + page[:-len("index.html")]
+    return base + "/" + page
+
+
 def nav(page, site):
     items = [("ledger/index.html", "Ledger"), ("not-done/index.html", "Not done"),
              ("projects/index.html", "Projects"), ("about/index.html", "About"),
-             ("ai/index.html", "AI disclosure")]
+             ("resume/index.html", "Resume"), ("ai/index.html", "AI disclosure")]
     lis = []
     for target, label in items:
         cur = ' aria-current="page"' if target == page else ""
@@ -165,16 +174,31 @@ def nav(page, site):
     return "<nav aria-label=\"Site\"><ul>" + "".join(lis) + "</ul></nav>"
 
 
-def layout(page, title, body, ctx, script=""):
+def layout(page, title, body, ctx, script="", description=None, full_title=None):
     site = ctx.site
+    doc_title = full_title or f"{title} — {site['name']}"
+    desc = description or site.get("description") or site["line"]
+    canon = canonical_url(site, page)
+    og_type = "website" if page == "index.html" else "article"
     return f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index, follow">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; font-src 'self'; script-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
-<title>{e(title)} — {e(site['name'])}</title>
+<title>{e(doc_title)}</title>
+<meta name="description" content="{e(desc)}">
+<link rel="canonical" href="{e(canon)}">
+<meta property="og:type" content="{og_type}">
+<meta property="og:site_name" content="{e(site['name'])}">
+<meta property="og:title" content="{e(doc_title)}">
+<meta property="og:description" content="{e(desc)}">
+<meta property="og:url" content="{e(canon)}">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{e(doc_title)}">
+<meta name="twitter:description" content="{e(desc)}">
 <link rel="stylesheet" href="{rel(page, 'style.css')}">
 </head>
 <body>
@@ -189,7 +213,7 @@ def layout(page, title, body, ctx, script=""):
 </main>
 <footer class="foot">
 <p>Built {e(ctx.build_date.isoformat())} from content/ledger.yaml. STALE = as_of older than 90 days at build time.
-Machine-readable: <a href="{rel(page, 'ledger.json')}">ledger.json</a>.</p>
+Machine-readable: <a href="{rel(page, 'ledger.json')}">ledger.json</a> · <a href="{rel(page, 'resume/index.html')}">Resume</a> · <a href="{rel(page, 'ai/index.html')}">AI disclosure</a>.</p>
 </footer>
 {script}
 </body>
@@ -327,20 +351,40 @@ def family_groups(entries, ctx, page, anchor=True, show_project=False, details=T
 # ---------------------------------------------------------------- about
 
 def skills_html(site, page, ctx):
+    groups = site.get("skill_groups")
+    if groups:
+        cols = []
+        for grp in groups:
+            lis = []
+            for sk in grp.get("items", []):
+                ids = [i for i in sk.get("backed_by", []) if i in ctx.by_id]
+                meta_parts = []
+                if ids:
+                    meta_parts.append(
+                        "evidence: " + ", ".join(
+                            f'<a href="{e(entry_home_href(page, ctx.by_id[i]))}">#{e(i)}</a>' for i in ids
+                        )
+                    )
+                if sk.get("note"):
+                    meta_parts.append(e(sk["note"]))
+                tail = f' <span class="seen">({" · ".join(meta_parts)})</span>' if meta_parts else ""
+                lis.append(f'<li>{e(sk["name"])}{tail}</li>')
+            cols.append(f'<div class="skillgroup"><h3>{e(grp["category"])}</h3><ul>{"".join(lis)}</ul></div>')
+        return '<div class="skillgroups">' + "".join(cols) + "</div>"
     lis = []
     for sk in site.get("skills", []):
         ids = [i for i in sk.get("backed_by", []) if i in ctx.by_id]
-        if ids:
-            seen = "seen in " + ", ".join(
-                f'<a href="{e(entry_home_href(page, ctx.by_id[i]))}">#{e(i)}</a>' for i in ids)
-        else:
-            seen = '<span class="stk stk-author">AUTHOR-REPORTED</span>'
-        note = f' <span class="seen">({e(sk["note"])})</span>' if sk.get("note") else ""
-        lis.append(f'<li>{e(sk["name"])} <span class="seen">{seen}</span>{note}</li>')
+        seen = (
+            "evidence: " + ", ".join(f'<a href="{e(entry_home_href(page, ctx.by_id[i]))}">#{e(i)}</a>' for i in ids)
+            if ids else ""
+        )
+        note = f' ({e(sk["note"])})' if sk.get("note") else ""
+        tail = f' <span class="seen">{seen}{note}</span>' if (seen or note) else ""
+        lis.append(f'<li>{e(sk["name"])}{tail}</li>')
     return "<ul>" + "".join(lis) + "</ul>"
 
 
-def contact_html(contact):
+def contact_html(contact, page=None):
     if isinstance(contact, dict):
         parts = []
         if contact.get("email"):
@@ -354,20 +398,37 @@ def contact_html(contact):
             li = contact["linkedin"].strip()
             label = li.replace("https://www.", "").replace("https://", "").replace("http://www.", "").replace("http://", "").rstrip("/")
             parts.append(f'<a href="{e(li)}" rel="noreferrer">{e(label)}</a>')
+        if page and page != "resume/index.html":
+            parts.append(f'<a href="{rel(page, "resume/index.html")}">Resume / CV</a>')
         if parts:
             return " · ".join(parts)
     return text(contact)
+
+
+def hero_links_html(site, page):
+    contact = site.get("contact", {})
+    items = []
+    if isinstance(contact, dict):
+        if contact.get("email"):
+            em = contact["email"].strip()
+            items.append(f'<li><a href="mailto:{e(em)}">{e(em)}</a></li>')
+        if contact.get("github"):
+            items.append(f'<li><a href="{e(contact["github"].strip())}" rel="noreferrer">GitHub</a></li>')
+        if contact.get("linkedin"):
+            items.append(f'<li><a href="{e(contact["linkedin"].strip())}" rel="noreferrer">LinkedIn</a></li>')
+    items.append(f'<li><a href="{rel(page, "resume/index.html")}">Resume / CV</a></li>')
+    return '<ul class="hero-links" aria-label="Direct links">' + "".join(items) + "</ul>"
 
 
 def about_dl(site, page, ctx):
     projs = ", ".join(f'<a href="{rel(page, "projects/" + p["slug"] + "/index.html")}">{e(p["name"])}</a>'
                       for p in site["projects"])
     return f"""<dl class="about">
-<dt>Education</dt><dd>{e(site['education'])} <span class="seen">Source: {e(site['education_source'])}.</span></dd>
+<dt>Education</dt><dd>{e(site['education'])}</dd>
 <dt>Focus</dt><dd>{e(site['focus'])}</dd>
-<dt>Skills</dt><dd>{skills_html(site, page, ctx)}<span class="seen">{e(site.get('skills_source', ''))}.</span></dd>
+<dt>Skills</dt><dd>{skills_html(site, page, ctx)}</dd>
 <dt>Projects</dt><dd>{projs}</dd>
-<dt>Contact</dt><dd>{contact_html(site['contact'])}</dd>
+<dt>Contact</dt><dd>{contact_html(site['contact'], page=page)}</dd>
 </dl>"""
 
 
@@ -377,9 +438,51 @@ def project_rows(entries, site, page, group):
         if p.get("group") != group:
             continue
         mine = [x for x in entries if x["project"] == p["slug"]]
+        desc = p.get("summary") or p["subtitle"]
+        meta_html = f'<span class="pmeta">{e(p["meta"])}</span>' if p.get("meta") else ""
         rows.append(f'<li class="projrow"><div><a class="pname" href="{rel(page, "projects/" + p["slug"] + "/index.html")}">'
-                    f'{e(p["name"])}</a><span class="psub">{e(p["subtitle"])}</span></div>{strip(mine)}</li>')
+                    f'{e(p["name"])}</a><span class="psub">{e(desc)}</span>{meta_html}</div>{strip(mine)}</li>')
     return '<ul class="projrows">' + "".join(rows) + "</ul>"
+
+
+def first_sentence(s):
+    s = str(s).strip()
+    if not s:
+        return ""
+    for sep in (". ", "; "):
+        idx = s.find(sep)
+        if 20 <= idx <= 220:
+            return s[:idx + 1]
+    return s if len(s) <= 220 else s[:217].rstrip() + "..."
+
+
+def home_finding_card(entry, ctx, page):
+    eid = entry["id"]
+    fam = family(entry["state"])
+    rows = entry.get("measurements") or entry.get("results") or []
+    metric_html = ""
+    if rows:
+        m = rows[0]
+        metric_html = (
+            f'<p class="fmetric"><span class="lbl">Key metric</span>'
+            f'{e(m.get("metric", ""))}: <strong>{e(str(m.get("value", "")))}</strong> '
+            f'<span class="seen">({e(str(m.get("denominator", "")))})</span></p>'
+        )
+    limit_text = first_sentence(entry["does_not_show"])
+    limit_html = f'<p class="flimit"><span class="lbl">Limit</span>{e(limit_text)}</p>'
+    proj_href = entry_home_href(page, entry)
+    ledg_href = entry_href(page, eid)
+    return (
+        f'<article class="finding {fam}">'
+        f'<p class="meta">{state_tag(entry["state"])} '
+        f'<span class="proj">{e(project_name(ctx.site, entry["project"]))}</span> '
+        f'<span class="asof">{e(entry["as_of"])}</span></p>'
+        f'<p class="fclaim">{e(entry["claim"])}</p>'
+        f'{metric_html}{limit_html}'
+        f'<p class="flink"><a href="{e(proj_href)}">Full table &amp; evidence (#{e(eid)})</a> · '
+        f'<a href="{e(ledg_href)}">Ledger</a></p>'
+        f'</article>'
+    )
 
 
 # ---------------------------------------------------------------- pages
@@ -397,24 +500,34 @@ def page_home(entries, ctx):
         f'<li><a href="{rel(page, targets[k])}"><span class="bigtape {k}">{shape(FAMILY_SHAPE[k])}'
         f'{e(label)}<span class="num">{fc[k]}</span></span></a></li>' for k, label, _s in FAMILIES)
     newest = sorted(entries, key=lambda x: (x["as_of"], x["id"]), reverse=True)[:3]
+    headline = site.get("hero_headline") or site["name"]
+    sub = site.get("hero_subheadline") or site["line"]
     body = f"""
 <section class="lead">
-<h1 class="title">{e(site['name'])}</h1>
-<p class="tagline">{e(site['line'])}</p>
+<h1 class="title hero-title">{e(headline)}</h1>
+<p class="hero-sub">{e(sub)}</p>
+{hero_links_html(site, page)}
 <ul class="counts" aria-label="Entries by family, computed from the ledger">{counts}</ul>
 <p class="wallnote">{len(entries)} public entries: {vc.get('LINKED', 0)} linked to a commit, {vc.get('AUTHOR-REPORTED', 0)} author-reported, {stale_n} stale, {disagree_n} where sources disagree. Counts are computed at build time.</p>
 </section>
 <section aria-labelledby="h-research"><h2 class="band" id="h-research">Research</h2>
 {project_rows(entries, site, page, "research")}</section>
-<section aria-labelledby="h-other"><h2 class="band" id="h-other">Other work</h2>
+<section aria-labelledby="h-other"><h2 class="band" id="h-other">Systems &amp; enterprise work</h2>
 {project_rows(entries, site, page, "other")}</section>
-<section aria-labelledby="h-about"><h2 class="band" id="h-about">About</h2>
+<section aria-labelledby="h-about"><h2 class="band" id="h-about">About &amp; capabilities</h2>
 <div class="sheet">{about_dl(site, page, ctx)}
-<p><a href="{rel(page, 'about/index.html')}">More: what I am looking at next, and open threads</a></p></div></section>
-<section aria-labelledby="h-new"><h2 class="band" id="h-new">Newest entries <a class="small" href="{rel(page, 'ledger/index.html')}">all {len(entries)}</a></h2>
-{"".join(tag(x, ctx, page, anchor=False) for x in newest)}</section>
+<p><a href="{rel(page, 'about/index.html')}">More: focus, next steps, and open threads</a> · <a href="{rel(page, 'resume/index.html')}">Printable Resume / CV</a></p></div></section>
+<section aria-labelledby="h-new"><h2 class="band" id="h-new">Recent findings <a class="small" href="{rel(page, 'ledger/index.html')}">all {len(entries)} entries</a></h2>
+<div class="findings">{"".join(home_finding_card(x, ctx, page) for x in newest)}</div></section>
 """
-    return layout(page, "Ledger summary", body, ctx)
+    return layout(
+        page,
+        "Applied AI Engineering & Systems Architecture",
+        body,
+        ctx,
+        full_title=f"{site['name']} — Deterministic Verification, Control Gates & AI Systems",
+        description=site.get("description"),
+    )
 
 
 def untested_built(entries):
@@ -449,7 +562,13 @@ def page_not_done(entries, ctx):
 <div class="sheet"><p>Built entries with no qualifying measurement in the evidence. Full tags are in the <a href="{rel(page, 'ledger/index.html')}">ledger</a> and on project pages.</p>
 <ul class="plain">{ut_rows}</ul></div></section>
 """
-    return layout(page, "Not done", body, ctx)
+    return layout(
+        page,
+        "Not done",
+        body,
+        ctx,
+        description="Negative results, killed experiments under preregistered criteria, blockers, unbuilt designs, and unmeasured builds.",
+    )
 
 
 FILTER_SCRIPT = """<script>
@@ -543,7 +662,14 @@ def page_ledger(entries, ctx):
 {ledger_sections(entries, ctx, page, anchor=True)}
 </div>
 """
-    return layout(page, "Ledger", body, ctx, script=FILTER_SCRIPT)
+    return layout(
+        page,
+        "Ledger",
+        body,
+        ctx,
+        script=FILTER_SCRIPT,
+        description=f"Full evidence ledger of {len(entries)} public entries with commit SHAs, denominators, datasets, and limits.",
+    )
 
 
 def page_facet(entries, ctx, facet, value):
@@ -559,7 +685,13 @@ def page_facet(entries, ctx, facet, value):
 </section>
 {ledger_sections(sub, ctx, page, anchor=False)}
 """
-    return layout(page, f"Ledger: {label}", body, ctx)
+    return layout(
+        page,
+        f"Ledger: {label}",
+        body,
+        ctx,
+        description=f"Evidence ledger filtered by {facet} = {value} ({len(sub)} of {len(entries)} public entries).",
+    )
 
 
 def page_projects(entries, ctx):
@@ -568,14 +700,76 @@ def page_projects(entries, ctx):
     body = f"""
 <section class="lead">
 <h1 class="title">Projects</h1>
-<p class="dek">Research on verifying AI output, and other work. The chips count each project's ledger entries by family.</p>
+<p class="dek">Applied AI verification research and systems/enterprise architecture. Build-time chips count each project's ledger entries by family.</p>
 </section>
 <section aria-labelledby="h-research"><h2 class="band" id="h-research">Research</h2>
 {project_rows(entries, site, page, "research")}</section>
-<section aria-labelledby="h-other"><h2 class="band" id="h-other">Other work</h2>
+<section aria-labelledby="h-other"><h2 class="band" id="h-other">Systems &amp; enterprise work</h2>
 {project_rows(entries, site, page, "other")}</section>
 """
-    return layout(page, "Projects", body, ctx)
+    return layout(
+        page,
+        "Projects",
+        body,
+        ctx,
+        description="Applied AI verification research (GIN, SEAR, Receipts + Assay, Latch, Backstop) and systems/enterprise engineering (PriceRiot, QSR ERP, TunedIn).",
+    )
+
+
+def artifact_link_html(art, site, page, ctx):
+    repo = art["repo"]
+    sha = str(art.get("sha", ""))
+    branch = str(art.get("branch", ""))
+    path = art["path"]
+    label = art["label"]
+    eid = art.get("entry_id")
+    url = None
+    if sha in site.get("linkable_shas", {}).get(repo, []) and repo in site.get("public_repos", {}):
+        if "(untracked)" not in branch:
+            url = f"{site['public_repos'][repo]}/blob/{sha}/{path}"
+    loc = f"{repo} @ {sha} : {path}" if sha and sha != "n/a" else f"{repo} : {path}"
+    if url:
+        code_ref = f'<a class="mono" href="{e(url)}" rel="noreferrer">{e(loc)}</a>'
+    else:
+        code_ref = f'<span class="mono">{e(loc)}</span>'
+    anchor_part = ""
+    if eid and eid in ctx.by_id:
+        anchor_part = f' <span class="seen">(<a href="{e(entry_home_href(page, ctx.by_id[eid]))}">#{e(eid)}</a>)</span>'
+    return f'<li><strong>{e(label)}</strong> — {code_ref}{anchor_part}</li>'
+
+
+def case_study_html(proj, ctx, page):
+    cs = proj.get("case_study")
+    if not cs:
+        return ""
+    site = ctx.site
+    arrow_svg = (
+        '<li class="flow-arrow" aria-hidden="true">'
+        '<svg viewBox="0 0 24 14" focusable="false">'
+        '<path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/>'
+        '</svg></li>'
+    )
+    flow_items = []
+    steps = cs.get("flow", [])
+    for idx, st in enumerate(steps):
+        if idx > 0:
+            flow_items.append(arrow_svg)
+        cls = "flow-step gate" if idx == 1 else "flow-step"
+        flow_items.append(
+            f'<li class="{cls}">'
+            f'<span class="flow-stage">{e(st["stage"])}</span>'
+            f'<span class="flow-title">{e(st["title"])}</span>'
+            f'<p class="flow-detail">{e(st["detail"])}</p></li>'
+        )
+    art_lis = "".join(artifact_link_html(a, site, page, ctx) for a in cs.get("artifacts", []))
+    return f"""<section aria-labelledby="overview"><h2 class="band" id="overview">Architectural overview</h2>
+<div class="sheet"><h3>Problem &amp; architectural thesis</h3><p>{e(cs['problem'])}</p>
+<h3>Control flow</h3>
+<ol class="flow" aria-label="{e(proj['name'])} control flow">{"".join(flow_items)}</ol></div>
+<div class="casegrid">
+<div class="sheet"><h3>Key tradeoff &amp; failure mode</h3><p>{e(cs['tradeoff'])}</p></div>
+<div class="sheet"><h3>Direct code &amp; artifact links</h3><ul class="plain">{art_lis}</ul></div>
+</div></section>"""
 
 
 def page_project(proj, entries, ctx):
@@ -632,18 +826,21 @@ def page_project(proj, entries, ctx):
                        + ", ".join(f'<span class="mono">{e(r)}</span>' for r in other) + ". "
                        + text("UNKNOWN — author to supply") + "</p>")
     dis_block = f"<div class='sheet'><h3>Where sources disagree</h3><ul class='plain'>{dis_html}</ul></div>" if dis_html else ""
+    meta_line = f'<p class="wallnote">{e(proj["meta"])}</p>' if proj.get("meta") else ""
 
     body = f"""
 <section class="lead">
 <h1 class="title">{e(proj['name'])}</h1>
 <p class="tagline">{e(proj['subtitle'])}</p>
+{meta_line}
 <p class="wallnote">{strip(mine)}</p>
 </section>
 <nav class="jump" aria-label="Sections"><ol>
-<li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
+<li><a href="#overview">Overview</a></li><li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
 <li><a href="#measured">What was measured</a></li><li><a href="#not-measured">Not measured or built</a></li>
 <li><a href="#weak">Weaknesses and negative results</a></li><li><a href="#open">Open questions</a></li>
 <li><a href="#evidence">Evidence</a></li></ol></nav>
+{case_study_html(proj, ctx, page)}
 <section><h2 class="band" id="what">What it is</h2>{versions_html(proj, page, ctx) or f'<div class="sheet"><ul class="plain">{what}</ul></div>'}</section>
 {section("What exists", "exists", exists, "No BUILT or IN-PROGRESS entries.")}
 {section("What was measured", "measured", measured, "No entry meets MEASURED: number, denominator, dataset, synthetic flag, system and date all known. Numbers that fall short are shown with their entries.")}
@@ -658,7 +855,13 @@ def page_project(proj, entries, ctx):
 <thead><tr><th scope="col">Repo / source</th><th scope="col">Branch</th><th scope="col">SHA</th><th scope="col">Path</th><th scope="col">Used by</th></tr></thead>
 <tbody>{ev_rows}</tbody></table></div></div></section>
 """
-    return layout(page, proj["name"], body, ctx)
+    return layout(
+        page,
+        proj["name"],
+        body,
+        ctx,
+        description=proj.get("summary") or proj["subtitle"],
+    )
 
 
 def versions_html(proj, page, ctx):
@@ -695,7 +898,61 @@ def page_about(entries, ctx):
 <section><h2 class="band" id="next">What I am looking at next</h2><div class="sheet"><p>{text(site['next'])}</p>
 <p>Open threads recorded in the evidence, not a plan:</p><ul class="plain">{"".join(threads)}</ul></div></section>
 """
-    return layout(page, "About", body, ctx)
+    return layout(
+        page,
+        "About",
+        body,
+        ctx,
+        description=f"Background, education, architectural capabilities, and contact details for {site['name']}.",
+    )
+
+
+def page_resume(entries, ctx):
+    page = "resume/index.html"
+    site = ctx.site
+    fc = family_counts(entries)
+
+    def proj_list(group):
+        lis = []
+        for p in site["projects"]:
+            if p.get("group") != group:
+                continue
+            mine = [x for x in entries if x["project"] == p["slug"]]
+            pfc = family_counts(mine)
+            meta = f' <span class="seen">({e(p["meta"])})</span>' if p.get("meta") else ""
+            lis.append(
+                f'<li><strong><a href="{rel(page, "projects/" + p["slug"] + "/index.html")}">{e(p["name"])}</a></strong>'
+                f'{meta} — {e(p.get("summary") or p["subtitle"])} '
+                f'<span class="seen">[Done {pfc["done"]} · Failed {pfc["failed"]} · Unfinished {pfc["unfinished"]}]</span></li>'
+            )
+        return '<ul class="plain">' + "".join(lis) + "</ul>"
+
+    body = f"""
+<section class="lead">
+<h1 class="title">Resume / CV</h1>
+<p class="dek">Structured summary backed by {len(entries)} build-time ledger entries (Done {fc['done']}, Failed {fc['failed']}, Unfinished {fc['unfinished']}). Use browser Print (Ctrl/Cmd+P) for a clean PDF copy.</p>
+</section>
+<div class="sheet">
+<div class="resume-head"><h2>{e(site['name'])}</h2><p class="mono small">{contact_html(site['contact'], page=page)}</p></div>
+<h3>Core thesis &amp; target focus</h3>
+<p>{e(site['focus'])} {e(site['next'])}</p>
+<h3>Education</h3>
+<p>{e(site['education'])}</p>
+<h3>Capabilities</h3>
+{skills_html(site, page, ctx)}
+<h3>Applied AI reliability &amp; verification research</h3>
+{proj_list("research")}
+<h3>Systems &amp; enterprise engineering</h3>
+{proj_list("other")}
+</div>
+"""
+    return layout(
+        page,
+        "Resume / CV",
+        body,
+        ctx,
+        description=f"Resume and technical CV for {site['name']} — Applied AI Engineering, Systems Architecture, and Technology Risk.",
+    )
 
 
 def page_ai(entries, ctx):
@@ -723,10 +980,35 @@ def page_ai(entries, ctx):
 </section>
 {"".join(sections)}
 """
-    return layout(page, "AI disclosure", body, ctx)
+    return layout(
+        page,
+        "AI disclosure",
+        body,
+        ctx,
+        description=disc["tagline"],
+    )
 
 
-# ---------------------------------------------------------------- json
+# ---------------------------------------------------------------- crawl & json
+
+def robots_txt(site):
+    base = site.get("base_url", "https://krattiger.dev").rstrip("/")
+    return f"User-agent: *\nAllow: /\n\nSitemap: {base}/sitemap.xml\n"
+
+
+def sitemap_xml(site, html_pages, build_date):
+    date_s = build_date.isoformat()
+    urls = []
+    for p in html_pages:
+        loc = canonical_url(site, p)
+        urls.append(f"  <url><loc>{e(loc)}</loc><lastmod>{e(date_s)}</lastmod></url>")
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        + "\n".join(urls)
+        + "\n</urlset>\n"
+    )
+
 
 def ledger_json(entries, ctx, n_hidden):
     out = []
@@ -756,9 +1038,14 @@ def build_site(all_entries, site, build_date):
     n_hidden = len(all_entries) - len(entries)
     ctx = Ctx(site, build_date, {x["id"]: x for x in entries})
     refs = [i for sk in site.get("skills", []) for i in sk.get("backed_by", [])]
+    for grp in site.get("skill_groups", []):
+        for sk in grp.get("items", []):
+            refs += sk.get("backed_by", [])
     for p in site["projects"]:
         refs += p["what_it_is_ids"] + [i for q in p["open_questions"] for i in q["ids"]]
         refs += [i for v in p.get("versions", []) for i in v["ids"]]
+        cs = p.get("case_study", {})
+        refs += [a["entry_id"] for a in cs.get("artifacts", []) if a.get("entry_id")]
     for i in refs:
         if i not in ctx.by_id:
             raise ValueError(f"site.json references unknown or hidden entry {i}")
@@ -773,7 +1060,11 @@ def build_site(all_entries, site, build_date):
     for p in site["projects"]:
         pages[f"projects/{p['slug']}/index.html"] = page_project(p, entries, ctx)
     pages["about/index.html"] = page_about(entries, ctx)
+    pages["resume/index.html"] = page_resume(entries, ctx)
     pages["ai/index.html"] = page_ai(entries, ctx)
+    html_pages = list(pages.keys())
+    pages["robots.txt"] = robots_txt(site)
+    pages["sitemap.xml"] = sitemap_xml(site, html_pages, build_date)
     pages["ledger.json"] = ledger_json(entries, ctx, n_hidden)
     from .style import CSS
     pages["style.css"] = CSS

@@ -98,7 +98,12 @@ h1,h2,h3,h4{{font-family:var(--cond);font-weight:800;margin:0;line-height:1;text
 /* page head */
 .lead{{padding:clamp(28px,6vw,64px) 0 20px}}
 .title{{font-size:clamp(3rem,10vw,7.5rem);line-height:.86;letter-spacing:-.01em;color:var(--wall-ink)}}
+.title.hero-title{{font-size:clamp(2.2rem,5.4vw,4.1rem);line-height:.96;max-width:24ch}}
 .tagline{{font-family:var(--cond);font-weight:600;font-size:clamp(1.35rem,3.2vw,2.2rem);line-height:1.12;margin:14px 0 0;max-width:30ch}}
+.hero-sub{{font-size:1.12rem;line-height:1.5;margin:16px 0 0;max-width:68ch;color:var(--wall-ink)}}
+.hero-links{{display:flex;flex-wrap:wrap;gap:8px 10px;margin:18px 0 0;padding:0;list-style:none}}
+.hero-links a{{display:inline-block;font-family:var(--mono);font-size:.82rem;font-weight:700;padding:5px 10px;border:1.5px solid var(--wall-rule);background:var(--tag);color:var(--ink);text-decoration:none}}
+.hero-links a:hover{{background:var(--ink);color:var(--tag)}}
 .dek{{font-size:1.1rem;margin:16px 0 0;max-width:62ch;color:var(--wall-ink)}}
 .wallnote{{color:var(--wall-ink-2);font-family:var(--mono);font-size:.82rem;margin:8px 0 0}}
 h2.band{{font-size:clamp(1.8rem,4.4vw,3rem);padding:12px 0 10px;margin:40px 0 16px;border-top:3px solid var(--wall-rule);display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 18px}}
@@ -154,11 +159,48 @@ h3.fam .n{{font-family:var(--mono);font-weight:400;font-size:.9rem}}
 .bigtape.unfinished{{background:var(--tape-unf);color:var(--tape-unf-ink)}}
 /* project rows */
 .projrows{{list-style:none;margin:0;padding:0}}
-.projrow{{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 20px;align-items:baseline;padding:12px 0;border-top:1.5px solid var(--wall-rule)}}
+.projrow{{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 20px;align-items:start;padding:14px 0;border-top:1.5px solid var(--wall-rule)}}
 .projrow:last-child{{border-bottom:1.5px solid var(--wall-rule)}}
-.projrow .pname{{font-family:var(--cond);font-weight:800;font-size:clamp(1.6rem,4vw,2.4rem);text-transform:uppercase;line-height:1;text-decoration:none}}
+.projrow .pname{{font-family:var(--cond);font-weight:800;font-size:clamp(1.6rem,4vw,2.3rem);text-transform:uppercase;line-height:1;text-decoration:none}}
 .projrow .pname:hover{{text-decoration:underline;text-decoration-thickness:3px}}
-.projrow .psub{{display:block;font-size:.95rem;color:var(--wall-ink-2);margin-top:4px;font-family:var(--serif);text-transform:none;font-weight:400}}
+.projrow .psub{{display:block;font-size:.98rem;color:var(--wall-ink);margin-top:6px;font-family:var(--serif);text-transform:none;font-weight:400;max-width:68ch}}
+.projrow .pmeta{{display:block;font-family:var(--mono);font-size:.76rem;color:var(--wall-ink-2);margin-top:4px}}
+/* compact home findings */
+.findings{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 16px}}
+.finding{{background:var(--tag);color:var(--ink);border:1.5px solid var(--rule);padding:16px 18px;display:flex;flex-direction:column;gap:8px}}
+.finding.unfinished{{background:var(--manila)}}
+.finding .meta{{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:0}}
+.finding .proj{{font-family:var(--cond);font-weight:800;font-size:.95rem;text-transform:uppercase;letter-spacing:.05em}}
+.finding .asof{{font-family:var(--mono);font-size:.74rem;color:var(--ink-2)}}
+.finding .fclaim{{font-family:var(--cond);font-weight:600;font-size:1.25rem;line-height:1.18;margin:2px 0 0}}
+.finding .fmetric{{margin:0;padding-top:8px;border-top:1px solid var(--rule-soft);font-size:.92rem}}
+.finding .flimit{{margin:0;font-size:.88rem;color:var(--ink-2)}}
+.finding .flink{{margin:auto 0 0;padding-top:8px;border-top:1px solid var(--rule-soft);font-family:var(--mono);font-size:.78rem;font-weight:700}}
+@media (max-width:920px){{.findings{{grid-template-columns:minmax(0,1fr)}}}}
+/* project case-study overview & control-flow diagram */
+.casegrid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:0 0 16px}}
+.casegrid .sheet{{margin:0}}
+@media (max-width:780px){{.casegrid{{grid-template-columns:minmax(0,1fr)}}}}
+.flow{{list-style:none;margin:12px 0 0;padding:0;display:grid;grid-template-columns:minmax(0,1fr) 26px minmax(0,1fr) 26px minmax(0,1fr);gap:8px;align-items:stretch}}
+.flow-step{{border:1.5px solid var(--rule);padding:12px 14px;background:var(--tag);color:var(--ink)}}
+.flow-step.gate{{background:var(--manila)}}
+.flow-stage{{display:block;font-family:var(--mono);font-weight:700;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);margin-bottom:4px}}
+.flow-title{{display:block;font-family:var(--cond);font-weight:800;font-size:1.2rem;text-transform:uppercase;line-height:1.05;margin-bottom:6px}}
+.flow-detail{{margin:0;font-size:.9rem;line-height:1.4}}
+.flow-arrow{{display:flex;align-items:center;justify-content:center;color:var(--ink)}}
+.flow-arrow svg{{width:24px;height:14px}}
+@media (max-width:820px){{.flow{{grid-template-columns:minmax(0,1fr)}}.flow-arrow{{transform:rotate(90deg);height:20px}}}}
+/* skills matrix */
+.skillgroups{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0}}
+.skillgroup{{border-top:2px solid var(--rule);padding-top:8px}}
+.skillgroup h3{{font-size:1.05rem;margin:0 0 8px;letter-spacing:.04em}}
+.skillgroup ul{{margin:0;padding:0;list-style:none}}
+.skillgroup li{{margin:0 0 8px;font-size:.94rem;line-height:1.4}}
+@media (max-width:860px){{.skillgroups{{grid-template-columns:minmax(0,1fr)}}}}
+/* resume print layout */
+.resume-head{{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 20px;border-bottom:2px solid var(--rule);padding-bottom:10px;margin-bottom:14px}}
+.resume-head h2{{font-size:1.8rem}}
+@media print{{body{{background:#fff;color:#000;max-width:none;padding:0}}.sheet,.tag,.finding{{border-color:#000;break-inside:avoid}}.hero-links{{display:none}}}}
 .strip{{display:inline-flex;flex-wrap:wrap;gap:6px;font-family:var(--mono);font-size:.85rem;font-weight:700;align-items:center}}
 .chip{{display:inline-flex;align-items:center;gap:5px;padding:2px 7px;border:1px solid var(--tape-edge)}}
 .chip .shape{{width:10px;height:10px}}

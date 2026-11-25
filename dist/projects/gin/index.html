@@ -3,9 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index, follow">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; font-src 'self'; script-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <title>GIN — Kristian Krattiger</title>
+<meta name="description" content="Prevents ungrounded LLM claims by constraining token generation to verbatim corpus spans and gating all graph state mutations through a single structural Bookkeeper across mTLS-federated nodes.">
+<link rel="canonical" href="https://krattiger.dev/projects/gin/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Kristian Krattiger">
+<meta property="og:title" content="GIN — Kristian Krattiger">
+<meta property="og:description" content="Prevents ungrounded LLM claims by constraining token generation to verbatim corpus spans and gating all graph state mutations through a single structural Bookkeeper across mTLS-federated nodes.">
+<meta property="og:url" content="https://krattiger.dev/projects/gin/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GIN — Kristian Krattiger">
+<meta name="twitter:description" content="Prevents ungrounded LLM claims by constraining token generation to verbatim corpus spans and gating all graph state mutations through a single structural Bookkeeper across mTLS-federated nodes.">
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
@@ -22,20 +33,29 @@
 </defs></svg>
 <header class="masthead">
 <p class="who"><a href="../../index.html">Kristian Krattiger</a></p>
-<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../ai/index.html">AI disclosure</a></li></ul></nav>
+<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../resume/index.html">Resume</a></li><li><a href="../../ai/index.html">AI disclosure</a></li></ul></nav>
 </header>
 <main id="main" tabindex="-1">
 
 <section class="lead">
 <h1 class="title">GIN</h1>
-<p class="tagline">Grounded Intelligence Network</p>
+<p class="tagline">Grounded Intelligence Network — decode-time grounding, sole-writer graph admission, and mTLS federation</p>
+<p class="wallnote">Python · Postgres + pgvector · llama-cpp-python · mTLS</p>
 <p class="wallnote"><span class="strip"><span class="chip done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-measured"/></svg>Done 9</span><span class="chip failed"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-killed"/></svg>Failed 7</span><span class="chip unfinished"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-not-done"/></svg>Unfinished 6</span></span></p>
 </section>
 <nav class="jump" aria-label="Sections"><ol>
-<li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
+<li><a href="#overview">Overview</a></li><li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
 <li><a href="#measured">What was measured</a></li><li><a href="#not-measured">Not measured or built</a></li>
 <li><a href="#weak">Weaknesses and negative results</a></li><li><a href="#open">Open questions</a></li>
 <li><a href="#evidence">Evidence</a></li></ol></nav>
+<section aria-labelledby="overview"><h2 class="band" id="overview">Architectural overview</h2>
+<div class="sheet"><h3>Problem &amp; architectural thesis</h3><p>Standard RAG pipelines let language models fabricate unsupported claims, silently merge conflicting sources, or write unverified assertions directly into persistent knowledge graphs. GIN separates probabilistic proposal from deterministic admission across decode-time token constraints, a sole-writer graph Bookkeeper, and trust-gated peer routing.</p>
+<h3>Control flow</h3>
+<ol class="flow" aria-label="GIN control flow"><li class="flow-step"><span class="flow-stage">Propose</span><span class="flow-title">Local LLM &amp; Cartographer</span><p class="flow-detail">Retrieves candidate chunks and proposes continuations (Mistral-7B / Qwen2.5-7B) or inter-document relations.</p></li><li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 14" focusable="false"><path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></li><li class="flow-step gate"><span class="flow-stage">Deterministic Gate</span><span class="flow-title">SEAR Mask + Bookkeeper + Trust Gate</span><p class="flow-detail">Logits processor masks tokens outside verbatim corpus spans; Bookkeeper checks confidence floor, anchors, and DAG acyclicity; mTLS router checks peer domain trust.</p></li><li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 14" focusable="false"><path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></li><li class="flow-step"><span class="flow-stage">Commit / Refuse</span><span class="flow-title">Provenance-Stamped State or Refusal</span><p class="flow-detail">Admits provenance-stamped graph nodes and grounded answers, or emits an explicit refusal when out-of-scope or untrusted.</p></li></ol></div>
+<div class="casegrid">
+<div class="sheet"><h3>Key tradeoff &amp; failure mode</h3><p>Verbatim decode constraints stopped token fabrication (0/21 on baseline, 0/50 adversarial decode trials), but cannot stop misleading juxtaposition or planted false sources (3/3 counterfactuals repeated). On the first all-layer stress run, production RRF peer selection dropped to 0.488 P@1, lexical-overlap verification accepted 15/16 adversarial probes, a forged peer chunk slipped through unverified, and issue-framing recall stayed 0/4 across 5 frozen encoders and 0/15 after patches.</p></div>
+<div class="sheet"><h3>Direct code &amp; artifact links</h3><ul class="plain"><li><strong>Decode-time logits constraint</strong> — <a class="mono" href="https://github.com/KristianKrattiger/GIN/blob/84abb9a/sear/processor.py" rel="noreferrer">GIN @ 84abb9a : sear/processor.py</a> <span class="seen">(<a href="#gin-sear-decode-constraint">#gin-sear-decode-constraint</a>)</span></li><li><strong>Sole-writer Bookkeeper gate</strong> — <a class="mono" href="https://github.com/KristianKrattiger/GIN/blob/84abb9a/gin/bookkeeper/bookkeeper.py" rel="noreferrer">GIN @ 84abb9a : gin/bookkeeper/bookkeeper.py</a> <span class="seen">(<a href="#gin-bookkeeper">#gin-bookkeeper</a>)</span></li><li><strong>Baseline SEAR vs RAG metrics</strong> — <a class="mono" href="https://github.com/KristianKrattiger/GIN/blob/84abb9a/data/eval_runs/20260702T012203Z/metrics.json" rel="noreferrer">GIN @ 84abb9a : data/eval_runs/20260702T012203Z/metrics.json</a> <span class="seen">(<a href="#gin-nc-baseline">#gin-nc-baseline</a>)</span></li><li><strong>All-layer stress benchmark report</strong> — <span class="mono">GIN @ bc5b455 : data/eval_runs/portfolio_stress/report.md</span> <span class="seen">(<a href="#gin-stress-first-run">#gin-stress-first-run</a>)</span></li></ul></div>
+</div></section>
 <section><h2 class="band" id="what">What it is</h2><div class="sheet"><ul class="plain"><li>GIN&#x27;s SEAR layer constrains every generated token, at decode time, to continue a span that occurs verbatim in the retrieved corpus, using a custom llama-cpp-python logits processor. <a class="mono" href="#gin-sear-decode-constraint">#gin-sear-decode-constraint</a></li><li>The Bookkeeper is the single admission gate for GIN&#x27;s graph state: it checks a confidence floor, endpoint existence, self-loops, anchor integrity, duplicates and DAG acyclicity, then stamps provenance on what it admits. <a class="mono" href="#gin-bookkeeper">#gin-bookkeeper</a></li><li>GIN&#x27;s federation layer passed its own bars for delegation, peer selection, per-domain trust gating and mutual TLS, on up to three nodes running on one machine. <a class="mono" href="#gin-federation">#gin-federation</a></li></ul></div></section>
 <section><h2 class="band" id="exists">What exists<span class="strip">3 entries</span></h2><article class="tag done" id="gin-bookkeeper" data-project="gin" data-state="BUILT" data-verification="LINKED">
 <p class="meta"><span class="tape done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-built"/></svg>BUILT</span> <span class="stk stk-linked">LINKED</span> <a class="eid" href="../../ledger/index.html#gin-bookkeeper">#gin-bookkeeper</a> <span class="asof">as of 2026-10-04</span></p>
@@ -179,8 +199,8 @@
 
 </main>
 <footer class="foot">
-<p>Built 2026-11-24 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
-Machine-readable: <a href="../../ledger.json">ledger.json</a>.</p>
+<p>Built 2026-11-25 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
+Machine-readable: <a href="../../ledger.json">ledger.json</a> · <a href="../../resume/index.html">Resume</a> · <a href="../../ai/index.html">AI disclosure</a>.</p>
 </footer>
 
 </body>

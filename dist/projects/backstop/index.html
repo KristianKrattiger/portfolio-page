@@ -3,9 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index, follow">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; font-src 'self'; script-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <title>Backstop + Diagnosis — Kristian Krattiger</title>
+<meta name="description" content="Intercepts premature agent stops after unresolved tool errors and injects deterministic hints parsed strictly from error text and tool schemas (zero ground truth), audited under Holm-Bonferroni and harm guardrails.">
+<link rel="canonical" href="https://krattiger.dev/projects/backstop/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Kristian Krattiger">
+<meta property="og:title" content="Backstop + Diagnosis — Kristian Krattiger">
+<meta property="og:description" content="Intercepts premature agent stops after unresolved tool errors and injects deterministic hints parsed strictly from error text and tool schemas (zero ground truth), audited under Holm-Bonferroni and harm guardrails.">
+<meta property="og:url" content="https://krattiger.dev/projects/backstop/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Backstop + Diagnosis — Kristian Krattiger">
+<meta name="twitter:description" content="Intercepts premature agent stops after unresolved tool errors and injects deterministic hints parsed strictly from error text and tool schemas (zero ground truth), audited under Holm-Bonferroni and harm guardrails.">
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
@@ -22,20 +33,29 @@
 </defs></svg>
 <header class="masthead">
 <p class="who"><a href="../../index.html">Kristian Krattiger</a></p>
-<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../ai/index.html">AI disclosure</a></li></ul></nav>
+<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../resume/index.html">Resume</a></li><li><a href="../../ai/index.html">AI disclosure</a></li></ul></nav>
 </header>
 <main id="main" tabindex="-1">
 
 <section class="lead">
 <h1 class="title">Backstop + Diagnosis</h1>
 <p class="tagline">Error-triggered stop gates and artifact-only diagnosis for small-model tool agents</p>
+<p class="wallnote">Python · Ollama (Qwen2.5 / Llama3.1 / Gemma4 / Ministral) · BFCL · Holm-Bonferroni &amp; Wilson Bounds</p>
 <p class="wallnote"><span class="strip"><span class="chip done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-measured"/></svg>Done 1</span><span class="chip failed"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-killed"/></svg>Failed 3</span><span class="chip unfinished zero"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-not-done"/></svg>Unfinished 0</span></span></p>
 </section>
 <nav class="jump" aria-label="Sections"><ol>
-<li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
+<li><a href="#overview">Overview</a></li><li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
 <li><a href="#measured">What was measured</a></li><li><a href="#not-measured">Not measured or built</a></li>
 <li><a href="#weak">Weaknesses and negative results</a></li><li><a href="#open">Open questions</a></li>
 <li><a href="#evidence">Evidence</a></li></ol></nav>
+<section aria-labelledby="overview"><h2 class="band" id="overview">Architectural overview</h2>
+<div class="sheet"><h3>Problem &amp; architectural thesis</h3><p>Small tool-calling agents frequently give up right after a tool error instead of correcting the bad argument or missing prerequisite. Blindly forcing retries adds wrong actions; Backstop tests whether deterministic error+schema diagnosis turns runtime failure artifacts into safe recovery.</p>
+<h3>Control flow</h3>
+<ol class="flow" aria-label="Backstop + Diagnosis control flow"><li class="flow-step"><span class="flow-stage">Propose</span><span class="flow-title">Agent Premature Stop After Tool Error</span><p class="flow-detail">Multi-turn tool agent (7B–9B) receives a runtime tool error and attempts to terminate the turn unresolved.</p></li><li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 14" focusable="false"><path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></li><li class="flow-step gate"><span class="flow-stage">Deterministic Gate</span><span class="flow-title">Stop Gate + Artifact-Only diagnose()</span><p class="flow-detail">Parses only the tool error string and active tool schema (zero ground truth) to decide whether an actionable repair hint exists.</p></li><li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 14" focusable="false"><path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></li><li class="flow-step"><span class="flow-stage">Commit / Refuse</span><span class="flow-title">Refuse with Hint or Permit Stop (D_only)</span><p class="flow-detail">Refuses premature stop with the deterministic diagnostic hint or permits clean termination; scored on H1/H2 lift plus G1/G2 harm ceilings.</p></li></ol></div>
+<div class="casegrid">
+<div class="sheet"><h3>Key tradeoff &amp; failure mode</h3><p>Stage 1 bare stop refusals tripped both harm guardrails. Confirmatory diagnosis (N=843, qwen2.5:7b) lifted recovery from 16.0% to 42.1% and whole-task success by +5.7 pp with clean G1 (4.0%), but failed G2 (2.579x post-fork wrong actions) because of blind fallback turns. Dropping blind fallbacks (D_only, exploratory) eliminated regressions (49 rescued, 0 lost) and cut wrong actions 73–79%, yet gains did not transfer uniformly across families (null on ministral-3:8b, redundant on gemma4:e4b) and an external tau2-bench smoke gate failed below the zero-tool floor.</p></div>
+<div class="sheet"><h3>Direct code &amp; artifact links</h3><ul class="plain"><li><strong>Stage 1 stop-gate verdict and metrics</strong> — <span class="mono">backstop @ b7de6a6 : study/RESULTS.md</span> <span class="seen">(<a href="#backstop-stage1-stop-gate">#backstop-stage1-stop-gate</a>)</span></li><li><strong>Frozen confirmatory preregistration</strong> — <span class="mono">backstop-diagnosis @ dbf2465 : study/PREREG.md</span> <span class="seen">(<a href="#backstop-diagnosis-confirmatory">#backstop-diagnosis-confirmatory</a>)</span></li><li><strong>Confirmatory analysis report (N=843)</strong> — <span class="mono">backstop-diagnosis @ dbf2465 : study/analysis/report.txt</span> <span class="seen">(<a href="#backstop-diagnosis-confirmatory">#backstop-diagnosis-confirmatory</a>)</span></li><li><strong>Hint-only gate implementation (D_only)</strong> — <span class="mono">backstop-diagnosis @ dbf2465 : extension/hint_only.py</span> <span class="seen">(<a href="#backstop-diagnosis-hint-only">#backstop-diagnosis-hint-only</a>)</span></li></ul></div>
+</div></section>
 <section><h2 class="band" id="what">What it is</h2><div class="sheet"><ul class="plain"><li>A preregistered error-triggered stop gate on BFCL multi-turn (llama3.1:8b and qwen2.5:7b) lifted per-turn recovery after an unresolved tool error, but failed to raise task success significantly and tripped both harm guardrails (registered verdict: guardrail failed — gain not clean). <a class="mono" href="#backstop-stage1-stop-gate">#backstop-stage1-stop-gate</a></li><li>A preregistered artifact-only diagnosis (built from error text and tool schemas, zero ground truth) lifted qwen2.5:7b error recovery from 16.0% to 42.1% and whole-task success by +5.7 percentage points with clean G1, but failed the post-fork wrong-action guardrail G2 (registered verdict: Gain not clean). <a class="mono" href="#backstop-diagnosis-confirmatory">#backstop-diagnosis-confirmatory</a></li><li>Exploratory cross-family testing showed artifact-only diagnosis is uneven across 7–9B model families and did not generalize over plain refusal on either gemma4:e4b (which already self-recovers on plain refusal) or ministral-3:8b (which failed to convert D&#x27;s hints); an external tau2-bench smoke gate failed below a zero-tool floor and was dropped. <a class="mono" href="#backstop-diagnosis-cross-family">#backstop-diagnosis-cross-family</a></li><li>In an exploratory follow-up, dropping the blind N2 fallback (D_only: refuse a stop only when diagnose() produces a hint) preserved 100% of task-success gains across all three models while eliminating regressions at N=843/250 and cutting post-fork wrong actions by 73–79%, though gains remained uneven across families. <a class="mono" href="#backstop-diagnosis-hint-only">#backstop-diagnosis-hint-only</a></li></ul></div></section>
 <section><h2 class="band" id="exists">What exists<span class="strip">0 entries</span></h2><div class="sheet"><p>No BUILT or IN-PROGRESS entries.</p></div></section>
 <section><h2 class="band" id="measured">What was measured<span class="strip">1 entry</span></h2><article class="tag done" id="backstop-diagnosis-hint-only" data-project="backstop" data-state="MEASURED" data-verification="LINKED">
@@ -73,8 +93,8 @@
 
 </main>
 <footer class="foot">
-<p>Built 2026-11-24 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
-Machine-readable: <a href="../../ledger.json">ledger.json</a>.</p>
+<p>Built 2026-11-25 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
+Machine-readable: <a href="../../ledger.json">ledger.json</a> · <a href="../../resume/index.html">Resume</a> · <a href="../../ai/index.html">AI disclosure</a>.</p>
 </footer>
 
 </body>

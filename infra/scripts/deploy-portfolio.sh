@@ -81,7 +81,10 @@ REQUIRED_FILES=(
   "ledger/index.html"
   "projects/index.html"
   "about/index.html"
+  "resume/index.html"
   "ai/index.html"
+  "robots.txt"
+  "sitemap.xml"
   "fonts/BarlowCondensed-SemiBold.ttf"
   "fonts/BarlowCondensed-ExtraBold.ttf"
 )
@@ -126,7 +129,10 @@ SMOKE_ROUTES=(
   "/not-done/"
   "/projects/"
   "/about/"
+  "/resume/"
   "/ai/"
+  "/robots.txt"
+  "/sitemap.xml"
   "/ledger.json"
   "/style.css"
 )

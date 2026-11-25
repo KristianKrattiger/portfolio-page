@@ -3,9 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index, follow">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; font-src 'self'; script-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <title>QSR ERP — Kristian Krattiger</title>
+<meta name="description" content="Architected the normalized SQLite data contract (sales, recipes, inventory, scheduling, double-booking trigger, reporting views), deterministic 4-week seed generator, and PBKDF2/RBAC/CSRF Flask screen loader for a multi-developer ERP team.">
+<link rel="canonical" href="https://krattiger.dev/projects/qsr-erp/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Kristian Krattiger">
+<meta property="og:title" content="QSR ERP — Kristian Krattiger">
+<meta property="og:description" content="Architected the normalized SQLite data contract (sales, recipes, inventory, scheduling, double-booking trigger, reporting views), deterministic 4-week seed generator, and PBKDF2/RBAC/CSRF Flask screen loader for a multi-developer ERP team.">
+<meta property="og:url" content="https://krattiger.dev/projects/qsr-erp/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="QSR ERP — Kristian Krattiger">
+<meta name="twitter:description" content="Architected the normalized SQLite data contract (sales, recipes, inventory, scheduling, double-booking trigger, reporting views), deterministic 4-week seed generator, and PBKDF2/RBAC/CSRF Flask screen loader for a multi-developer ERP team.">
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
@@ -22,20 +33,29 @@
 </defs></svg>
 <header class="masthead">
 <p class="who"><a href="../../index.html">Kristian Krattiger</a></p>
-<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../ai/index.html">AI disclosure</a></li></ul></nav>
+<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../resume/index.html">Resume</a></li><li><a href="../../ai/index.html">AI disclosure</a></li></ul></nav>
 </header>
 <main id="main" tabindex="-1">
 
 <section class="lead">
 <h1 class="title">QSR ERP</h1>
-<p class="tagline">Restaurant ERP database and app, ISDS 454 group project (I lead it)</p>
+<p class="tagline">Relational SQLite ERP schema, fail-fast modular Flask framework, and team architecture lead</p>
+<p class="wallnote">Architecture &amp; Team Lead · SQLite / SQL · Flask · CSUF ISDS 454</p>
 <p class="wallnote"><span class="strip"><span class="chip done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-measured"/></svg>Done 2</span><span class="chip failed zero"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-killed"/></svg>Failed 0</span><span class="chip unfinished"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-not-done"/></svg>Unfinished 2</span></span></p>
 </section>
 <nav class="jump" aria-label="Sections"><ol>
-<li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
+<li><a href="#overview">Overview</a></li><li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
 <li><a href="#measured">What was measured</a></li><li><a href="#not-measured">Not measured or built</a></li>
 <li><a href="#weak">Weaknesses and negative results</a></li><li><a href="#open">Open questions</a></li>
 <li><a href="#evidence">Evidence</a></li></ol></nav>
+<section aria-labelledby="overview"><h2 class="band" id="overview">Architectural overview</h2>
+<div class="sheet"><h3>Problem &amp; architectural thesis</h3><p>Multi-developer enterprise applications break down when teams write ad-hoc queries without enforced relational invariants, auth checks, or clean module boundaries. QSR ERP puts schema constraints, reporting views, auth/CSRF guards, and fail-fast screen registration in a single shared foundation.</p>
+<h3>Control flow</h3>
+<ol class="flow" aria-label="QSR ERP control flow"><li class="flow-step"><span class="flow-stage">Propose / Submit</span><span class="flow-title">Team Screen Modules &amp; Operational POSTs</span><p class="flow-detail">Independent feature folders register screens for sales imports, inventory/recipes, scheduling, and threshold alerts.</p></li><li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 14" focusable="false"><path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></li><li class="flow-step gate"><span class="flow-stage">Deterministic Gate</span><span class="flow-title">Fail-Fast Loader, Auth/CSRF &amp; SQLite Triggers</span><p class="flow-detail">Screen loader halts startup on broken modules; PBKDF2 login, role guards, and CSRF check every POST; SQLite constraints and triggers block double-booking.</p></li><li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 14" focusable="false"><path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></li><li class="flow-step"><span class="flow-stage">Commit / Refuse</span><span class="flow-title">Transactional Ledger &amp; Reporting Views</span><p class="flow-detail">Commits valid operational rows and serves pre-joined SQL reporting views for team BI screens, or rejects invalid writes.</p></li></ol></div>
+<div class="casegrid">
+<div class="sheet"><h3>Key tradeoff &amp; failure mode</h3><p>The relational schema, reporting views, deterministic 4-week seed generator, and Flask framework are built on main (30 commits), while teammates&#x27; feature screens remain in progress ahead of feature freeze. All current rows are generated sample data, and parked extensions (break-even simulator, database-grounded AI summaries, live POS onboarding) remain design-only.</p></div>
+<div class="sheet"><h3>Direct code &amp; artifact links</h3><ul class="plain"><li><strong>SQLite schema, constraints &amp; double-booking trigger</strong> — <span class="mono">ISDS454_QSR_ERP @ 72a912e : db/schema.sql</span> <span class="seen">(<a href="#qsr-erp-database">#qsr-erp-database</a>)</span></li><li><strong>SQL reporting views</strong> — <span class="mono">ISDS454_QSR_ERP @ 72a912e : db/views.sql</span> <span class="seen">(<a href="#qsr-erp-database">#qsr-erp-database</a>)</span></li><li><strong>Fail-fast Flask screen loader</strong> — <span class="mono">ISDS454_QSR_ERP @ 72a912e : app/framework/loader.py</span> <span class="seen">(<a href="#qsr-erp-framework">#qsr-erp-framework</a>)</span></li><li><strong>PBKDF2 auth, role guards &amp; CSRF</strong> — <span class="mono">ISDS454_QSR_ERP @ 72a912e : app/framework/auth.py</span> <span class="seen">(<a href="#qsr-erp-framework">#qsr-erp-framework</a>)</span></li></ul></div>
+</div></section>
 <section><h2 class="band" id="what">What it is</h2><div class="sheet"><ul class="plain"><li>A SQLite database for a quick-service restaurant ERP, built from the group&#x27;s logical ERD: sales import, recipes and inventory, staff scheduling and labor cost, and threshold alerts, with reporting views and a deterministic generator for four weeks of sample data for a fictional pizza shop. <a class="mono" href="#qsr-erp-database">#qsr-erp-database</a></li><li>The app framework the team builds on: a Flask screen loader that registers each screen folder and refuses to start on a broken one, PBKDF2 login with role guards and CSRF checks on every POST, a base template, shared components, and a starter stylesheet for teammates to edit. <a class="mono" href="#qsr-erp-framework">#qsr-erp-framework</a></li><li>I designed the database and the app&#x27;s architecture, built the framework screens and base styling, and am leading the team through implementation. Teammates own the data visualisation and the queries that put data on each screen. <a class="mono" href="#qsr-erp-role">#qsr-erp-role</a></li></ul></div></section>
 <section><h2 class="band" id="exists">What exists<span class="strip">3 entries</span></h2><article class="tag done" id="qsr-erp-database" data-project="qsr-erp" data-state="BUILT" data-verification="LINKED">
 <p class="meta"><span class="tape done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-built"/></svg>BUILT</span> <span class="stk stk-linked">LINKED</span> <a class="eid" href="../../ledger/index.html#qsr-erp-database">#qsr-erp-database</a> <span class="asof">as of 2026-11-11</span></p>
@@ -73,8 +93,8 @@
 
 </main>
 <footer class="foot">
-<p>Built 2026-11-24 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
-Machine-readable: <a href="../../ledger.json">ledger.json</a>.</p>
+<p>Built 2026-11-25 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
+Machine-readable: <a href="../../ledger.json">ledger.json</a> · <a href="../../resume/index.html">Resume</a> · <a href="../../ai/index.html">AI disclosure</a>.</p>
 </footer>
 
 </body>

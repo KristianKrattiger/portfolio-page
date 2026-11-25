@@ -3,9 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index, follow">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; font-src 'self'; script-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <title>TunedIn — Kristian Krattiger</title>
+<meta name="description" content="Structured a multi-screen desktop ticketing workflow (login, ticket-pack selection, cart, payment, receipts) over a separated ISDS309.Core domain/services library backed by delimited flat-file persistence.">
+<link rel="canonical" href="https://krattiger.dev/projects/tunedin/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Kristian Krattiger">
+<meta property="og:title" content="TunedIn — Kristian Krattiger">
+<meta property="og:description" content="Structured a multi-screen desktop ticketing workflow (login, ticket-pack selection, cart, payment, receipts) over a separated ISDS309.Core domain/services library backed by delimited flat-file persistence.">
+<meta property="og:url" content="https://krattiger.dev/projects/tunedin/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TunedIn — Kristian Krattiger">
+<meta name="twitter:description" content="Structured a multi-screen desktop ticketing workflow (login, ticket-pack selection, cart, payment, receipts) over a separated ISDS309.Core domain/services library backed by delimited flat-file persistence.">
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
@@ -22,20 +33,29 @@
 </defs></svg>
 <header class="masthead">
 <p class="who"><a href="../../index.html">Kristian Krattiger</a></p>
-<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../ai/index.html">AI disclosure</a></li></ul></nav>
+<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../resume/index.html">Resume</a></li><li><a href="../../ai/index.html">AI disclosure</a></li></ul></nav>
 </header>
 <main id="main" tabindex="-1">
 
 <section class="lead">
 <h1 class="title">TunedIn</h1>
-<p class="tagline">Desktop ticketing app, ISDS 309</p>
+<p class="tagline">Layered .NET 8 desktop ticketing architecture with decoupled core domain and service layer</p>
+<p class="wallnote">C# / .NET 8 WinForms · Layered Architecture · CSUF ISDS 309</p>
 <p class="wallnote"><span class="strip"><span class="chip done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-measured"/></svg>Done 1</span><span class="chip failed zero"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-killed"/></svg>Failed 0</span><span class="chip unfinished"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-not-done"/></svg>Unfinished 1</span></span></p>
 </section>
 <nav class="jump" aria-label="Sections"><ol>
-<li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
+<li><a href="#overview">Overview</a></li><li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
 <li><a href="#measured">What was measured</a></li><li><a href="#not-measured">Not measured or built</a></li>
 <li><a href="#weak">Weaknesses and negative results</a></li><li><a href="#open">Open questions</a></li>
 <li><a href="#evidence">Evidence</a></li></ol></nav>
+<section aria-labelledby="overview"><h2 class="band" id="overview">Architectural overview</h2>
+<div class="sheet"><h3>Problem &amp; architectural thesis</h3><p>Small desktop applications often couple UI forms directly to storage files, making workflows brittle to extend. TunedIn separates domain models, enums, and ticketing services into a shared .NET 8 core library beneath the WinForms screens.</p>
+<h3>Control flow</h3>
+<ol class="flow" aria-label="TunedIn control flow"><li class="flow-step"><span class="flow-stage">Propose / Input</span><span class="flow-title">WinForms Ticketing Screens</span><p class="flow-detail">Captures user actions across login, ticket-pack selection, cart management, and checkout screens.</p></li><li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 14" focusable="false"><path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></li><li class="flow-step gate"><span class="flow-stage">Domain Contract</span><span class="flow-title">ISDS309.Core Domain &amp; Services</span><p class="flow-detail">Isolates domain entities, status enums, and cart/payment service logic from form event handlers.</p></li><li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 14" focusable="false"><path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></li><li class="flow-step"><span class="flow-stage">Commit / Output</span><span class="flow-title">Receipts &amp; Delimited File Storage</span><p class="flow-detail">Generates order receipts and writes state to comma-delimited text files (with explicitly documented reliability gaps).</p></li></ol></div>
+<div class="casegrid">
+<div class="sheet"><h3>Key tradeoff &amp; failure mode</h3><p>Built as an earlier desktop systems project and published with its known README limitations intact: login does not check credentials against stored user records, state is not auto-saved on exit, the main loop lacks top-level error handling, and the directory was not kept under Git version control.</p></div>
+<div class="sheet"><h3>Direct code &amp; artifact links</h3><ul class="plain"><li><strong>Core domain, enums &amp; services library</strong> — <span class="mono">ISDS309_TunedIn : ISDS309.Core</span> <span class="seen">(<a href="#tunedin-app">#tunedin-app</a>)</span></li><li><strong>Architecture overview &amp; documented known gaps</strong> — <span class="mono">ISDS309_TunedIn : README.md</span> <span class="seen">(<a href="#tunedin-gaps">#tunedin-gaps</a>)</span></li></ul></div>
+</div></section>
 <section><h2 class="band" id="what">What it is</h2><div class="sheet"><ul class="plain"><li>TunedIn is a .NET 8 WinForms ticketing app built for ISDS 309 (Spring 2025): login, ticket-pack selection, cart, payment and receipt screens over a shared core library, with comma-delimited text files as storage. <a class="mono" href="#tunedin-app">#tunedin-app</a></li></ul></div></section>
 <section><h2 class="band" id="exists">What exists<span class="strip">1 entry</span></h2><article class="tag done" id="tunedin-app" data-project="tunedin" data-state="BUILT" data-verification="AUTHOR-REPORTED">
 <p class="meta"><span class="tape done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-built"/></svg>BUILT</span> <span class="stk stk-author">AUTHOR-REPORTED</span> <a class="eid" href="../../ledger/index.html#tunedin-app">#tunedin-app</a> <span class="asof">as of 2026-09-15</span></p>
@@ -61,8 +81,8 @@
 
 </main>
 <footer class="foot">
-<p>Built 2026-11-24 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
-Machine-readable: <a href="../../ledger.json">ledger.json</a>.</p>
+<p>Built 2026-11-25 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
+Machine-readable: <a href="../../ledger.json">ledger.json</a> · <a href="../../resume/index.html">Resume</a> · <a href="../../ai/index.html">AI disclosure</a>.</p>
 </footer>
 
 </body>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://krattiger.dev/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/not-done/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/project/gin/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/project/sear/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/project/receipts/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/project/latch/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/project/backstop/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/project/priceriot/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/project/qsr-erp/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/project/tunedin/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/state/measured/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/state/built/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/state/in-progress/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/state/design-only/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/state/blocked/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/state/not-done/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/state/killed/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/state/negative-result/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/verification/linked/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ledger/verification/author-reported/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/projects/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/projects/gin/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/projects/sear/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/projects/receipts/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/projects/latch/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/projects/backstop/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/projects/priceriot/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/projects/qsr-erp/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/projects/tunedin/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/about/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/resume/</loc><lastmod>2026-11-25</lastmod></url>
+  <url><loc>https://krattiger.dev/ai/</loc><lastmod>2026-11-25</lastmod></url>
+</urlset>

@@ -3,9 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index, follow">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; font-src 'self'; script-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <title>Receipts + Assay — Kristian Krattiger</title>
+<meta name="description" content="Audits vendor claims against independent regulatory filings (SEC, NHTSA, IIHS) by letting a model propose candidate contradictions while discarding any quote a deterministic byte-offset gate cannot re-find.">
+<link rel="canonical" href="https://krattiger.dev/projects/receipts/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Kristian Krattiger">
+<meta property="og:title" content="Receipts + Assay — Kristian Krattiger">
+<meta property="og:description" content="Audits vendor claims against independent regulatory filings (SEC, NHTSA, IIHS) by letting a model propose candidate contradictions while discarding any quote a deterministic byte-offset gate cannot re-find.">
+<meta property="og:url" content="https://krattiger.dev/projects/receipts/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Receipts + Assay — Kristian Krattiger">
+<meta name="twitter:description" content="Audits vendor claims against independent regulatory filings (SEC, NHTSA, IIHS) by letting a model propose candidate contradictions while discarding any quote a deterministic byte-offset gate cannot re-find.">
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
@@ -22,20 +33,29 @@
 </defs></svg>
 <header class="masthead">
 <p class="who"><a href="../../index.html">Kristian Krattiger</a></p>
-<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../ai/index.html">AI disclosure</a></li></ul></nav>
+<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../resume/index.html">Resume</a></li><li><a href="../../ai/index.html">AI disclosure</a></li></ul></nav>
 </header>
 <main id="main" tabindex="-1">
 
 <section class="lead">
 <h1 class="title">Receipts + Assay</h1>
-<p class="tagline">Vendor claims against independent sources, with a substring gate</p>
+<p class="tagline">Claim-audit pipeline and standalone TypeScript verification library (Assay v0.1.0)</p>
+<p class="wallnote">TypeScript · Byte-Offset Quote Gate · SEC / NHTSA / IIHS · Assay v0.1.0</p>
 <p class="wallnote"><span class="strip"><span class="chip done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-measured"/></svg>Done 4</span><span class="chip failed"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-killed"/></svg>Failed 2</span><span class="chip unfinished"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-not-done"/></svg>Unfinished 1</span></span></p>
 </section>
 <nav class="jump" aria-label="Sections"><ol>
-<li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
+<li><a href="#overview">Overview</a></li><li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
 <li><a href="#measured">What was measured</a></li><li><a href="#not-measured">Not measured or built</a></li>
 <li><a href="#weak">Weaknesses and negative results</a></li><li><a href="#open">Open questions</a></li>
 <li><a href="#evidence">Evidence</a></li></ol></nav>
+<section aria-labelledby="overview"><h2 class="band" id="overview">Architectural overview</h2>
+<div class="sheet"><h3>Problem &amp; architectural thesis</h3><p>Automated due-diligence and compliance tools that summarize vendor pages with LLMs routinely hallucinate citations or silently omit sources they failed to fetch. Receipts and its extracted library Assay enforce verbatim byte-offset grounding and explicit &#x27;not read&#x27; accounting.</p>
+<h3>Control flow</h3>
+<ol class="flow" aria-label="Receipts + Assay control flow"><li class="flow-step"><span class="flow-stage">Propose</span><span class="flow-title">Source Fetch &amp; Model Proposer</span><p class="flow-detail">Fetches vendor pages alongside independent sources (SEC 10-K, NHTSA recalls, IIHS); an LLM proposes candidate claim-vs-source pairings.</p></li><li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 14" focusable="false"><path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></li><li class="flow-step gate"><span class="flow-stage">Deterministic Gate</span><span class="flow-title">Assay Byte-Offset Substring Gate</span><p class="flow-detail">Re-locates every quoted string verbatim in the fetched source bytes with exact offsets and discards unanchored quotes.</p></li><li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 14" focusable="false"><path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></li><li class="flow-step"><span class="flow-stage">Commit / Refuse</span><span class="flow-title">Audited Ledger or Reasoned Refusal</span><p class="flow-detail">Writes structured ledger rows (disputed, unverified, context_unverified) and explicitly records blocked sources as &#x27;not read&#x27;.</p></li></ol></div>
+<div class="casegrid">
+<div class="sheet"><h3>Key tradeoff &amp; failure mode</h3><p>Exact substring checks stop fabricated quotes but do not prove a quote is a fair reading—an earlier divergent Tesla row had to be removed after catching a truncated Wikipedia sentence. A frontier-model relation check denied 30/30 no-relation pairs but admitted only 2/5 real relations (left off by default); G2 (0/16 attempts) and Reddit could not be fetched and remain logged as &#x27;not read&#x27;.</p></div>
+<div class="sheet"><h3>Direct code &amp; artifact links</h3><ul class="plain"><li><strong>Receipts TypeScript engine source</strong> — <a class="mono" href="https://github.com/KristianKrattiger/receipts/blob/9a0eeb8/src" rel="noreferrer">receipts @ 9a0eeb8 : src</a> <span class="seen">(<a href="#receipts-pipeline">#receipts-pipeline</a>)</span></li><li><strong>Committed Tesla FSD audited ledger (JSON)</strong> — <a class="mono" href="https://github.com/KristianKrattiger/receipts/blob/9a0eeb8/reports/tesla-fsd.json" rel="noreferrer">receipts @ 9a0eeb8 : reports/tesla-fsd.json</a> <span class="seen">(<a href="#receipts-tesla-ledger">#receipts-tesla-ledger</a>)</span></li><li><strong>Relation-measure verifier eval spec (FAIL)</strong> — <a class="mono" href="https://github.com/KristianKrattiger/receipts/blob/9a0eeb8/docs/superpowers/specs/2026-09-25-relation-measure-check-design.md" rel="noreferrer">receipts @ 9a0eeb8 : docs/superpowers/specs/2026-09-25-relation-measure-check-design.md</a> <span class="seen">(<a href="#receipts-relation-check">#receipts-relation-check</a>)</span></li><li><strong>Extracted Assay v0.1.0 library source</strong> — <span class="mono">assay @ 2b6878e : src</span> <span class="seen">(<a href="#assay-library">#assay-library</a>)</span></li></ul></div>
+</div></section>
 <section><h2 class="band" id="what">What it is</h2><div class="sheet"><ul class="plain"><li>Receipts is a TypeScript pipeline that reads a vendor&#x27;s pages and independent sources (including SEC filings, NHTSA and IIHS), lets a model propose which claims contradict which, and discards any quote a deterministic gate cannot re-find in the fetched bytes. <a class="mono" href="#receipts-pipeline">#receipts-pipeline</a></li><li>Assay is the claim-audit constraint layer extracted from Receipts into a standalone TypeScript library (v0.1.0): corpus plus subject in, a ledger or a reasoned refusal out. <a class="mono" href="#assay-library">#assay-library</a></li></ul></div></section>
 <section><h2 class="band" id="exists">What exists<span class="strip">4 entries</span></h2><article class="tag done" id="assay-library" data-project="receipts" data-state="BUILT" data-verification="LINKED">
 <p class="meta"><span class="tape done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-built"/></svg>BUILT</span> <span class="stk stk-linked">LINKED</span> <a class="eid" href="../../ledger/index.html#assay-library">#assay-library</a> <span class="asof">as of 2026-10-03</span></p>
@@ -82,7 +102,7 @@
 </article><div class='sheet'><h3>Where sources disagree</h3><ul class='plain'><li><a class="mono" href="#receipts-tesla-ledger">#receipts-tesla-ledger</a> <span class="sig">The seed says Receipts &#x27;surfaced a Tesla disclosure divergence&#x27;. The committed ledger has zero divergent rows. An earlier ledger had one divergent row; the README says it was removed because it rested on a Wikipedia sentence cut off mid-way, whose full text was about a benchmark, not a collision rate. The repo wins.</span></li><li><a class="mono" href="#receipts-tests">#receipts-tests</a> <span class="sig">README says 816 tests; the author&#x27;s vault note says 846. The higher tier (README) is shown first; neither was re-counted.</span></li><li><a class="mono" href="#assay-testing">#assay-testing</a> <span class="sig">The repo contains tests carried over from Receipts plus a smoke test, which sits awkwardly with &#x27;testing NOT-DONE&#x27;. Most likely the seed means testing beyond the inherited unit tests, but that is a guess by the site&#x27;s builder, so it is listed in NEEDS_AUTHOR.md.</span></li></ul></div></section>
 <section><h2 class="band" id="open">Open questions</h2><div class="sheet"><ul class="plain"><li>Can any relation check, local or frontier, admit real relations without admitting same-topic noise? <span class="mono small">from <a href="#receipts-relation-check">#receipts-relation-check</a>, <a href="../../projects/gin/index.html#gin-decline-eval">#gin-decline-eval</a></span><br><span class="small">Would resolve it: More than about four independent positive labels.</span></li><li>What does &#x27;testing Assay&#x27; still need to cover? <span class="mono small">from <a href="#assay-testing">#assay-testing</a></span><br><span class="small">Would resolve it: Author to define the scope.</span></li></ul></div></section>
 <section><h2 class="band" id="evidence">Evidence</h2><div class="sheet">
-<p>Public locations named in the evidence:</p><ul><li><a href="https://github.com/KristianKrattiger/receipts" rel="noreferrer">https://github.com/KristianKrattiger/receipts</a></li><li><a href="https://kristiankrattiger.github.io/receipts/" rel="noreferrer">Hosted Receipts ledgers (GitHub Pages, linked from the repo README)</a></li></ul><p>Repos with no public URL on this site (visibility not confirmed): <span class="mono">assay</span>. <span class="unknown">UNKNOWN — author to supply</span></p>
+<p>Public locations named in the evidence:</p><ul><li><a href="https://github.com/KristianKrattiger/receipts" rel="noreferrer">https://github.com/KristianKrattiger/receipts</a></li><li><a href="https://kristiankrattiger.github.io/receipts/" rel="noreferrer">Hosted Receipts ledgers (GitHub Pages)</a></li></ul><p>Repos with no public URL on this site (visibility not confirmed): <span class="mono">assay</span>. <span class="unknown">UNKNOWN — author to supply</span></p>
 <div class="scroll" role="region" aria-label="Evidence index" tabindex="0"><table class="nums">
 <caption>Every evidence pointer used on this page</caption>
 <thead><tr><th scope="col">Repo / source</th><th scope="col">Branch</th><th scope="col">SHA</th><th scope="col">Path</th><th scope="col">Used by</th></tr></thead>
@@ -90,8 +110,8 @@
 
 </main>
 <footer class="foot">
-<p>Built 2026-11-24 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
-Machine-readable: <a href="../../ledger.json">ledger.json</a>.</p>
+<p>Built 2026-11-25 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
+Machine-readable: <a href="../../ledger.json">ledger.json</a> · <a href="../../resume/index.html">Resume</a> · <a href="../../ai/index.html">AI disclosure</a>.</p>
 </footer>
 
 </body>

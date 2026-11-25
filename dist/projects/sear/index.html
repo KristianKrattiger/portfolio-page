@@ -3,9 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index, follow">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; font-src 'self'; script-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <title>SEAR — Kristian Krattiger</title>
+<meta name="description" content="Compares two grounding architectures for LLM outputs: blocking unsupported tokens during decoding (GIN) versus filtering free-form drafts through NLI entailment and exact name/number checks (sear-demo).">
+<link rel="canonical" href="https://krattiger.dev/projects/sear/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Kristian Krattiger">
+<meta property="og:title" content="SEAR — Kristian Krattiger">
+<meta property="og:description" content="Compares two grounding architectures for LLM outputs: blocking unsupported tokens during decoding (GIN) versus filtering free-form drafts through NLI entailment and exact name/number checks (sear-demo).">
+<meta property="og:url" content="https://krattiger.dev/projects/sear/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SEAR — Kristian Krattiger">
+<meta name="twitter:description" content="Compares two grounding architectures for LLM outputs: blocking unsupported tokens during decoding (GIN) versus filtering free-form drafts through NLI entailment and exact name/number checks (sear-demo).">
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
@@ -22,20 +33,29 @@
 </defs></svg>
 <header class="masthead">
 <p class="who"><a href="../../index.html">Kristian Krattiger</a></p>
-<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../ai/index.html">AI disclosure</a></li></ul></nav>
+<nav aria-label="Site"><ul><li><a href="../../ledger/index.html">Ledger</a></li><li><a href="../../not-done/index.html">Not done</a></li><li><a href="../../projects/index.html">Projects</a></li><li><a href="../../about/index.html">About</a></li><li><a href="../../resume/index.html">Resume</a></li><li><a href="../../ai/index.html">AI disclosure</a></li></ul></nav>
 </header>
 <main id="main" tabindex="-1">
 
 <section class="lead">
 <h1 class="title">SEAR</h1>
-<p class="tagline">Sparse Epistemically Anchored Reasoning, in two versions: token-level inside GIN, and verify-after in sear-demo</p>
+<p class="tagline">Sparse Epistemically Anchored Reasoning — decode-time constraints (GIN) and verify-after claim gating (sear-demo)</p>
+<p class="wallnote">Python · phi-4 · DeBERTa-v3 NLI · Deterministic Span Checks</p>
 <p class="wallnote"><span class="strip"><span class="chip done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-measured"/></svg>Done 2</span><span class="chip failed"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-killed"/></svg>Failed 2</span><span class="chip unfinished"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-not-done"/></svg>Unfinished 2</span></span></p>
 </section>
 <nav class="jump" aria-label="Sections"><ol>
-<li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
+<li><a href="#overview">Overview</a></li><li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
 <li><a href="#measured">What was measured</a></li><li><a href="#not-measured">Not measured or built</a></li>
 <li><a href="#weak">Weaknesses and negative results</a></li><li><a href="#open">Open questions</a></li>
 <li><a href="#evidence">Evidence</a></li></ol></nav>
+<section aria-labelledby="overview"><h2 class="band" id="overview">Architectural overview</h2>
+<div class="sheet"><h3>Problem &amp; architectural thesis</h3><p>Free-form RAG answers routinely blend retrieved facts with memorized claims, especially on near-miss or out-of-corpus queries. SEAR enforces that emitted claims trace back to retrieved chunks, replacing unsupported guesses with an explicit failure state.</p>
+<h3>Control flow</h3>
+<ol class="flow" aria-label="SEAR control flow"><li class="flow-step"><span class="flow-stage">Propose</span><span class="flow-title">Draft Generation (phi-4)</span><p class="flow-detail">Generates candidate claims citing retrieved chunks (or proposes tokens constrained by GIN&#x27;s verbatim logits processor).</p></li><li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 14" focusable="false"><path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></li><li class="flow-step gate"><span class="flow-stage">Deterministic Gate</span><span class="flow-title">NLI Entailment + Name/Number Check</span><p class="flow-detail">Verifies chunk entailment with nli-deberta-v3-base and checks that every name and number appears verbatim in the cited chunk.</p></li><li class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 14" focusable="false"><path d="M1 7 H20 M15 2 L21 7 L15 12" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></li><li class="flow-step"><span class="flow-stage">Commit / Refuse</span><span class="flow-title">Grounded Answer or Explicit Refusal</span><p class="flow-detail">Emits only claims that clear both checks; when zero claims survive, returns an explicit failure state instead of guessing.</p></li></ol></div>
+<div class="casegrid">
+<div class="sheet"><h3>Key tradeoff &amp; failure mode</h3><p>Refused 9/9 out-of-corpus and near-miss probes on a 27-probe smoke set, but over-refused 5 supportable probes (9/14 failure-state precision). Verification enforces the corpus rather than ground truth: poisoned chunks passed 5/5, and conflicting chunks were silently resolved to the model&#x27;s parametric memory on 4/5 conflict probes (no conflict detector is built).</p></div>
+<div class="sheet"><h3>Direct code &amp; artifact links</h3><ul class="plain"><li><strong>Decode-time SEAR logits processor (in GIN)</strong> — <a class="mono" href="https://github.com/KristianKrattiger/GIN/blob/84abb9a/sear/processor.py" rel="noreferrer">GIN @ 84abb9a : sear/processor.py</a> <span class="seen">(<a href="../../projects/gin/index.html#gin-sear-decode-constraint">#gin-sear-decode-constraint</a>)</span></li><li><strong>Verify-after pipeline config (phi-4 + DeBERTa NLI)</strong> — <span class="mono">sear-demo @ 730ad1d : config/default.yaml</span> <span class="seen">(<a href="#sear-demo-pipeline">#sear-demo-pipeline</a>)</span></li><li><strong>Verify-after pipeline source</strong> — <span class="mono">sear-demo @ 730ad1d : src</span> <span class="seen">(<a href="#sear-demo-pipeline">#sear-demo-pipeline</a>)</span></li><li><strong>Walkthrough and library-corpus design</strong> — <span class="mono">sear-demo @ 730ad1d : docs/DESIGN.md</span> <span class="seen">(<a href="#sear-demo-status">#sear-demo-status</a>)</span></li></ul></div>
+</div></section>
 <section><h2 class="band" id="what">What it is</h2><div class="versions"><div class="sheet version"><h3><span class="vnum">Version 1</span> SEAR in GIN: verify while generating</h3><p>A custom llama-cpp-python logits processor constrains every token at decode time to continue a span that occurs verbatim in the retrieved corpus. Text the corpus does not contain cannot be generated in the first place.</p><ul class="plain"><li><span class="tape done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-built"/></svg>BUILT</span> GIN&#x27;s SEAR layer constrains every generated token, at decode time, to continue a span that occurs verbatim in the retrieved corpus, using a custom llama-cpp-python logits processor. <a class="mono" href="../../projects/gin/index.html#gin-sear-decode-constraint">#gin-sear-decode-constraint</a></li><li><span class="tape done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-measured"/></svg>MEASURED</span> On a 20-query synthetic eval set, SEAR&#x27;s no-continuation arm produced no fabricated claims, while a plain RAG arm on the same set fabricated about a quarter of its claims. <a class="mono" href="../../projects/gin/index.html#gin-nc-baseline">#gin-nc-baseline</a></li><li><span class="tape done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-measured"/></svg>MEASURED</span> On six two-node queries over excerpts of public institutional and advocacy texts, the no-continuation arm kept both sides of each divergence and fabricated nothing, with Mistral-7B and with Qwen2.5-7B. <a class="mono" href="../../projects/gin/index.html#gin-divergence-realtext">#gin-divergence-realtext</a></li></ul><p class="seen">These entries live on the GIN page and are counted under GIN.</p></div><div class="sheet version"><h3><span class="vnum">Version 2</span> sear-demo: verify after generating</h3><p>The model writes freely. Each claim must then be entailed by its cited chunk (NLI), and every name and number must appear in that chunk, or the claim is dropped. When nothing survives, an explicit failure state replaces a guess.</p><ul class="plain"><li><span class="tape done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-built"/></svg>BUILT</span> sear-demo is a corpus-grounded answer pipeline with a verification gate: the model writes freely, then each claim must be entailed by its cited chunk (NLI) and every name and number must appear in it, or the claim is dropped; an explicit failure state replaces guessing. <a class="mono" href="#sear-demo-pipeline">#sear-demo-pipeline</a></li><li><span class="tape done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-built"/></svg>BUILT</span> On its 27-probe main set, sear-demo refused all 9 probes that should be refused, but 5 of its 14 failure states were on probes that had a supportable answer. <a class="mono" href="#sear-demo-results">#sear-demo-results</a></li><li><span class="tape failed"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-negative-result"/></svg>NEGATIVE-RESULT</span> When two retrieved chunks contradict each other, sear-demo does not notice: in 4 of 5 conflict probes it silently stated one value, each time the one the model knew from memory. <a class="mono" href="#sear-conflict-fork">#sear-conflict-fork</a></li></ul><p class="seen">The rest of this page covers this version; the counts on this page and on Home are its entries only.</p></div></div></section>
 <section><h2 class="band" id="exists">What exists<span class="strip">4 entries</span></h2><article class="tag done" id="sear-demo-pipeline" data-project="sear" data-state="BUILT" data-verification="LINKED">
 <p class="meta"><span class="tape done"><svg class="shape" aria-hidden="true" focusable="false"><use href="#s-built"/></svg>BUILT</span> <span class="stk stk-linked">LINKED</span> <a class="eid" href="../../ledger/index.html#sear-demo-pipeline">#sear-demo-pipeline</a> <span class="asof">as of 2026-10-09</span></p>
@@ -85,8 +105,8 @@
 
 </main>
 <footer class="foot">
-<p>Built 2026-11-24 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
-Machine-readable: <a href="../../ledger.json">ledger.json</a>.</p>
+<p>Built 2026-11-25 from content/ledger.yaml. STALE = as_of older than 90 days at build time.
+Machine-readable: <a href="../../ledger.json">ledger.json</a> · <a href="../../resume/index.html">Resume</a> · <a href="../../ai/index.html">AI disclosure</a>.</p>
 </footer>
 
 </body>

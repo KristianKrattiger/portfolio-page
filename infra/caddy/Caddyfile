@@ -13,10 +13,10 @@
 	}
 }
 
-# Optional canonical www -> apex redirect once you choose a domain:
-# http://www.yourdomain.com {
-# 	redir https://yourdomain.com{uri} permanent
-# }
+# Canonical www -> apex redirect (requires www.krattiger.dev routed to http://caddy:80 in Cloudflare Tunnel).
+http://www.krattiger.dev {
+	redir https://krattiger.dev{uri} permanent
+}
 
 :80 {
 	encode zstd gzip

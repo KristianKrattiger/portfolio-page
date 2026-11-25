@@ -43,7 +43,7 @@ STALE is computed at build time: `as_of` older than 90 days before the build dat
 `/` ledger-first home with computed counts · `/not-done/` · `/ledger/` with
 JS filter plus pre-rendered no-JS filter pages under `/ledger/<facet>/<value>/` ·
 `/projects/<slug>/` for gin, sear, receipts, latch in the fixed section order ·
-`/about/` · `/ai/` (AI disclosure, replacing the former Colophon page) · `/ledger.json`. (Build and hosting notes live in `COLOPHON.md` in the repository.)
+`/about/` · `/resume/` · `/ai/` (AI disclosure, replacing the former Colophon page) · `/robots.txt` · `/sitemap.xml` · `/ledger.json`. (Build and hosting notes live in `COLOPHON.md` in the repository.)
 
 ## Constraints
 Python 3 stdlib only. No third-party requests. Every page works without JS.
