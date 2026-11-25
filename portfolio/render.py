@@ -432,6 +432,13 @@ def about_dl(site, page, ctx):
 </dl>"""
 
 
+def status_stamp(proj):
+    if proj.get("status") == "completed":
+        label = proj.get("status_label") or "Completed"
+        return f' <span class="status-stamp">{e(label)}</span>'
+    return ""
+
+
 def project_rows(entries, site, page, group):
     rows = []
     for p in site["projects"]:
@@ -440,8 +447,12 @@ def project_rows(entries, site, page, group):
         mine = [x for x in entries if x["project"] == p["slug"]]
         desc = p.get("summary") or p["subtitle"]
         meta_html = f'<span class="pmeta">{e(p["meta"])}</span>' if p.get("meta") else ""
-        rows.append(f'<li class="projrow"><div><a class="pname" href="{rel(page, "projects/" + p["slug"] + "/index.html")}">'
-                    f'{e(p["name"])}</a><span class="psub">{e(desc)}</span>{meta_html}</div>{strip(mine)}</li>')
+        rows.append(
+            f'<li class="projrow"><div><div class="phead">'
+            f'<a class="pname" href="{rel(page, "projects/" + p["slug"] + "/index.html")}">{e(p["name"])}</a>'
+            f'{status_stamp(p)}</div>'
+            f'<span class="psub">{e(desc)}</span>{meta_html}</div>{strip(mine)}</li>'
+        )
     return '<ul class="projrows">' + "".join(rows) + "</ul>"
 
 
@@ -827,13 +838,18 @@ def page_project(proj, entries, ctx):
                        + text("UNKNOWN — author to supply") + "</p>")
     dis_block = f"<div class='sheet'><h3>Where sources disagree</h3><ul class='plain'>{dis_html}</ul></div>" if dis_html else ""
     meta_line = f'<p class="wallnote">{e(proj["meta"])}</p>' if proj.get("meta") else ""
+    closed_banner = (
+        f'<p class="closed-note"><span class="lbl">Closed</span>{e(proj["closed_note"])}</p>'
+        if proj.get("closed_note") else ""
+    )
 
     body = f"""
 <section class="lead">
-<h1 class="title">{e(proj['name'])}</h1>
+<h1 class="title">{e(proj['name'])}{status_stamp(proj)}</h1>
 <p class="tagline">{e(proj['subtitle'])}</p>
 {meta_line}
 <p class="wallnote">{strip(mine)}</p>
+{closed_banner}
 </section>
 <nav class="jump" aria-label="Sections"><ol>
 <li><a href="#overview">Overview</a></li><li><a href="#what">What it is</a></li><li><a href="#exists">What exists</a></li>
@@ -922,7 +938,7 @@ def page_resume(entries, ctx):
             meta = f' <span class="seen">({e(p["meta"])})</span>' if p.get("meta") else ""
             lis.append(
                 f'<li><strong><a href="{rel(page, "projects/" + p["slug"] + "/index.html")}">{e(p["name"])}</a></strong>'
-                f'{meta} — {e(p.get("summary") or p["subtitle"])} '
+                f'{status_stamp(p)}{meta} — {e(p.get("summary") or p["subtitle"])} '
                 f'<span class="seen">[Done {pfc["done"]} · Failed {pfc["failed"]} · Unfinished {pfc["unfinished"]}]</span></li>'
             )
         return '<ul class="plain">' + "".join(lis) + "</ul>"

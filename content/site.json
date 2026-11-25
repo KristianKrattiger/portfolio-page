@@ -19,7 +19,8 @@
   ],
   "public_repos": {
     "GIN": "https://github.com/KristianKrattiger/GIN",
-    "receipts": "https://github.com/KristianKrattiger/receipts"
+    "receipts": "https://github.com/KristianKrattiger/receipts",
+    "PriceRiot": "https://github.com/KristianKrattiger/PriceRiot"
   },
   "linkable_shas": {
     "GIN": [
@@ -27,6 +28,9 @@
     ],
     "receipts": [
       "9a0eeb8"
+    ],
+    "PriceRiot": [
+      "650c8f4"
     ]
   },
   "extra_links": {
@@ -515,76 +519,82 @@
       "slug": "priceriot",
       "name": "PriceRiot",
       "group": "other",
-      "subtitle": "C++17 discrete-event retail simulation core, POS CSV ETL pipeline, and analytics stack",
-      "summary": "Combines a C++17/pybind11 A* navmesh store-simulation engine with a POS transaction cleaning and SKU-mapping ETL pipeline, exposed through FastAPI/Vue 3 and Streamlit decision-support dashboards.",
-      "meta": "C++17 · pybind11 · Python ETL · FastAPI + Vue 3 · Streamlit",
+      "status": "completed",
+      "status_label": "Completed",
+      "closed_note": "Closed as v1 on 2026-11-25 (commit 650c8f4): headless C++17 simulation core, dynamic pricing elasticity, parameter-sweep API, held-out POS calibration & elasticity evaluations, and full-stack tests (27 pytest + 16 Vitest) are complete. Automated layout optimization (P3.9) and built-in ML (P4) are formally closed as out of scope.",
+      "subtitle": "C++17 discrete-event retail simulation core, dynamic pricing & sweeps API, POS ETL, and held-out calibration eval",
+      "summary": "Completed v1 retail simulation engine (C++17/pybind11 A* navmesh, dynamic price elasticity, parameter-sweep API, POS CSV ETL, FastAPI + Vue 3 / Streamlit) validated with held-out synthetic POS calibration, controlled pricing-elasticity sweeps, and 43 full-stack tests.",
+      "meta": "Completed v1 · C++17 · pybind11 · Python ETL · FastAPI + Vue 3 · Streamlit · 27 pytest / 16 Vitest",
       "what_it_is_ids": [
         "priceriot-engine",
-        "priceriot-pos-etl"
+        "priceriot-pos-etl",
+        "priceriot-pricing-sweeps-tests",
+        "priceriot-calibration-holdout",
+        "priceriot-pricing-elasticity"
       ],
       "case_study": {
-        "problem": "Retail analytics and queuing models often lack clean, repeatable transaction datasets tied to physical floor layouts. PriceRiot pairs an ETL parameter extractor over historical POS CSVs with a C++17 discrete-event agent simulation core exposed cleanly to Python.",
+        "problem": "Retail analytics, staffing, and pricing studies often lack repeatable transaction datasets tied to physical store layouts and deterministic controls. PriceRiot pairs a POS CSV parameter-extraction ETL with a headless C++17 discrete-event agent engine, dynamic SKU pricing, multi-run sweeps, and out-of-sample evaluation.",
         "flow": [
           {
             "stage": "Propose / Ingest",
-            "title": "POS CSV ETL & YAML Store Spec",
-            "detail": "Cleans raw POS transaction exports, maps SKUs, extracts arrival/basket parameters, and loads YAML store geometry."
+            "title": "POS CSV ETL, Pricing & YAML Spec",
+            "detail": "Cleans POS transaction exports, maps SKUs, fits arrival parameters out-of-sample, and configures YAML layouts, staffing, and SKU price multipliers."
           },
           {
             "stage": "Deterministic Core",
-            "title": "C++17 Engine + pybind11 Boundary",
-            "detail": "Runs deterministic A* navmesh pathfinding for customer and worker agents across typed C++/Python bindings."
+            "title": "C++17 Engine, Elasticity & Sweeps",
+            "detail": "Runs deterministic A* navmesh agents with price-elasticity acceptance across typed pybind11 bindings, multi-day TemporalScheduler, and /api/sweeps."
           },
           {
-            "stage": "Commit / Analyze",
-            "title": "Synthetic Transaction Logs & Dashboards",
-            "detail": "Outputs structured transaction and queue logs to FastAPI/Vue 3 run comparison, Streamlit dashboards, and Jupyter notebooks."
+            "stage": "Commit / Verify",
+            "title": "Calibrated Logs, Dashboards & Eval",
+            "detail": "Persists runs/sweeps to SQLite, exports CSVs to FastAPI/Vue 3 and Streamlit, and scores held-out calibration and elasticity invariants."
           }
         ],
-        "tradeoff": "The simulation kernel, ETL ingestion pipeline, and analytics apps all run, but extracted parameters have not yet been calibrated or scored against held-out real store sales. Dynamic pricing hooks, queued-run worker updates (POST /api/runs/{id}/workers), layout optimization, and front-end tests remain unbuilt.",
+        "tradeoff": "Held-out synthetic POS calibration matched 6 schedule-aligned Mon-Sat open days within -3.22% transactions and +4.03% revenue (0.0325 intraday TVD), and controlled price markups produced monotonic demand drops (-0.414 to -0.941 arc elasticity) with stable control SKUs. Because extract_params() transfers only spawn_interval_seconds, SKU top-10 overlap stayed at 38% and a Sunday schedule mismatch widened 7-day transaction error to -15.23%; fit to real (non-synthetic) store data is not tested. Automated layout optimization (P3.9) and built-in ML (P4) are formally closed as out of scope for v1.",
         "artifacts": [
           {
-            "label": "C++17 pybind11 module bindings",
+            "label": "Held-out calibration & elasticity report (Tier-1)",
             "repo": "PriceRiot",
             "branch": "main",
-            "sha": "2870b22",
-            "path": "cxx/bindings",
+            "sha": "650c8f4",
+            "path": "data/eval/CALIBRATION_REPORT.md",
+            "entry_id": "priceriot-calibration-holdout"
+          },
+          {
+            "label": "Reproducible evaluation harness (21d->7d + elasticity)",
+            "repo": "PriceRiot",
+            "branch": "main",
+            "sha": "650c8f4",
+            "path": "scripts/evaluate_calibration.py",
+            "entry_id": "priceriot-pricing-elasticity"
+          },
+          {
+            "label": "C++17 pybind11 bindings & dynamic pricing hooks",
+            "repo": "PriceRiot",
+            "branch": "main",
+            "sha": "650c8f4",
+            "path": "cxx/bindings/priceriot_bindings.cpp",
             "entry_id": "priceriot-engine"
           },
           {
-            "label": "POS ingestion & SKU-mapping ETL",
+            "label": "Multi-run parameter sweeps & FastAPI routes",
             "repo": "PriceRiot",
             "branch": "main",
-            "sha": "2870b22",
-            "path": "python/ingestion",
-            "entry_id": "priceriot-pos-etl"
-          },
-          {
-            "label": "FastAPI backend routes",
-            "repo": "PriceRiot",
-            "branch": "main",
-            "sha": "2870b22",
-            "path": "python/webapp/app.py",
-            "entry_id": "priceriot-analysis-apps"
-          },
-          {
-            "label": "Streamlit analytics dashboard",
-            "repo": "PriceRiot",
-            "branch": "main",
-            "sha": "2870b22",
-            "path": "python/dashboard/app.py",
-            "entry_id": "priceriot-analysis-apps"
+            "sha": "650c8f4",
+            "path": "python/analytics/sweeps.py",
+            "entry_id": "priceriot-pricing-sweeps-tests"
           }
         ]
       },
       "open_questions": [
         {
-          "q": "Do the simulated shoppers reproduce a real store's transactions?",
+          "q": "Would fitting per-SKU popularity and basket-size distributions into the C++ shopper state machines close the 38% top-10 SKU overlap gap, and how does the engine calibrate against real (non-synthetic) store POS exports?",
           "ids": [
-            "priceriot-engine",
+            "priceriot-calibration-holdout",
             "priceriot-pos-etl"
           ],
-          "resolves": "Fitting extracted parameters on one slice of POS data and scoring the simulation on a held-out slice."
+          "resolves": "Calibrating on real retail POS transactions (out of scope for v1 closure; PriceRiot v1 is closed)."
         }
       ]
     },
@@ -774,10 +784,12 @@
           ]
         },
         {
-          "name": "ETL pipelines & synthetic transaction simulation (C++17, pybind11, Python)",
+          "name": "ETL pipelines, held-out calibration & synthetic transaction simulation (C++17, pybind11, Python)",
           "backed_by": [
             "priceriot-pos-etl",
-            "priceriot-engine"
+            "priceriot-engine",
+            "priceriot-calibration-holdout",
+            "priceriot-pricing-elasticity"
           ]
         },
         {

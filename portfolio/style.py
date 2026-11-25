@@ -163,6 +163,10 @@ h3.fam .n{{font-family:var(--mono);font-weight:400;font-size:.9rem}}
 .projrow:last-child{{border-bottom:1.5px solid var(--wall-rule)}}
 .projrow .pname{{font-family:var(--cond);font-weight:800;font-size:clamp(1.6rem,4vw,2.3rem);text-transform:uppercase;line-height:1;text-decoration:none}}
 .projrow .pname:hover{{text-decoration:underline;text-decoration-thickness:3px}}
+.projrow .phead{{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px}}
+.status-stamp{{display:inline-block;font-family:var(--mono);font-weight:700;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:2px 7px;border:1.5px solid var(--wall-ink);color:var(--wall-ink);vertical-align:middle;white-space:nowrap}}
+.sheet .status-stamp{{border-color:var(--ink);color:var(--ink)}}
+.closed-note{{margin:12px 0 0;padding:10px 14px;border:1.5px solid var(--rule);background:var(--tag);color:var(--ink);font-size:.94rem;max-width:74ch}}
 .projrow .psub{{display:block;font-size:.98rem;color:var(--wall-ink);margin-top:6px;font-family:var(--serif);text-transform:none;font-weight:400;max-width:68ch}}
 .projrow .pmeta{{display:block;font-family:var(--mono);font-size:.76rem;color:var(--wall-ink-2);margin-top:4px}}
 /* compact home findings */
